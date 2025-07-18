@@ -39,6 +39,8 @@ DEMOBACKEND/
 ├─ main.py
 ├─ tba_fetcher.py
 ├─ logos/
+
+run.py
 ```
 
 ## Development Setup
