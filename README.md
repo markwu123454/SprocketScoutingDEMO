@@ -14,8 +14,8 @@ interactive match input, and TBA integration.
 
 Planned features:
 
-- 🔔 Live mobile notifications
-- 📅 Match schedule auto-matching and validation
+- Live mobile notifications
+- Match schedule auto-matching and validation
 
 ## Tech Stack
 
