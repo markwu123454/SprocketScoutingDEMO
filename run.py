@@ -23,7 +23,7 @@ def run_process(name, cmd, cwd):
 
 project_root = os.path.abspath(os.path.dirname(__file__))
 frontend_proc = run_process("FRONTEND", ["npm", "run", "dev"], os.path.join(project_root, "DEMOFRONTEND"))
-backend_proc = run_process("BACKEND", ["uvicorn", "main:app", "--reload"], os.path.join(project_root, "DEMOBACKEND"))
+backend_proc = run_process("BACKEND", ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000", "--reload"], os.path.join(project_root, "DEMOBACKEND"))
 
 try:
     frontend_proc.wait()

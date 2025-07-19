@@ -1,10 +1,6 @@
-type TeamInfo = {
-    number: number
-    name: string
-    logo: string
-}
+import type {TeamInfo} from '@/types'
 
-const url = "http://127.0.0.1:8000"
+const url = "http://192.168.1.127:8000"
 
 export function useScoutingSync() {
     const patchData = async (
@@ -14,11 +10,11 @@ export function useScoutingSync() {
         phase?: string
     ): Promise<boolean> => {
         try {
-            const body: any = { updates }
+            const body: any = {updates}
             if (phase) body.phase = phase
             const res = await fetch(`${url}/scouting/${match}/${team}`, {
                 method: 'PATCH',
-                headers: { 'Content-Type': 'application/json' },
+                headers: {'Content-Type': 'application/json'},
                 body: JSON.stringify(body),
             })
             return res.ok
@@ -47,7 +43,7 @@ export function useScoutingSync() {
     ): Promise<TeamInfo[]> => {
         try {
             const res = await fetch(`${url}/match/${match}/${alliance}`)
-            if (!res.ok) throw new Error('Team list fetch failed')
+            if (!res.ok) console.error('Team list fetch failed')
             const json = await res.json()
             return json.teams
         } catch (err) {
@@ -56,20 +52,17 @@ export function useScoutingSync() {
         }
     }
 
-    const getClaimedTeams = async (
-        match: string,
-        teams: TeamInfo[],
-        scouter: string
-    ): Promise<number[]> => {
-        const claimed: number[] = []
-        for (const t of teams) {
-            const status = await getStatus(match, t.number)
-            if (status && status.scouter !== scouter && status.status !== 'unclaimed') {
-                claimed.push(t.number)
-            }
+    // in useScoutingSync
+    const getAllStatuses = async (): Promise<Record<string, Record<number, { status: string; scouter: string | null }>> | null> => {
+        try {
+            const res = await fetch(`${url}/status/None/None`)
+            return res.ok ? await res.json() : null
+        } catch (err) {
+            console.error('getAllStatuses failed:', err)
+            return null
         }
-        return claimed
     }
 
-    return { patchData, getStatus, getTeamList, getClaimedTeams }
+
+    return {patchData, getStatus, getTeamList, getAllStatuses}
 }
