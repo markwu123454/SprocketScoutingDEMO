@@ -143,36 +143,29 @@ def submit_data(match: str, team: int, full_data: FullData):
 
 @app.get("/match/{match}/{alliance}")
 def get_match_info(match: str, alliance: str):
-    red_teams_1 = [7157, 4141, 3473]
-    blue_teams_1 = [254, 1678, 118]
-    red_teams_2 = [1690, 4414, 2073]
-    blue_teams_2 = [1323, 2910, 4272]
+    event_key = "2025caoc"  # hardcoded or pull from config if needed
 
-    if match == "1":
-        red_teams, blue_teams = red_teams_1, blue_teams_1
-    elif match == "2":
-        red_teams, blue_teams = red_teams_2, blue_teams_2
-    else:
-        red_teams, blue_teams = red_teams_1, blue_teams_1
-
-    selected = red_teams if alliance == "red" else blue_teams
+    try:
+        team_numbers = tba_fetcher.get_match_alliance_teams(event_key, int(match), alliance)
+    except (FileNotFoundError, ValueError) as e:
+        raise HTTPException(status_code=404, detail=str(e))
 
     return {
         "match": match,
         "alliance": alliance,
         "teams": [
             {
-                "number": t,
-                "name": tba_fetcher.fetch_team_name("frc" + str(t)),
-                "logo": tba_fetcher.resolve_team_logo(t),
+                "number": int(t),
+                "name": tba_fetcher.fetch_team_name(f"frc{t}"),
+                "logo": tba_fetcher.resolve_team_logo(int(t)),
                 "scouter": (
-                    scouting_db[match][t].get("scouter")
-                    if match in scouting_db and t in scouting_db[match]
-                    else None
+                    scouting_db.get(match, {}).get(int(t), {}).get("scouter")
                 ),
-            } for t in selected
-        ]
+            }
+            for t in team_numbers
+        ],
     }
+
 
 
 @app.get("/teams/{team}")

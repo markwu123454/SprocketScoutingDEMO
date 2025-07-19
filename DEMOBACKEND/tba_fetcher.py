@@ -21,7 +21,6 @@ def fetch_event_matches(event_key: str) -> List[Dict[str, Any]]:
     r.raise_for_status()
     return r.json()
 
-
 def resolve_team_logo(team_number: int, year: str = DEFAULT_YEAR) -> str:
     team_key = f"frc{team_number}"
     local_path = LOGO_DIR / f"{team_key}.png"
@@ -42,7 +41,6 @@ def resolve_team_logo(team_number: int, year: str = DEFAULT_YEAR) -> str:
         encoded = base64.b64encode(f.read()).decode("utf-8")
     return f"data:image/png;base64,{encoded}"
 
-
 def fetch_team_logo(team_key: str, year: str) -> (Optional[str], Optional[bool]):
     url = f"{TBA_BASE_URL}/team/{team_key}/media/{year}"
     r = requests.get(url, headers=HEADERS)
@@ -56,7 +54,6 @@ def fetch_team_logo(team_key: str, year: str) -> (Optional[str], Optional[bool])
             return item["direct_url"], False
     return None, None
 
-
 def save_logo(team_key: str, data: str, is_base64: bool) -> None:
     LOGO_DIR.mkdir(exist_ok=True)
     path: Path = LOGO_DIR / f"{team_key}.png"
@@ -68,7 +65,6 @@ def save_logo(team_key: str, data: str, is_base64: bool) -> None:
         if r.status_code == 200:
             with open(path, "wb") as f:
                 f.write(r.content)
-
 
 def fetch_team_name(team_key: str) -> Dict[str, Optional[str]]:
     url = f"{TBA_BASE_URL}/team/{team_key}"
@@ -84,19 +80,85 @@ def fetch_team_name(team_key: str) -> Dict[str, Optional[str]]:
         "country": team_info.get("country")
     }
 
+def get_match_alliance_teams(event_key: str, match_number: int, alliance: str) -> List[str]:
+    event_csv = Path(f"{event_key}.csv")
+    if not event_csv.exists():
+        raise FileNotFoundError(f"CSV file for event '{event_key}' not found.")
+
+    if alliance not in ("red", "blue"):
+        raise ValueError("Alliance must be 'red' or 'blue'")
+
+    with open(event_csv, newline='', encoding="utf-8") as f:
+        reader = csv.DictReader(f)
+        for row in reader:
+            if row["comp_level"] == "qm" and int(row["match_number"]) == match_number:
+                return [team_key[3:] if team_key.startswith("frc") else team_key for team_key in row[alliance].split(",")]
+
+    raise ValueError(f"Quals match {match_number} not found in event '{event_key}'.")
 
 def get_event_data(event_key: str) -> Dict[str, Any]:
-    year: str = event_key[:4]
-    matches: List[Dict[str, Any]] = fetch_event_matches(event_key)
-    matches.sort(key=lambda m: (m["comp_level"], m["match_number"]))
-
-    all_teams: set[str] = set()
-    for match in matches:
-        red = match["alliances"]["red"]["team_keys"]
-        blue = match["alliances"]["blue"]["team_keys"]
-        all_teams.update(red + blue)
-
+    year = event_key[:4]
+    event_csv = Path(f"{event_key}.csv")
+    matches: List[Dict[str, Any]] = []
     logos_downloaded: List[str] = []
+    all_teams: set[str] = set()
+
+    # If CSV exists, load from it
+    if event_csv.exists():
+        with open(event_csv, newline='', encoding="utf-8") as f:
+            reader = csv.DictReader(f)
+            for row in reader:
+                match = {
+                    "comp_level": row["comp_level"],
+                    "match_number": row["match_number"],
+                    "red": row["red"].split(","),
+                    "blue": row["blue"].split(","),
+                    "timestamp": float(row["timestamp"])
+                }
+                matches.append({
+                    "comp_level": match["comp_level"],
+                    "match_number": match["match_number"],
+                    "alliances": {
+                        "red": {"team_keys": match["red"]},
+                        "blue": {"team_keys": match["blue"]},
+                    },
+                    "actual_time": match["timestamp"]
+                })
+                all_teams.update(match["red"] + match["blue"])
+    else:
+        # Fetch from TBA
+        matches_raw = fetch_event_matches(event_key)
+        matches_raw.sort(key=lambda m: (m["comp_level"], m["match_number"]))
+
+        with open(event_csv, "w", newline='', encoding="utf-8") as f:
+            writer = csv.DictWriter(f, fieldnames=["comp_level", "match_number", "red", "blue", "timestamp"])
+            writer.writeheader()
+
+            for m in matches_raw:
+                red = m["alliances"]["red"]["team_keys"]
+                blue = m["alliances"]["blue"]["team_keys"]
+                timestamp = m.get("actual_time") or m.get("predicted_time") or m.get("time") or 0
+
+                writer.writerow({
+                    "comp_level": m["comp_level"],
+                    "match_number": m["match_number"],
+                    "red": ",".join(red),
+                    "blue": ",".join(blue),
+                    "timestamp": timestamp,
+                })
+
+                matches.append({
+                    "comp_level": m["comp_level"],
+                    "match_number": m["match_number"],
+                    "alliances": {
+                        "red": {"team_keys": red},
+                        "blue": {"team_keys": blue},
+                    },
+                    "actual_time": timestamp
+                })
+                all_teams.update(red + blue)
+
+    # Cache team logos
     for team_key in sorted(all_teams):
         logo_data, is_base64 = fetch_team_logo(team_key, year)
         if logo_data:
@@ -135,11 +197,13 @@ if __name__ == "__main__":
         team_info_list.append(info)
 
     # Write to CSV
-    with open("team_info.csv", "w", newline='', encoding="utf-8") as f:
+    file_exists = os.path.exists("team_info.csv")
+    with open("team_info.csv", "a", newline='', encoding="utf-8") as f:
         writer = csv.DictWriter(f, fieldnames=[
             "team_number", "nickname", "name", "city", "state_prov", "country"
         ])
-        writer.writeheader()
+        if not file_exists:
+            writer.writeheader()
         writer.writerows(team_info_list)
 
     print(f"Saved info for {len(team_info_list)} teams to team_info.csv")

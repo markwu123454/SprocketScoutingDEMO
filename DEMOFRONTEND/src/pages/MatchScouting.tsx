@@ -314,7 +314,7 @@ export function PreMatch({
                                 <span className='text-xl'>{`${team.name.nickname}(${team.number})`}</span>
                                 {isClaimed && (
                                     <span className="text-sm">
-                                        (Claimed by {team.scouter})
+                                        {`Scouting by ${team.scouter === SCOUTER ? 'you' : team.scouter}`}
                                     </span>
                                 )}
                             </button>
