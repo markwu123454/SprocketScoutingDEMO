@@ -17,7 +17,7 @@ export default function App() {
                 <Route path="/scouting/match" element={<MatchScoutingLayout />} />
                 <Route path="/scouting/pit" element={<PitScoutingLayout />} />
                 <Route path="/data/*" element={<DataLayout />} />
-                <Route path="/scouting/monitor*" element={<MatchMonitoringLayout />} />
+                <Route path="/scouting/monitor/*" element={<MatchMonitoringLayout />} />
             </Routes>
         </BrowserRouter>
     )

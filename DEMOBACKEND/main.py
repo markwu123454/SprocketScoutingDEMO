@@ -98,22 +98,32 @@ def patch_data(match: str, team: int, patch: PatchData):
             "lastModified": datetime.now(timezone.utc).isoformat()
         }
 
+    unclaimed = False
     for key, value in patch.updates.items():
         parts = key.split('.')
         target = scouting_db[match][team]["data"]
+
+        if key == "scouter":
+            if value == "__UNCLAIM__":
+                unclaimed = True
+            else:
+                scouting_db[match][team]["scouter"] = value
+            continue  # skip storing into .data
+
         for part in parts[:-1]:
             target = target.setdefault(part, {})
-
-        if key == "scouter" and value == "__UNCLAIM__":
-            target[parts[-1]] = None
-            scouting_db[match][team]["status"] = "unclaimed"
-        else:
-            target[parts[-1]] = value
+        target[parts[-1]] = value
 
     if patch.phase:
         scouting_db[match][team]["status"] = patch.phase
 
+
+    if unclaimed:
+        scouting_db[match][team]["scouter"] = None
+        scouting_db[match][team]["status"] = "unclaimed"
+
     scouting_db[match][team]["lastModified"] = datetime.now(timezone.utc).isoformat()
+    print("PATCH:", match, team, scouting_db[match][team]["status"])
     return {"status": "patched"}
 
 
@@ -156,7 +166,7 @@ def get_match_info(match: str, alliance: str):
                 "name": tba_fetcher.fetch_team_name("frc" + str(t)),
                 "logo": tba_fetcher.resolve_team_logo(t),
                 "scouter": (
-                    scouting_db[match][t]["data"].get("scouter")
+                    scouting_db[match][t].get("scouter")
                     if match in scouting_db and t in scouting_db[match]
                     else None
                 ),
@@ -178,14 +188,14 @@ def get_team_info(team: int):
 
 @app.get("/status/{match}/{team}")
 def get_status(match: str, team: str):  # team is str to allow "None"
-    if match == "None" and team == "None":
+    if match == "All" and team == "All":
         full_status = {}
         for m, teams in scouting_db.items():
             full_status[m] = {}
             for t, data in teams.items():
                 full_status[m][t] = {
                     "status": data.get("status", "prematch"),
-                    "scouter": data.get("data", {}).get("scouter")
+                    "scouter": data.get("scouter")
                 }
         return full_status
 

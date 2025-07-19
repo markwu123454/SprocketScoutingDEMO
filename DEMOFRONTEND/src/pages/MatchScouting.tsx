@@ -24,9 +24,10 @@ const initialScoutingData: ScoutingData = {
         l2: 0,
         l3: 0,
         l4: 0,
-        missed: 0,
+        coralMissed: 0,
         reef: 0,
         barge: 0,
+        algaeMissed: 0,
     },
 
     endgame: {
@@ -74,7 +75,7 @@ export default function MatchScoutingLayout() {
         }
          */
         setIsSubmitting(true)
-        await patchData(scoutingData.match, scoutingData.teamNumber!, {}, "completed")
+        await patchData(scoutingData.match, scoutingData.teamNumber!, {}, 'submitted')
         await new Promise((resolve) => setTimeout(resolve, 1000));
         setScoutingData(initialScoutingData)
         setPhaseIndex(0) // go back to pre-match
@@ -82,15 +83,9 @@ export default function MatchScoutingLayout() {
     }
 
     const handleNext = async () => {
-        if (phaseIndex < PHASE_ORDER.length - 1) {
-            const nextIndex = phaseIndex + 1
-            setPhaseIndex(nextIndex)
-            await patchData(scoutingData.match, scoutingData.teamNumber!, {}, PHASE_ORDER[nextIndex])
-        } else {
-            console.log('Submit match data')
-            // TODO: Change to actual submit logic
-
-        }
+        const nextIndex = phaseIndex + 1
+        setPhaseIndex(nextIndex)
+        await patchData(scoutingData.match, scoutingData.teamNumber!, {}, PHASE_ORDER[nextIndex])
     }
 
     const handleBack = async () => {
@@ -293,7 +288,7 @@ export function PreMatch({
                         }
 
                         const isSelected = teamNumber === team.number
-                        const isClaimed = team.scouter !== null && team.scouter !== SCOUTER
+                        const isClaimed = team.scouter !== null && team.number !== teamNumber
 
                         return (
                             <button
@@ -371,7 +366,7 @@ function AutoPhase({data, setData}: {
     data: ScoutingData,
     setData: React.Dispatch<React.SetStateAction<ScoutingData>>
 }) {
-    const {patchData, getTeamList} = useScoutingSync()
+    const {patchData} = useScoutingSync()
     const coralFields = ['l4', 'l3', 'l2', 'l1', 'missed'] as const
     const otherFields = ['reef', 'barge'] as const
 
@@ -448,7 +443,7 @@ function TeleopPhase({data, setData}: {
     data: ScoutingData,
     setData: React.Dispatch<React.SetStateAction<ScoutingData>>
 }) {
-    const {patchData, getTeamList} = useScoutingSync()
+    const {patchData} = useScoutingSync()
     const coralFields: (keyof ScoutingData['teleop'])[] = ['l4', 'l3', 'l2', 'l1', 'coralMissed']
     const otherFields: (keyof ScoutingData['teleop'])[] = ['reef', 'barge', 'algaeMissed']
 

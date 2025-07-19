@@ -12,6 +12,7 @@ export function useScoutingSync() {
         try {
             const body: any = {updates}
             if (phase) body.phase = phase
+            console.log(body.phase)
             const res = await fetch(`${url}/scouting/${match}/${team}`, {
                 method: 'PATCH',
                 headers: {'Content-Type': 'application/json'},
@@ -55,7 +56,7 @@ export function useScoutingSync() {
     // in useScoutingSync
     const getAllStatuses = async (): Promise<Record<string, Record<number, { status: string; scouter: string | null }>> | null> => {
         try {
-            const res = await fetch(`${url}/status/None/None`)
+            const res = await fetch(`${url}/status/All/All`)
             return res.ok ? await res.json() : null
         } catch (err) {
             console.error('getAllStatuses failed:', err)
