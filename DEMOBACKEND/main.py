@@ -155,8 +155,8 @@ def get_match_info(match: str, alliance: str):
         "teams": [
             {
                 "number": int(t),
-                "name": tba_fetcher.fetch_team_name(f"frc{t}"),
-                "logo": tba_fetcher.resolve_team_logo(int(t)),
+                "name": tba_fetcher.fetch_team_name_cached(f"frc{t}"),
+                "logo": tba_fetcher.resolve_team_logo_cached(int(t)),
                 "scouter": (
                     scouting_db.get(match, {}).get(int(t), {}).get("scouter")
                 ),

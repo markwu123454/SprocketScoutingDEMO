@@ -6,6 +6,7 @@ import csv
 import os
 from typing import List, Optional, Dict, Any
 from dotenv import load_dotenv
+from functools import lru_cache
 load_dotenv()
 
 TBA_BASE_URL: str = "https://www.thebluealliance.com/api/v3"
@@ -40,6 +41,10 @@ def resolve_team_logo(team_number: int, year: str = DEFAULT_YEAR) -> str:
     with open(local_path, "rb") as f:
         encoded = base64.b64encode(f.read()).decode("utf-8")
     return f"data:image/png;base64,{encoded}"
+
+@lru_cache(maxsize=512)
+def resolve_team_logo_cached(team_number: int, year: str = DEFAULT_YEAR) -> str:
+    return resolve_team_logo(team_number, year)
 
 def fetch_team_logo(team_key: str, year: str) -> (Optional[str], Optional[bool]):
     url = f"{TBA_BASE_URL}/team/{team_key}/media/{year}"
@@ -80,21 +85,40 @@ def fetch_team_name(team_key: str) -> Dict[str, Optional[str]]:
         "country": team_info.get("country")
     }
 
-def get_match_alliance_teams(event_key: str, match_number: int, alliance: str) -> List[str]:
+@lru_cache(maxsize=512)
+def fetch_team_name_cached(team_key: str) -> dict:
+    return fetch_team_name(team_key)
+
+_cached_matches: dict[int, dict[str, list[str]]] = {}
+
+def load_event_data(event_key: str):
     event_csv = Path(f"{event_key}.csv")
     if not event_csv.exists():
         raise FileNotFoundError(f"CSV file for event '{event_key}' not found.")
 
-    if alliance not in ("red", "blue"):
-        raise ValueError("Alliance must be 'red' or 'blue'")
-
+    matches = {}
     with open(event_csv, newline='', encoding="utf-8") as f:
         reader = csv.DictReader(f)
         for row in reader:
-            if row["comp_level"] == "qm" and int(row["match_number"]) == match_number:
-                return [team_key[3:] if team_key.startswith("frc") else team_key for team_key in row[alliance].split(",")]
+            if row["comp_level"] == "qm":
+                match_num = int(row["match_number"])
+                matches[match_num] = {
+                    "red": [t[3:] if t.startswith("frc") else t for t in row["red"].split(",")],
+                    "blue": [t[3:] if t.startswith("frc") else t for t in row["blue"].split(",")],
+                }
+    return matches
 
-    raise ValueError(f"Quals match {match_number} not found in event '{event_key}'.")
+def get_match_alliance_teams(event_key: str, match_number: int, alliance: str) -> list[str]:
+    if not _cached_matches:
+        _cached_matches.update(load_event_data(event_key))
+
+    if alliance not in ("red", "blue"):
+        raise ValueError("Alliance must be 'red' or 'blue'")
+
+    if match_number not in _cached_matches:
+        raise ValueError(f"Quals match {match_number} not found")
+
+    return _cached_matches[match_number][alliance]
 
 def get_event_data(event_key: str) -> Dict[str, Any]:
     year = event_key[:4]
