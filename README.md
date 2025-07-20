@@ -37,6 +37,10 @@ Planned features:
 ### Communication
 * HTTP Client-Server communication
 
+## FlowCharts:
+
+![Diagram](https://lucid.app/publicSegments/view/1887b93a-9819-4fe0-822c-1f8e0046f64b/image.png)
+
 ## Directory Structure
 
 ```
