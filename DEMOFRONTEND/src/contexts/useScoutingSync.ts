@@ -1,8 +1,45 @@
 import type {TeamInfo} from '@/types'
 
 const url = "http://192.168.1.22:8000"
+const UUID_COOKIE = "scouting_uuid"
+const NAME_COOKIE = "scouting_name"
 
+// --- Cookie utilities ---
+function setCookie(name: string, value: string, days: number) {
+    const expires = new Date(Date.now() + days * 864e5).toUTCString()
+    document.cookie = `${name}=${value}; expires=${expires}; path=/`
+}
+
+function getCookie(name: string): string | null {
+    const match = document.cookie.match(new RegExp('(^| )' + name + '=([^;]+)'))
+    return match ? match[2] : null
+}
+
+function deleteCookie(name: string) {
+    document.cookie = `${name}=; Max-Age=0; path=/`
+}
+
+function getAuthHeaders(): HeadersInit {
+    const uuid = getCookie(UUID_COOKIE)
+    const headers: HeadersInit = {
+        'Content-Type': 'application/json',
+    }
+    if (uuid) headers['x-uuid'] = uuid
+    return headers
+}
+
+export function getScouterName(): string | null {
+    console.log(getCookie(NAME_COOKIE), getCookie(UUID_COOKIE))
+    return getCookie(NAME_COOKIE)
+}
+
+
+// --- Hook ---
 export function useScoutingSync() {
+    let cachedName: string | null = null
+
+    const getName = (): string | null => cachedName
+
     const patchData = async (
         match: string,
         team: number,
@@ -12,10 +49,9 @@ export function useScoutingSync() {
         try {
             const body: any = {updates}
             if (phase) body.phase = phase
-            console.log(body.phase)
             const res = await fetch(`${url}/scouting/${match}/${team}`, {
                 method: 'PATCH',
-                headers: {'Content-Type': 'application/json'},
+                headers: getAuthHeaders(),
                 body: JSON.stringify(body),
             })
             return res.ok
@@ -30,7 +66,9 @@ export function useScoutingSync() {
         team: number
     ): Promise<any | null> => {
         try {
-            const res = await fetch(`${url}/status/${match}/${team}`)
+            const res = await fetch(`${url}/status/${match}/${team}`, {
+                headers: getAuthHeaders(),
+            })
             return res.ok ? await res.json() : null
         } catch (err) {
             console.error('getStatus failed:', err)
@@ -43,14 +81,15 @@ export function useScoutingSync() {
         alliance: 'red' | 'blue'
     ): Promise<TeamInfo[]> => {
         try {
-            const res = await fetch(`${url}/match/${match}/${alliance}`)
+            const res = await fetch(`${url}/match/${match}/${alliance}`, {
+                headers: getAuthHeaders(),
+            })
             if (!res.ok) {
                 console.warn(`getTeamList: ${res.status} ${res.statusText}`)
                 return []
             }
 
             const json = await res.json()
-
             if (!json || !Array.isArray(json.teams)) {
                 console.error("getTeamList: Malformed response", json)
                 return []
@@ -63,14 +102,15 @@ export function useScoutingSync() {
         }
     }
 
-
-    // in useScoutingSync
     const getAllStatuses = async (): Promise<Record<string, Record<number, {
-        status: string;
-        scouter: string | null
-    }>> | null> => {
+            status: string;
+            scouter: string | null
+        }>>
+        | null> => {
         try {
-            const res = await fetch(`${url}/status/All/All`)
+            const res = await fetch(`${url}/status/All/All`, {
+                headers: getAuthHeaders(),
+            })
             return res.ok ? await res.json() : null
         } catch (err) {
             console.error('getAllStatuses failed:', err)
@@ -78,16 +118,84 @@ export function useScoutingSync() {
         }
     }
 
+    const login = async (passcode: string): Promise<{
+        success: boolean
+        name?: string
+        error?: string
+        permissions?: {
+            dev: boolean
+            admin: boolean
+            match_scouting: boolean
+            pit_scouting: boolean
+        }
+    }> =>
+    {
+        deleteCookie(UUID_COOKIE)
+        deleteCookie(NAME_COOKIE)
 
-    return {patchData, getStatus, getTeamList, getAllStatuses}
+        try {
+            const res = await fetch(`${url}/auth/login`, {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({passcode}),
+            })
+
+            if (!res.ok) {
+                return {success: false, error: `Login failed: ${res.statusText}`}
+            }
+
+            const json = await res.json()
+            setCookie(UUID_COOKIE, json.uuid, 1)
+            setCookie(NAME_COOKIE, json.name, 1)
+            cachedName = json.name
+            return {
+                success: true,
+                name: json.name,
+                permissions: json.permissions
+            }
+        } catch (err) {
+            console.error("login failed:", err)
+            return {success: false, error: "Network error"}
+        }
+    }
+
+    const verify = async (): Promise<{
+        success: boolean
+        name?: string
+        permissions?: {
+            dev: boolean
+            admin: boolean
+            match_scouting: boolean
+            pit_scouting: boolean
+        }
+    }> => {
+        try {
+            const res = await fetch(`${url}/auth/verify`, {
+                headers: getAuthHeaders(),
+            })
+            if (!res.ok) return {success: false}
+
+            const json = await res.json()
+            cachedName = json.name
+            return {
+                success: true,
+                name: json.name,
+                permissions: json.permissions,
+            }
+        } catch {
+            return {success: false}
+        }
+    }
+
+    return {patchData, getStatus, getTeamList, getAllStatuses, login, verify, getName}
 }
 
 export async function unclaimTeam(match: string, team: number, alliance: string) {
-    console.log("[unclaimTeam]", { match, team, alliance })
+    console.log("[unclaimTeam]", {match, team, alliance})
     try {
         const res = await fetch(`${url}/scouting/${match}/${team}`, {
             method: 'PATCH',
-            headers: { 'Content-Type': 'application/json' },
+            headers: getAuthHeaders(),
             body: JSON.stringify({
                 updates: {
                     match,
@@ -97,7 +205,7 @@ export async function unclaimTeam(match: string, team: number, alliance: string)
                 },
                 phase: 'pre',
             }),
-            keepalive: true, // Important for unload reliability
+            keepalive: true,
         })
         return res.ok
     } catch (err) {

@@ -4,8 +4,8 @@ from pydantic import BaseModel
 from typing import Dict, Any, Optional
 from datetime import datetime, timedelta, timezone
 from fastapi.middleware.cors import CORSMiddleware
+from functools import partial
 import os
-import pyotp
 import uuid
 import tba_fetcher
 from dotenv import load_dotenv
@@ -18,7 +18,7 @@ app = FastAPI()
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # or ["http://192.168.1.127:5173"] for tighter control
+    allow_origins=["http://192.168.1.22:5173", "http://10.176.209.233:5173"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -30,7 +30,8 @@ SESSION_DURATION = timedelta(minutes=30)
 
 # In-memory storages
 scouting_db: Dict[str, Dict[int, Dict[str, Any]]] = {}
-sessions: Dict[str, datetime] = {}  # session_id -> expiration
+uuid_sessions: Dict[str, Dict[str, Any]] = {}
+UUID_DURATION = timedelta(days=100)
 
 team_data = {}
 with open("team_info.csv", newline="", encoding="utf-8") as f:
@@ -42,10 +43,10 @@ with open("team_info.csv", newline="", encoding="utf-8") as f:
 
 
 # --- Data Models ---
+
 class PatchData(BaseModel):
     updates: Dict[str, Any]
     phase: Optional[str] = None
-
 
 class FullData(BaseModel):
     match: str
@@ -57,45 +58,142 @@ class FullData(BaseModel):
     endgame: Optional[Dict[str, Any]] = None
     postmatch: Optional[Dict[str, Any]] = None
 
-
 class EventKey(BaseModel):
     event_key: str
-
 
 class AdminCode(BaseModel):
     code: str
 
-# --- Admin Auth ---
+class PasscodeBody(BaseModel):
+    passcode: str
 
-@app.post("/admin/auth")
-def admin_auth(body: AdminCode):
+# --- Auth ---
+@app.post("/auth/login")
+def login(body: PasscodeBody):
     """
-    Authenticates an admin using TOTP.
-    Returns a session ID valid for 30 minutes.
+    Authenticates via passcode and returns UUID session and permissions.
     """
-    totp = pyotp.TOTP(TOTP_SECRET)
-    if not totp.verify(body.code):
-        raise HTTPException(status_code=401, detail="Invalid code")
+    try:
+        with open("users.csv", newline="", encoding="utf-8") as f:
+            reader = csv.DictReader(f)
+            for row in reader:
+                if row["passcode"] == body.passcode:
+                    session_id = str(uuid.uuid4())
+                    uuid_sessions[session_id] = {
+                        "name": row["name"],
+                        "dev": row["dev"].lower() == "true",
+                        "admin": row["admin"].lower() == "true",
+                        "match_scouting": row["match_scouting"].lower() == "true",
+                        "pit_scouting": row["pit_scouting"].lower() == "true",
+                        "expires": datetime.now(timezone.utc) + UUID_DURATION
+                    }
+                    print(f"assigned uuid {session_id}")
+                    return {
+                        "uuid": session_id,
+                        "name": row["name"],
+                        "expires": uuid_sessions[session_id]["expires"].isoformat(),
+                        "permissions": {
+                            "dev": uuid_sessions[session_id]["dev"],
+                            "admin": uuid_sessions[session_id]["admin"],
+                            "match_scouting": uuid_sessions[session_id]["match_scouting"],
+                            "pit_scouting": uuid_sessions[session_id]["pit_scouting"],
+                        }
+                    }
+    except FileNotFoundError:
+        raise HTTPException(status_code=500, detail="User file not found")
 
-    session_id = str(uuid.uuid4())
-    sessions[session_id] = datetime.now(timezone.utc) + SESSION_DURATION
-    return {"session_id": session_id, "expires": sessions[session_id].isoformat()}
+    raise HTTPException(status_code=401, detail="Invalid passcode")
 
 
-def verify_admin_session(x_session_id: str = Header(...)):
+@app.get("/auth/verify")
+def verify_session(x_uuid: str = Header(...)):
+    session = uuid_sessions.get(x_uuid)
+    if not session or session["expires"] < datetime.now(timezone.utc):
+        raise HTTPException(status_code=403, detail="Invalid or expired UUID")
+    return {
+        "name": session["name"],
+        "permissions": {
+            "dev": session["dev"],
+            "admin": session["admin"],
+            "match_scouting": session["match_scouting"],
+            "pit_scouting": session["pit_scouting"],
+        },
+    }
+
+
+def verify_uuid(
+    x_uuid: str = Header(..., alias="x-uuid"),
+    required: Optional[str] = None
+) -> Dict[str, Any]:
     """
-    Dependency: Verifies that a given admin session ID is valid and not expired.
-    Raises 403 if invalid.
+    Verifies UUID session and required permission.
     """
-    now = datetime.now(timezone.utc)
-    if x_session_id not in sessions or sessions[x_session_id] < now:
-        raise HTTPException(status_code=403, detail="Session expired or invalid")
+    session = uuid_sessions.get(x_uuid)
+    print("[DEBUG] UUID lookup:", x_uuid)
+    print("[DEBUG] Session entry:", uuid_sessions.get(x_uuid))
+    if not session or session["expires"] < datetime.now(timezone.utc):
+        raise HTTPException(status_code=403, detail="Invalid or expired UUID")
+
+    if required and not session.get(required, False):
+        raise HTTPException(status_code=403, detail=f"Missing '{required}' permission")
+
+    return session  # can be used in route handler
+
+
+
+# --- Admin ---
+
+@app.post("/admin/expire/{session_id}")
+def expire_uuid(session_id: str, _: dict = Depends(partial(verify_uuid, required="admin"))):
+    """
+    Expires a single UUID session.
+    """
+    if session_id in uuid_sessions:
+        del uuid_sessions[session_id]
+        return {"status": "expired"}
+    raise HTTPException(status_code=404, detail="Session ID not found")
+
+@app.post("/admin/expire_all")
+def expire_all(_: dict = Depends(partial(verify_uuid, required="admin"))):
+    """
+    Expires all UUID sessions.
+    """
+    uuid_sessions.clear()
+    return {"status": "all expired"}
+
+@app.post("/admin/set_event")
+def set_event(event: EventKey, _: dict = Depends(partial(verify_uuid, required="admin"))):
+    """
+    Admin-only: Initializes the scouting database for a given event key.
+    Pulls data from TBA and creates empty records for each team in each match.
+    """
+    global scouting_db
+    try:
+        matches = tba_fetcher.get_event_data(event.event_key)["matches"]
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=f"Failed to fetch event data: {str(e)}")
+
+    scouting_db.clear()
+    for match in matches:
+        match_key = match["key"].split("_")[-1]  # e.g., qm1
+        scouting_db[match_key] = {}
+        for side in ["red", "blue"]:
+            for team_key in match["alliances"][side]["team_keys"]:
+                team_number = int(team_key[3:])
+                scouting_db[match_key][team_number] = {
+                    "data": {},
+                    "alliance": side,
+                    "scouter": None,
+                    "status": "unclaimed",
+                    "lastModified": None
+                }
+    return {"status": "event initialized", "matches": len(matches)}
 
 
 # --- Routes ---
 
 @app.patch("/scouting/{match}/{team}")
-def patch_data(match: str, team: int, patch: PatchData):
+def patch_data(match: str, team: int, patch: PatchData, _: dict = Depends(partial(verify_uuid, required="match_scouting"))):
     """
     Patch (partially update) a team's scouting data for a specific match.
     Supports nested keys (e.g., 'auto.score').
@@ -140,7 +238,7 @@ def patch_data(match: str, team: int, patch: PatchData):
 
 
 @app.post("/scouting/{match}/{team}/submit")
-def submit_data(match: str, team: int, full_data: FullData):
+def submit_data(match: str, team: int, full_data: FullData, _: dict = Depends(partial(verify_uuid, required="match_scouting"))):
     """
     Submit full scouting data for a team in a specific match.
     Replaces any previous data for that match/team.
@@ -158,8 +256,13 @@ def submit_data(match: str, team: int, full_data: FullData):
     return {"status": "submitted"}
 
 
+
 @app.get("/match/{match}/{alliance}")
-def get_match_info(match: str, alliance: str):
+def get_match_info(
+    match: str,
+    alliance: str,
+    _: dict = Depends(partial(verify_uuid, required="match_scouting"))
+):
     """
     Get team numbers, names, and logos for a given match and alliance ('red' or 'blue').
     Also returns current scouter assignments (if any).
@@ -189,7 +292,7 @@ def get_match_info(match: str, alliance: str):
 
 
 @app.get("/teams/{team}")
-def get_team_info(team: int):
+def get_team_info(team: int, _: dict = Depends(partial(verify_uuid, required="match_scouting"))):
     """
     Returns basic info (number, nickname, logo URL) for a given team.
     Uses preloaded CSV data.
@@ -204,7 +307,7 @@ def get_team_info(team: int):
 
 
 @app.get("/status/{match}/{team}")
-def get_status(match: str, team: str):  # team is str to allow "None"
+def get_status(match: str, team: str, _: dict = Depends(partial(verify_uuid, required="match_scouting"))):  # team is str to allow "None"
     """
     Returns scouting status and scouter assignment for a specific team in a match.
     If match/team are both "All", returns full status for the event.
@@ -241,35 +344,6 @@ def get_status(match: str, team: str):  # team is str to allow "None"
         "scouter": entry.get("scouter"),
         "status": entry.get("status", "error")
     }
-
-
-@app.post("/admin/set_event")
-def set_event(event: EventKey, _: Any = Depends(verify_admin_session)):
-    """
-    Admin-only: Initializes the scouting database for a given event key.
-    Pulls data from TBA and creates empty records for each team in each match.
-    """
-    global scouting_db
-    try:
-        matches = tba_fetcher.get_event_data(event.event_key)["matches"]
-    except Exception as e:
-        raise HTTPException(status_code=400, detail=f"Failed to fetch event data: {str(e)}")
-
-    scouting_db.clear()
-    for match in matches:
-        match_key = match["key"].split("_")[-1]  # e.g., qm1
-        scouting_db[match_key] = {}
-        for side in ["red", "blue"]:
-            for team_key in match["alliances"][side]["team_keys"]:
-                team_number = int(team_key[3:])
-                scouting_db[match_key][team_number] = {
-                    "data": {},
-                    "alliance": side,
-                    "scouter": None,
-                    "status": "unclaimed",
-                    "lastModified": None
-                }
-    return {"status": "event initialized", "matches": len(matches)}
 
 
 # --- WebSocket Endpoint ---
