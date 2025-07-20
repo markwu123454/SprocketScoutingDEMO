@@ -1,5 +1,5 @@
 import csv
-from fastapi import FastAPI, HTTPException, Header, Depends
+from fastapi import FastAPI, HTTPException, Header, Depends, WebSocket, WebSocketDisconnect
 from pydantic import BaseModel
 from typing import Dict, Any, Optional
 from datetime import datetime, timedelta, timezone
@@ -41,28 +41,6 @@ with open("team_info.csv", newline="", encoding="utf-8") as f:
         team_data[number] = nickname
 
 
-# --- Admin Auth ---
-class AdminCode(BaseModel):
-    code: str
-
-
-@app.post("/admin/auth")
-def admin_auth(body: AdminCode):
-    totp = pyotp.TOTP(TOTP_SECRET)
-    if not totp.verify(body.code):
-        raise HTTPException(status_code=401, detail="Invalid code")
-
-    session_id = str(uuid.uuid4())
-    sessions[session_id] = datetime.now(timezone.utc) + SESSION_DURATION
-    return {"session_id": session_id, "expires": sessions[session_id].isoformat()}
-
-
-def verify_admin_session(x_session_id: str = Header(...)):
-    now = datetime.now(timezone.utc)
-    if x_session_id not in sessions or sessions[x_session_id] < now:
-        raise HTTPException(status_code=403, detail="Session expired or invalid")
-
-
 # --- Data Models ---
 class PatchData(BaseModel):
     updates: Dict[str, Any]
@@ -84,9 +62,45 @@ class EventKey(BaseModel):
     event_key: str
 
 
+class AdminCode(BaseModel):
+    code: str
+
+# --- Admin Auth ---
+
+@app.post("/admin/auth")
+def admin_auth(body: AdminCode):
+    """
+    Authenticates an admin using TOTP.
+    Returns a session ID valid for 30 minutes.
+    """
+    totp = pyotp.TOTP(TOTP_SECRET)
+    if not totp.verify(body.code):
+        raise HTTPException(status_code=401, detail="Invalid code")
+
+    session_id = str(uuid.uuid4())
+    sessions[session_id] = datetime.now(timezone.utc) + SESSION_DURATION
+    return {"session_id": session_id, "expires": sessions[session_id].isoformat()}
+
+
+def verify_admin_session(x_session_id: str = Header(...)):
+    """
+    Dependency: Verifies that a given admin session ID is valid and not expired.
+    Raises 403 if invalid.
+    """
+    now = datetime.now(timezone.utc)
+    if x_session_id not in sessions or sessions[x_session_id] < now:
+        raise HTTPException(status_code=403, detail="Session expired or invalid")
+
+
 # --- Routes ---
+
 @app.patch("/scouting/{match}/{team}")
 def patch_data(match: str, team: int, patch: PatchData):
+    """
+    Patch (partially update) a team's scouting data for a specific match.
+    Supports nested keys (e.g., 'auto.score').
+    Updates phase status if provided.
+    """
     if match not in scouting_db:
         scouting_db[match] = {}
     if team not in scouting_db[match]:
@@ -117,7 +131,6 @@ def patch_data(match: str, team: int, patch: PatchData):
     if patch.phase:
         scouting_db[match][team]["status"] = patch.phase
 
-
     if unclaimed:
         scouting_db[match][team]["scouter"] = None
         scouting_db[match][team]["status"] = "unclaimed"
@@ -128,6 +141,11 @@ def patch_data(match: str, team: int, patch: PatchData):
 
 @app.post("/scouting/{match}/{team}/submit")
 def submit_data(match: str, team: int, full_data: FullData):
+    """
+    Submit full scouting data for a team in a specific match.
+    Replaces any previous data for that match/team.
+    Sets status to 'submitted'.
+    """
     if match not in scouting_db:
         scouting_db[match] = {}
     scouting_db[match][team] = {
@@ -142,6 +160,10 @@ def submit_data(match: str, team: int, full_data: FullData):
 
 @app.get("/match/{match}/{alliance}")
 def get_match_info(match: str, alliance: str):
+    """
+    Get team numbers, names, and logos for a given match and alliance ('red' or 'blue').
+    Also returns current scouter assignments (if any).
+    """
     event_key = "2025caoc"  # hardcoded or pull from config if needed
 
     try:
@@ -166,9 +188,12 @@ def get_match_info(match: str, alliance: str):
     }
 
 
-
 @app.get("/teams/{team}")
 def get_team_info(team: int):
+    """
+    Returns basic info (number, nickname, logo URL) for a given team.
+    Uses preloaded CSV data.
+    """
     if team not in team_data:
         raise HTTPException(status_code=404, detail="Team not found")
     return {
@@ -180,6 +205,10 @@ def get_team_info(team: int):
 
 @app.get("/status/{match}/{team}")
 def get_status(match: str, team: str):  # team is str to allow "None"
+    """
+    Returns scouting status and scouter assignment for a specific team in a match.
+    If match/team are both "All", returns full status for the event.
+    """
     if match == "All" and team == "All":
         full_status = {}
         for m, teams in scouting_db.items():
@@ -214,9 +243,12 @@ def get_status(match: str, team: str):  # team is str to allow "None"
     }
 
 
-
 @app.post("/admin/set_event")
 def set_event(event: EventKey, _: Any = Depends(verify_admin_session)):
+    """
+    Admin-only: Initializes the scouting database for a given event key.
+    Pulls data from TBA and creates empty records for each team in each match.
+    """
     global scouting_db
     try:
         matches = tba_fetcher.get_event_data(event.event_key)["matches"]
@@ -238,3 +270,20 @@ def set_event(event: EventKey, _: Any = Depends(verify_admin_session)):
                     "lastModified": None
                 }
     return {"status": "event initialized", "matches": len(matches)}
+
+
+# --- WebSocket Endpoint ---
+
+@app.websocket("/ws")
+async def websocket_endpoint(websocket: WebSocket):
+    """
+    Basic WebSocket that accepts connections and echoes back any received message.
+    Useful for testing or simple live communication.
+    """
+    await websocket.accept()
+    try:
+        while True:
+            data = await websocket.receive_text()
+            await websocket.send_text(f"Echo: {data}")
+    except WebSocketDisconnect:
+        print("Client disconnected")

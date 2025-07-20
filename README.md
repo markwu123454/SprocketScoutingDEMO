@@ -146,3 +146,39 @@ Optional function to determine if `onValueUpdate` should trigger the `triggered 
     patchData("auto", "l1", v)
   }
 />
+```
+
+--------
+
+## LoadButton
+
+A reusable button component with a built-in loading indicator for submission states.
+
+### Props
+
+#### `loading: boolean`
+If `true`, disables the button and shows a loading spinner.
+
+#### `onClick: () => void`
+Callback function to execute when the button is clicked.
+
+#### `disabled?: boolean`  
+**Default:** `false`  
+Additional disabled condition. Will combine with `loading`.
+
+#### `children: React.ReactNode`
+Button content (text or elements) displayed when not loading.
+
+---
+
+### Example Usage
+
+```tsx
+<LoadButton
+  loading={isSubmitting}
+  onClick={handleSubmit}
+  disabled={!formIsValid}
+>
+  Submit
+</LoadButton>
+```

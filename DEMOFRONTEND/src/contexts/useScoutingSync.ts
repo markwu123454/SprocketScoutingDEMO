@@ -44,8 +44,18 @@ export function useScoutingSync() {
     ): Promise<TeamInfo[]> => {
         try {
             const res = await fetch(`${url}/match/${match}/${alliance}`)
-            if (!res.ok) console.error('Team list fetch failed')
+            if (!res.ok) {
+                console.warn(`getTeamList: ${res.status} ${res.statusText}`)
+                return []
+            }
+
             const json = await res.json()
+
+            if (!json || !Array.isArray(json.teams)) {
+                console.error("getTeamList: Malformed response", json)
+                return []
+            }
+
             return json.teams
         } catch (err) {
             console.error('getTeamList failed:', err)
@@ -53,8 +63,12 @@ export function useScoutingSync() {
         }
     }
 
+
     // in useScoutingSync
-    const getAllStatuses = async (): Promise<Record<string, Record<number, { status: string; scouter: string | null }>> | null> => {
+    const getAllStatuses = async (): Promise<Record<string, Record<number, {
+        status: string;
+        scouter: string | null
+    }>> | null> => {
         try {
             const res = await fetch(`${url}/status/All/All`)
             return res.ok ? await res.json() : null
@@ -66,4 +80,28 @@ export function useScoutingSync() {
 
 
     return {patchData, getStatus, getTeamList, getAllStatuses}
+}
+
+export async function unclaimTeam(match: string, team: number, alliance: string) {
+    console.log("[unclaimTeam]", { match, team, alliance })
+    try {
+        const res = await fetch(`${url}/scouting/${match}/${team}`, {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                updates: {
+                    match,
+                    alliance,
+                    teamNumber: team,
+                    scouter: "__UNCLAIM__",
+                },
+                phase: 'pre',
+            }),
+            keepalive: true, // Important for unload reliability
+        })
+        return res.ok
+    } catch (err) {
+        console.error("unclaimTeam failed:", err)
+        return false
+    }
 }

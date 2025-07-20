@@ -1,11 +1,16 @@
 import {useState, useEffect, useRef} from 'react'
-import {useScoutingSync} from '@/contexts/useScoutingSync'
-import {Button} from '@/components/ui/button'
+import * as React from "react";
 import type {ScoutingData, Phase, TeamInfo} from '@/types'
+
+import {useScoutingSync, unclaimTeam} from '@/contexts/useScoutingSync'
+
+import {Button} from '@/components/ui/button'
+import LoadButton from '@/components/ui/loadButton'
+
 import AutoPhase from "@/components/2025/auto.tsx";
 import TeleopPhase from "@/components/2025/teleop.tsx";
 import PostMatch from "@/components/2025/post.tsx";
-import * as React from "react";
+
 
 const initialScoutingData: ScoutingData = {
     match: '',
@@ -151,26 +156,23 @@ export default function MatchScoutingLayout() {
                                                 setData={setScoutingData}/>}
             </div>
 
-            {/* Bottom Right Action */}
+            {/* Bottom Action Bar */}
             <div className="flex justify-between items-center p-4 bg-zinc-800 text-xl font-semibold">
 
                 <Button onClick={handleBack} disabled={isSubmitting || phaseIndex < 1}>
                     Back
                 </Button>
-                <Button onClick={phase === "post" ? handleSubmit : handleNext}
-                        disabled={isSubmitting ||
-                            scoutingData.match.trim() === '' ||
-                            scoutingData.alliance === null ||
-                            scoutingData.teamNumber === null}>
-                    {isSubmitting ? (
-                        <div className="flex items-center gap-2">
-                            <span
-                                className="animate-spin h-4 w-4 border-2 rounded-full"/>
-                            Submitting...
-                        </div>
-                    ) : phase === "post" ? "Submit" : "Next"}
-                </Button>
-
+                <LoadButton
+                    loading={isSubmitting}
+                    onClick={phase === "post" ? handleSubmit : handleNext}
+                    disabled={
+                        scoutingData.match.trim() === '' ||
+                        scoutingData.alliance === null ||
+                        scoutingData.teamNumber === null
+                    }
+                >
+                    {phase === "post" ? "Submit" : "Next"}
+                </LoadButton>
             </div>
         </div>
     )
@@ -191,6 +193,8 @@ function PreMatch({
 
     const patchTimeoutRef = useRef<NodeJS.Timeout | null>(null)
 
+    const isValidMatch = (m: string) => /^\d+$/.test(m)
+
     useEffect(() => {
         if (!match || !alliance || teamNumber === null) return
 
@@ -206,24 +210,65 @@ function PreMatch({
     }, [match, alliance, teamNumber])
 
     useEffect(() => {
-        if (!match || !alliance) return
+        if (!isValidMatch(match) || !alliance) {
+            setTeamList([])
+            return
+        }
 
         let mounted = true
         const load = async () => {
-            const teams = await getTeamList(match, alliance)
-            if (mounted) setTeamList(teams)
+            try {
+                const teams = await getTeamList(match, alliance)
+                if (mounted) setTeamList(teams)
+            } catch (err) {
+                if (mounted) setTeamList([])  // <- fallback to empty list instead of null
+            }
         }
 
-        setTeamList(null)
+        setTeamList(null)  // <- only during loading
         void load()
 
         const interval = setInterval(load, 500)
-
         return () => {
             mounted = false
             clearInterval(interval)
         }
     }, [match, alliance])
+
+    useEffect(() => {
+        const handleUnload = () => {
+            if (match && teamNumber !== null && alliance) {
+                void unclaimTeam(match, teamNumber, alliance)
+            }
+        }
+
+        window.addEventListener("beforeunload", handleUnload)
+        return () => window.removeEventListener("beforeunload", handleUnload)
+    }, [match, teamNumber, alliance])
+
+    useEffect(() => {
+        return () => {
+            if (match && teamNumber !== null && alliance) {
+                void unclaimTeam(match, teamNumber, alliance)
+            }
+        }
+    }, [match, teamNumber, alliance])
+
+    useEffect(() => {
+        const handleVisibility = () => {
+            if (document.visibilityState === "hidden") {
+                if (match && teamNumber !== null && alliance) {
+                    void unclaimTeam(match, teamNumber, alliance)
+                }
+            }
+        }
+
+        document.addEventListener("visibilitychange", handleVisibility)
+        return () => {
+            document.removeEventListener("visibilitychange", handleVisibility)
+        }
+    }, [])
+
 
     const handleTeamSelect = async (newTeamNumber: number) => {
         setShowCustomTeam(false)
@@ -321,8 +366,13 @@ function PreMatch({
             <div>
                 <label className="block text-lg font-medium mb-1">Select Team</label>
                 <div className="flex flex-col gap-2">
-                    {(teamList ?? Array(3).fill(null)).map((team, i) => {
-                        if (team === null) {
+                    {(teamList === null
+                            ? Array(3).fill(null)
+                            : teamList.length > 0
+                                ? teamList
+                                : Array(3).fill(undefined)
+                    ).map((team, i) => {
+                        if (!team) {
                             return (
                                 <button
                                     key={i}
