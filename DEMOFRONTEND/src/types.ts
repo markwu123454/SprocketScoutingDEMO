@@ -7,15 +7,21 @@ export type ScoutingData = {
     teamNumber: number | null
 
     auto: {
+        branchPlacement: {
+            [branchId: string]: {
+                l2: boolean
+                l3: boolean
+                l4: boolean
+            }
+        }
+
+        missed: { l2: number; l3: number; l4: number; l1: number }
         l1: number
-        l2: number
-        l3: number
-        l4: number
-        missed: number
         reef: number
         barge: number
         moved: boolean
     }
+
 
     teleop: {
         l1: number

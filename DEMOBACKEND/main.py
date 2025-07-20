@@ -123,7 +123,6 @@ def patch_data(match: str, team: int, patch: PatchData):
         scouting_db[match][team]["status"] = "unclaimed"
 
     scouting_db[match][team]["lastModified"] = datetime.now(timezone.utc).isoformat()
-    print("PATCH:", match, team, scouting_db[match][team]["status"])
     return {"status": "patched"}
 
 

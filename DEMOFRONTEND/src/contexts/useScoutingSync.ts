@@ -1,6 +1,6 @@
 import type {TeamInfo} from '@/types'
 
-const url = "http://192.168.1.127:8000"
+const url = "http://192.168.1.22:8000"
 
 export function useScoutingSync() {
     const patchData = async (

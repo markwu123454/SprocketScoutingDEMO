@@ -60,3 +60,85 @@ run.py
 
 ```bash
 python run.py
+```
+
+
+# DOCUMENTATION
+
+--------
+
+## ScoreBox
+
+A customizable score tracking widget for UI interaction.
+
+### Props
+
+### `id: string`
+Unique identifier for the component.
+
+### `label: string`
+Text label shown before the current value (e.g., `"L1 ▷ 3"`).
+
+### `value: number`
+Current value displayed and controlled by the component.
+
+### `onChange: (newValue: number) => void`
+Required callback to handle value updates externally.
+
+### `onValueUpdate?: (newValue: number, triggered: boolean) => void`
+Optional callback called after each change. Includes a boolean indicating whether the change met a custom trigger condition.
+
+### `step?: number`  
+**Default:** `1`  
+Amount to increment or decrement per click.
+
+### `min?: number`  
+**Default:** `0`  
+Minimum allowed value. Values below this are clamped.
+
+### `max?: number`  
+**Default:** `Infinity`  
+Maximum allowed value. Values above this are clamped.
+
+### `showPulse?: boolean`  
+**Default:** `true`  
+Whether to briefly flash the background color on value change.
+
+### `pulseDuration?: number`  
+**Default:** `150` (milliseconds)  
+Duration of the pulse effect.
+
+### `upColor?: string`  
+**Default:** `bg-green-700`  
+Tailwind class used for background when incrementing.
+
+### `downColor?: string`  
+**Default:** `bg-red-700`  
+Tailwind class used for background when decrementing.
+
+### `baseColor?: string`  
+**Default:** `bg-zinc-800`  
+Tailwind class used for background when idle.
+
+### `triggerPulseCondition?: (label: string, delta: number) => boolean`
+Optional function to determine if `onValueUpdate` should trigger the `triggered = true` flag. Useful for identifying special behaviors (e.g. movement detection).
+
+---
+
+## Example Usage
+
+```tsx
+<ScoreBox
+  id="auto-l1"
+  label="L1"
+  value={data.auto.l1}
+  onChange={(v) =>
+    setData(d => ({
+      ...d,
+      auto: { ...d.auto, l1: v }
+    }))
+  }
+  onValueUpdate={(v, move) =>
+    patchData("auto", "l1", v)
+  }
+/>
