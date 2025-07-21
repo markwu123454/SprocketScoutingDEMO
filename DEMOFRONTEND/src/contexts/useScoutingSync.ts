@@ -1,6 +1,6 @@
 import type {TeamInfo} from '@/types'
 
-const url = "http://192.168.1.22:8000"
+const url = `${window.location.protocol}//${window.location.hostname}:8000`;
 const UUID_COOKIE = "scouting_uuid"
 const NAME_COOKIE = "scouting_name"
 
@@ -19,7 +19,7 @@ function deleteCookie(name: string) {
     document.cookie = `${name}=; Max-Age=0; path=/`
 }
 
-function getAuthHeaders(): HeadersInit {
+export function getAuthHeaders(): HeadersInit {
     const uuid = getCookie(UUID_COOKIE)
     const headers: HeadersInit = {
         'Content-Type': 'application/json',
@@ -29,7 +29,6 @@ function getAuthHeaders(): HeadersInit {
 }
 
 export function getScouterName(): string | null {
-    console.log(getCookie(NAME_COOKIE), getCookie(UUID_COOKIE))
     return getCookie(NAME_COOKIE)
 }
 
@@ -41,25 +40,44 @@ export function useScoutingSync() {
     const getName = (): string | null => cachedName
 
     const patchData = async (
-        match: string,
-        team: number,
-        updates: Record<string, any>,
-        phase?: string
-    ): Promise<boolean> => {
-        try {
-            const body: any = {updates}
-            if (phase) body.phase = phase
-            const res = await fetch(`${url}/scouting/${match}/${team}`, {
-                method: 'PATCH',
-                headers: getAuthHeaders(),
-                body: JSON.stringify(body),
-            })
-            return res.ok
-        } catch (err) {
-            console.error('patchData failed:', err)
+    match: string,
+    team: number,
+    updates: Record<string, any>, // TODO: replace with explicit `scouter` and `phase` params
+    phase?: string
+): Promise<boolean> => {
+    try {
+        const body: any = { updates: {} }
+
+        if ("scouter" in updates) {
+            body.updates.scouter = updates.scouter ?? "__UNCLAIM__"
+        }
+
+        const extraKeys = Object.keys(updates).filter(k => k !== "scouter")
+        if (extraKeys.length > 0) {
+            console.warn(`patchMetadata: Ignored unsupported keys: ${extraKeys.join(", ")}`)
+        }
+
+        if (!("scouter" in updates) && !phase) {
+            console.warn("patchMetadata: called with no valid updates.")
             return false
         }
+
+        if (phase) body.phase = phase
+
+        const res = await fetch(`${url}/scouting/${match}/${team}`, {
+            method: "PATCH",
+            headers: getAuthHeaders(),
+            body: JSON.stringify(body),
+        })
+
+        return res.ok
+    } catch (err) {
+        console.error("patchMetadata failed:", err)
+        return false
     }
+}
+
+
 
     const getStatus = async (
         match: string,
@@ -128,8 +146,7 @@ export function useScoutingSync() {
             match_scouting: boolean
             pit_scouting: boolean
         }
-    }> =>
-    {
+    }> => {
         deleteCookie(UUID_COOKIE)
         deleteCookie(NAME_COOKIE)
 

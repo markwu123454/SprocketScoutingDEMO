@@ -5,6 +5,7 @@ export type ScoutingData = {
     match: string
     alliance: 'red' | 'blue' | null
     teamNumber: number | null
+    scouter: string | null
 
     auto: {
         branchPlacement: {

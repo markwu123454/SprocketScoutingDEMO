@@ -1,4 +1,5 @@
 passcode,name,dev,admin,match_scouting,pit_scouting
-M@rk!,Mark,true,true,true,true
-DEMO1,DEMO1,false,true,false,true
-DEMO2,DEMO2,false,false,true,false
+M@rk1!,Mark,true,true,true,true
+B0th#1!,DEMO1,false,true,false,true
+Sc0uT!2,DEMO2,false,false,true,false
+Adm!n#03,DEMO3,true,true,true,true

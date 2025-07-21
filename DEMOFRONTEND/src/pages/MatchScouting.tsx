@@ -1,12 +1,12 @@
-import {useState, useEffect, useRef} from 'react'
-import * as React from "react";
-import type {ScoutingData, Phase, TeamInfo} from '@/types'
+import {useState} from 'react'
+import type {ScoutingData, Phase} from '@/types'
 
-import {useScoutingSync, unclaimTeam} from '@/contexts/useScoutingSync'
+import {useScoutingSync, getScouterName} from '@/contexts/useScoutingSync'
 
 import {Button} from '@/components/ui/button'
 import LoadButton from '@/components/ui/loadButton'
 
+import PreMatch from "@/pages/preMatch.tsx";
 import AutoPhase from "@/components/2025/auto.tsx";
 import TeleopPhase from "@/components/2025/teleop.tsx";
 import PostMatch from "@/components/2025/post.tsx";
@@ -16,6 +16,7 @@ const initialScoutingData: ScoutingData = {
     match: '',
     alliance: null,
     teamNumber: null,
+    scouter: null,
 
     auto: {
         branchPlacement: {
@@ -67,7 +68,7 @@ const initialScoutingData: ScoutingData = {
 
 const PHASE_ORDER: Phase[] = ['pre', 'auto', 'teleop', 'post']
 
-const SCOUTER = `DEMO${Math.floor(Math.random() * 10)}`
+const scouter = getScouterName()
 
 export default function MatchScoutingLayout() {
     const [phaseIndex, setPhaseIndex] = useState(0)
@@ -130,7 +131,7 @@ export default function MatchScoutingLayout() {
             {/* Top Bar */}
             <div className="flex justify-between items-center p-4 bg-zinc-800 text-ml font-semibold">
                 <div>
-                    {SCOUTER}
+                    {scouter}
                 </div>
                 <div>
                     {scoutingData.teamNumber !== null
@@ -158,10 +159,14 @@ export default function MatchScoutingLayout() {
 
             {/* Bottom Action Bar */}
             <div className="flex justify-between items-center p-4 bg-zinc-800 text-xl font-semibold">
-
-                <Button onClick={handleBack} disabled={isSubmitting || phaseIndex < 1}>
+                <Button
+                    onClick={handleBack}
+                    disabled={isSubmitting || phaseIndex < 1}
+                    className={isSubmitting || phaseIndex < 1 ? "cursor-not-allowed opacity-50" : "cursor-pointer"}
+                >
                     Back
                 </Button>
+
                 <LoadButton
                     loading={isSubmitting}
                     onClick={phase === "post" ? handleSubmit : handleNext}
@@ -170,6 +175,13 @@ export default function MatchScoutingLayout() {
                         scoutingData.alliance === null ||
                         scoutingData.teamNumber === null
                     }
+                    className={
+                        scoutingData.match.trim() === '' ||
+                        scoutingData.alliance === null ||
+                        scoutingData.teamNumber === null
+                            ? "cursor-not-allowed opacity-50"
+                            : "cursor-pointer"
+                    }
                 >
                     {phase === "post" ? "Submit" : "Next"}
                 </LoadButton>
@@ -177,287 +189,4 @@ export default function MatchScoutingLayout() {
         </div>
     )
 }
-
-function PreMatch({
-                      data,
-                      setData,
-                  }: {
-    data: ScoutingData
-    setData: React.Dispatch<React.SetStateAction<ScoutingData>>
-}) {
-    const {patchData, getTeamList} = useScoutingSync()
-    const [teamList, setTeamList] = useState<TeamInfo[] | null>(null)
-    const [showCustomTeam, setShowCustomTeam] = useState(false)
-
-    const {match, alliance, teamNumber} = data
-
-    const patchTimeoutRef = useRef<NodeJS.Timeout | null>(null)
-
-    const isValidMatch = (m: string) => /^\d+$/.test(m)
-
-    useEffect(() => {
-        if (!match || !alliance || teamNumber === null) return
-
-        if (patchTimeoutRef.current) clearTimeout(patchTimeoutRef.current)
-        patchTimeoutRef.current = setTimeout(() => {
-            void patchData(match, teamNumber, {
-                match,
-                alliance,
-                teamNumber,
-                scouter: SCOUTER,
-            }, 'pre')
-        }, 300)
-    }, [match, alliance, teamNumber])
-
-    useEffect(() => {
-        if (!isValidMatch(match) || !alliance) {
-            setTeamList([])
-            return
-        }
-
-        let mounted = true
-        const load = async () => {
-            try {
-                const teams = await getTeamList(match, alliance)
-                if (mounted) setTeamList(teams)
-            } catch (err) {
-                if (mounted) setTeamList([])  // <- fallback to empty list instead of null
-            }
-        }
-
-        setTeamList(null)  // <- only during loading
-        void load()
-
-        const interval = setInterval(load, 500)
-        return () => {
-            mounted = false
-            clearInterval(interval)
-        }
-    }, [match, alliance])
-
-    useEffect(() => {
-        const handleUnload = () => {
-            if (match && teamNumber !== null && alliance) {
-                void unclaimTeam(match, teamNumber, alliance)
-            }
-        }
-
-        window.addEventListener("beforeunload", handleUnload)
-        return () => window.removeEventListener("beforeunload", handleUnload)
-    }, [match, teamNumber, alliance])
-
-    useEffect(() => {
-        return () => {
-            if (match && teamNumber !== null && alliance) {
-                void unclaimTeam(match, teamNumber, alliance)
-            }
-        }
-    }, [match, teamNumber, alliance])
-
-    useEffect(() => {
-        const handleVisibility = () => {
-            if (document.visibilityState === "hidden") {
-                if (match && teamNumber !== null && alliance) {
-                    void unclaimTeam(match, teamNumber, alliance)
-                }
-            }
-        }
-
-        document.addEventListener("visibilitychange", handleVisibility)
-        return () => {
-            document.removeEventListener("visibilitychange", handleVisibility)
-        }
-    }, [])
-
-
-    const handleTeamSelect = async (newTeamNumber: number) => {
-        setShowCustomTeam(false)
-
-        if (match && teamNumber !== null && teamNumber !== newTeamNumber) {
-            const oldTeamNumber = teamNumber
-
-            // Optimistically mark old team unclaimed
-            setTeamList((prev) => {
-                if (!prev) return prev
-                return prev.map((t) =>
-                    t.number === oldTeamNumber ? {...t, scouter: null} : t
-                )
-            })
-
-            await patchData(match, oldTeamNumber, {
-                match,
-                alliance,
-                teamNumber: oldTeamNumber,
-                scouter: "__UNCLAIM__",
-            }, 'pre')
-        }
-
-        setData((d) => ({
-            ...d,
-            teamNumber: newTeamNumber,
-        }))
-    }
-
-
-    return (
-        <div className="p-4 w-full h-full flex flex-col justify gap-2">
-            <div>Pre-Match</div>
-
-            {/* Match Number */}
-            <div>
-                <label className="block text-lg font-medium mb-1">Match Number</label>
-                <input
-                    type="text"
-                    inputMode="numeric"
-                    value={match}
-                    onChange={(e) => {
-                        const newMatch = e.target.value
-                        if (match && teamNumber !== null) {
-                            const oldTeamNumber = teamNumber
-                            void patchData(match, oldTeamNumber, {
-                                match,
-                                alliance,
-                                teamNumber: oldTeamNumber,
-                                scouter: "__UNCLAIM__",
-                            }, 'pre')
-                        }
-
-                        setData((d) => ({
-                            ...d,
-                            match: newMatch,
-                            teamNumber: null,
-                        }))
-                    }}
-                    className="w-full p-2 rounded bg-zinc-800 border border-zinc-700 text-white"
-                />
-            </div>
-
-            {/* Alliance Selection */}
-            <div>
-                <label className="block text-lg font-medium mb-1">Select Alliance</label>
-                <div className="flex gap-4">
-                    {(['red', 'blue'] as const).map((color) => (
-                        <button
-                            key={color}
-                            onClick={() => {
-                                if (match && teamNumber !== null) {
-                                    const oldTeamNumber = teamNumber
-                                    void patchData(match, oldTeamNumber, {
-                                        match,
-                                        alliance,
-                                        teamNumber: oldTeamNumber,
-                                        scouter: "__UNCLAIM__",
-                                    }, 'pre')
-                                }
-
-                                setData((d) => ({
-                                    ...d,
-                                    alliance: color,
-                                    teamNumber: null,
-                                }))
-                            }}
-                            className={`w-16 h-16 rounded ${alliance === color ? 'outline-2 outline-white' : ''} ${color === 'red' ? 'bg-red-600' : 'bg-blue-600'}`}
-                        />
-                    ))}
-                </div>
-            </div>
-
-            {/* Team Selection */}
-            <div>
-                <label className="block text-lg font-medium mb-1">Select Team</label>
-                <div className="flex flex-col gap-2">
-                    {(teamList === null
-                            ? Array(3).fill(null)
-                            : teamList.length > 0
-                                ? teamList
-                                : Array(3).fill(undefined)
-                    ).map((team, i) => {
-                        if (!team) {
-                            return (
-                                <button
-                                    key={i}
-                                    disabled
-                                    className="w-full py-2 rounded bg-zinc-800 opacity-50"
-                                >
-                                    ---
-                                </button>
-                            )
-                        }
-
-                        const isSelected = teamNumber === team.number
-                        const isClaimed = team.scouter !== null && team.number !== teamNumber
-
-                        return (
-                            <button
-                                key={team.number}
-                                disabled={isClaimed}
-                                onClick={() => handleTeamSelect(team.number)}
-                                className={`w-full py-2 px-4 rounded flex items-center justify-center gap-3 ${isSelected ? 'bg-zinc-500' : 'bg-zinc-700'} ${isClaimed ? 'opacity-50 cursor-not-allowed' : ''}`}
-                            >
-                                <div
-                                    className={`w-10 h-10 rounded flex items-center justify-center ${
-                                        alliance === 'red' ? 'bg-red-700' : alliance === 'blue' ? 'bg-blue-700' : 'bg-zinc-600'
-                                    }`}
-                                >
-                                    <img
-                                        src={team.logo}
-                                        alt={team.name}
-                                        className="w-8 h-8 rounded"
-                                    />
-                                </div>
-
-                                <span className='text-xl'>{`${team.name.nickname}(${team.number})`}</span>
-                                {isClaimed && (
-                                    <span className="text-sm">
-                                        {`Scouting by ${team.scouter === SCOUTER ? 'you' : team.scouter}`}
-                                    </span>
-                                )}
-                            </button>
-                        )
-                    })}
-
-                    {!showCustomTeam ? (
-                        <button
-                            className="text-left text-sm text-zinc-400 underline mt-1"
-                            onClick={() => {
-                                if (match && teamNumber !== null) {
-                                    const oldTeamNumber = teamNumber
-                                    void patchData(match, oldTeamNumber, {
-                                        match,
-                                        alliance,
-                                        teamNumber: oldTeamNumber,
-                                        scouter: "__UNCLAIM__",
-                                    }, 'pre')
-                                }
-
-                                setShowCustomTeam(true)
-                                setData((d) => ({
-                                    ...d,
-                                    teamNumber: null,
-                                }))
-                            }}
-                        >
-                            If your team isn’t listed, enter it manually
-                        </button>
-                    ) : (
-                        <input
-                            type="text"
-                            placeholder="Custom team number"
-                            value={teamNumber?.toString() ?? ''}
-                            onChange={(e) => {
-                                const num = parseInt(e.target.value || '0')
-                                setData((d) => ({
-                                    ...d,
-                                    teamNumber: num || null,
-                                }))
-                            }}
-                            className="w-full p-2 rounded bg-zinc-800 border border-zinc-700 text-white"
-                        />
-                    )}
-                </div>
-            </div>
-        </div>
-    )
-}
-
 
