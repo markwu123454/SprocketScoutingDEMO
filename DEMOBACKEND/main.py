@@ -1,9 +1,12 @@
 import asyncio
 import csv
+import json
+import sqlite3
+import time
 
 from fastapi import FastAPI, Header, Depends
 from pydantic import BaseModel
-from typing import Dict, Any, Optional
+from typing import Dict, Any, Optional, Literal
 from datetime import datetime, timedelta, timezone
 from fastapi.middleware.cors import CORSMiddleware
 from functools import partial
@@ -31,8 +34,165 @@ app.add_middleware(
 TOTP_SECRET = os.getenv("TOTP_SECRET", "base32secret3232")
 SESSION_DURATION = timedelta(minutes=30)
 
+
 # In-memory storages
-scouting_db: Dict[str, Dict[int, Dict[str, Any]]] = {}
+def get_db_conn():
+    return sqlite3.connect("match_scouting.db", check_same_thread=False)
+
+
+alliance_type = Literal["red", "blue"]
+match_type = Literal["qm", "sf", "f"]
+status_type = Literal["unclaimed", "pre", "auto", "teleop", "post", "submitted"]
+
+match_scouting_conn = get_db_conn()
+match_scouting_cursor = match_scouting_conn.cursor()
+match_scouting_cursor.execute("""
+                              CREATE TABLE IF NOT EXISTS match_scouting
+                              (
+                                  match
+                                  INTEGER,
+                                  match_type
+                                  TEXT,
+                                  team
+                                  TEXT,
+                                  alliance
+                                  TEXT,
+                                  scouter
+                                  TEXT,
+                                  status
+                                  TEXT,
+                                  data
+                                  TEXT,
+                                  last_modified
+                                  INTEGER
+                              )
+                              """)
+match_scouting_conn.commit()
+
+
+def add_match_scouting(
+        match: int,
+        m_type: match_type,
+        team: int | str,
+        alliance: alliance_type,
+        scouter: str | None,
+        status: status_type,
+        data: Dict[str, Any]
+):
+    conn = get_db_conn()
+    cursor = conn.cursor()
+    cursor.execute("""
+                   INSERT INTO match_scouting
+                   (match, match_type, team, alliance, scouter, status, data, last_modified)
+                   VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+                   """, (
+                       match,
+                       m_type,
+                       str(team),
+                       alliance,
+                       scouter,
+                       status,
+                       json.dumps(data),
+                       time.time_ns()
+                   ))
+    conn.commit()
+
+
+def get_match_scouting(
+    match: Optional[int] = None,
+    m_type: Optional[match_type] = None,
+    team: Optional[int | str] = None,
+    scouter: Optional[str] = "__NOTPASSED__"
+) -> list[dict]:
+    conn = get_db_conn()
+    cursor = conn.cursor()
+    query = "SELECT * FROM match_scouting WHERE 1=1"
+    params = []
+
+    if match is not None:
+        query += " AND match = ?"
+        params.append(match)
+    if m_type is not None:
+        query += " AND match_type = ?"
+        params.append(m_type)
+    if team is not None:
+        query += " AND team = ?"
+        params.append(str(team))
+
+    if scouter != "__NOTPASSED__":
+        if scouter is None:
+            query += " AND scouter IS NULL"
+        else:
+            query += " AND scouter = ?"
+            params.append(scouter)
+
+    cursor.execute(query, params)
+    rows = cursor.fetchall()
+    conn.close()
+
+    return [
+        {
+            "match": r[0],
+            "match_type": r[1],
+            "team": r[2],
+            "alliance": r[3],
+            "scouter": r[4],
+            "status": r[5],
+            "data": json.loads(r[6]),
+            "last_modified": r[7]
+        }
+        for r in rows
+    ]
+
+
+
+def update_match_scouting(
+        match: int,
+        m_type: match_type,
+        team: int | str,
+        scouter: str,
+        data: Optional[Dict[str, Any]] = None,
+        status: Optional[status_type] = None
+):
+    conn = get_db_conn()
+    cursor = conn.cursor()
+    # Fetch existing record
+    cursor.execute("""
+                   SELECT data, status
+                   FROM match_scouting
+                   WHERE match = ? AND match_type = ? AND team = ? AND scouter = ?
+                   """, (match, m_type, str(team), scouter))
+    row = cursor.fetchone()
+    if not row:
+        raise ValueError("Match scouting entry not found")
+
+    current_data = json.loads(row[0])
+    current_status = row[1]
+
+    # Merge delta
+    if data:
+        current_data.update(data)
+
+    new_status = status if status is not None else current_status
+
+    cursor.execute("""
+                   UPDATE match_scouting
+                   SET data          = ?,
+                       status        = ?,
+                       last_modified = ?
+                   WHERE match = ? AND match_type = ? AND team = ? AND scouter = ?
+                   """, (
+                       json.dumps(current_data),
+                       new_status,
+                       time.time_ns(),
+                       match,
+                       m_type,
+                       str(team),
+                       scouter
+                   ))
+    conn.commit()
+
+
 uuid_sessions: Dict[str, Dict[str, Any]] = {}
 UUID_DURATION = timedelta(days=100)
 
@@ -45,6 +205,7 @@ with open("team_info.csv", newline="", encoding="utf-8") as f:
         team_data[number] = nickname
 
 POLL_TIMEOUT = 10  # seconds
+
 
 # </editor-fold>
 
@@ -207,97 +368,94 @@ def set_event(event: EventKey, _: dict = Depends(partial(verify_uuid, required="
 # <editor-fold desc="HTTP non-polling">
 from fastapi import HTTPException
 
+
 @app.patch("/scouting/{match}/{team}")
-def patch_metadata_only(match: str, team: int, patch: PatchData,
+def patch_metadata_only(match: int, team: int, patch: PatchData,
                         _: dict = Depends(partial(verify_uuid, required="match_scouting"))):
-    """
-    Patch only metadata: scouter and phase (status).
-    Rejects all other update keys.
-    """
-    if match not in scouting_db:
-        scouting_db[match] = {}
-    if team not in scouting_db[match]:
-        scouting_db[match][team] = {
-            "data": {},
-            "alliance": None,
-            "scouter": None,
-            "status": "unclaimed",
-            "lastModified": None,
-        }
+    existing = get_match_scouting(match=match, m_type="qm", team=team)
+    if not existing:
+        raise HTTPException(status_code=404, detail="Entry not found")
 
-    entry = scouting_db[match][team]
-    updated = False
+    entry = existing[0]
+    original_scouter = entry["scouter"]
 
-    for key, value in patch.updates.items():
-        if key == "scouter":
-            new_value = None if value == "__UNCLAIM__" else value
-            if entry["scouter"] != new_value:
-                entry["scouter"] = new_value
-                updated = True
-            if value == "__UNCLAIM__":
-                if entry["status"] != "unclaimed":
-                    entry["status"] = "unclaimed"
-                    updated = True
-        else:
-            raise HTTPException(status_code=400, detail=f"Unsupported patch key: {key}")
+    # Handle scouter patch first
+    if "scouter" in patch.updates:
+        val = patch.updates["scouter"]
+        new_scouter = None if val == "__UNCLAIM__" else val
 
+        if new_scouter != original_scouter:
+            conn = get_db_conn()
+            cursor = conn.cursor()
+            cursor.execute("""
+                UPDATE match_scouting
+                SET scouter = ?, last_modified = ?
+                WHERE match = ? AND match_type = ? AND team = ? AND scouter IS ?
+            """, (
+                new_scouter,
+                time.time_ns(),
+                entry["match"],
+                entry["match_type"],
+                entry["team"],
+                original_scouter
+            ))
+            conn.commit()
+            conn.close()
+            original_scouter = new_scouter  # for update_match_scouting
+
+        if val == "__UNCLAIM__":
+            patch.phase = "unclaimed"
+
+    # Then update other metadata (status)
     if patch.phase and patch.phase != entry["status"]:
-        entry["status"] = patch.phase
-        updated = True
-
-    if updated:
-            entry["lastModified"] = datetime.now(timezone.utc).isoformat()
+        update_match_scouting(
+            match=entry["match"],
+            m_type=entry["match_type"],
+            team=entry["team"],
+            scouter=original_scouter,
+            data=None,
+            status=patch.phase
+        )
 
     return {"status": "patched"}
 
 
-
 @app.post("/scouting/{match}/{team}/submit")
-def submit_data(match: str, team: int, full_data: FullData,
+def submit_data(match: int, team: int, full_data: FullData,
                 _: dict = Depends(partial(verify_uuid, required="match_scouting"))):
-    """
-    Submit full scouting data for a team in a specific match.
-    Replaces any previous data for that match/team.
-    Sets status to 'submitted'.
-    """
-    if match not in scouting_db:
-        scouting_db[match] = {}
-    scouting_db[match][team] = {
-        "data": full_data.model_dump(),
-        "alliance": full_data.alliance,
-        "scouter": full_data.scouter,
-        "status": "submitted",
-        "lastModified": datetime.now(timezone.utc).isoformat()
-    }
+    add_match_scouting(
+        match=match,
+        m_type=full_data.match_type,
+        team=team,
+        alliance=full_data.alliance,
+        scouter=full_data.scouter,
+        status="submitted",
+        data=full_data.model_dump()
+    )
     return {"status": "submitted"}
 
 
 @app.get("/match/{match}/{alliance}")
-def get_match_info(match: str, alliance: str, _: dict = Depends(partial(verify_uuid, required="match_scouting"))):
-    """
-    Get team numbers, names, and logos for a given match and alliance ('red' or 'blue').
-    Also initializes empty scouting_db entries if they don't exist.
-    """
-    event_key = "2025caoc"  # hardcoded or pull from config if needed
+def get_match_info(match: int, alliance: alliance_type, _: dict = Depends(partial(verify_uuid, required="match_scouting"))):
+    event_key = "2025caoc"
 
     try:
-        team_numbers = tba_fetcher.get_match_alliance_teams(event_key, int(match), alliance)
+        team_numbers = tba_fetcher.get_match_alliance_teams(event_key, match, alliance)
     except (FileNotFoundError, ValueError) as e:
         raise HTTPException(status_code=404, detail=str(e))
 
-    if match not in scouting_db:
-        scouting_db[match] = {}
-
     for t in team_numbers:
-        t_int = int(t)
-        if t_int not in scouting_db[match]:
-            scouting_db[match][t_int] = {
-                "data": {},
-                "alliance": alliance,
-                "scouter": None,
-                "status": "unclaimed",
-                "lastModified": None,
-            }
+        if not get_match_scouting(match=match, m_type="qm", team=str(t)):
+
+            add_match_scouting(
+                match=match,
+                m_type="qm",
+                team=t,
+                alliance=alliance,
+                scouter=None,
+                status="unclaimed",
+                data={}
+            )
 
     return {
         "match": match,
@@ -307,10 +465,10 @@ def get_match_info(match: str, alliance: str, _: dict = Depends(partial(verify_u
                 "number": int(t),
                 "name": tba_fetcher.fetch_team_name_cached(f"frc{t}"),
                 "logo": tba_fetcher.resolve_team_logo_cached(int(t)),
-                "scouter": scouting_db[match][int(t)]["scouter"],
+                "scouter": get_match_scouting(match=match, m_type="qm", team=t)[0].get("scouter")
             }
             for t in team_numbers
-        ],
+        ]
     }
 
 
@@ -331,40 +489,39 @@ def get_team_info(team: int, _: dict = Depends(partial(verify_uuid, required="ma
 
 @app.get("/status/{match}/{team}")
 def get_status(match: str, team: str,
-               _: dict = Depends(partial(verify_uuid, required="match_scouting"))):  # team is str to allow "None"
-    """
-    Returns scouting status and scouter assignment for a specific team in a match.
-    If match/team are both "All", returns full status for the event.
-    """
+               _: dict = Depends(partial(verify_uuid, required="match_scouting"))):
     if match == "All" and team == "All":
+        all_entries = get_match_scouting(None, None, None, None)
         full_status = {}
-        for m, teams in scouting_db.items():
-            full_status[m] = {}
-            for t, data in teams.items():
-                full_status[m][t] = {
-                    "status": data.get("status", "prematch"),
-                    "scouter": data.get("scouter")
-                }
+        for e in all_entries:
+            m = str(e["match"])
+            t = int(e["team"])
+            if m not in full_status:
+                full_status[m] = {}
+            full_status[m][t] = {
+                "status": e["status"],
+                "scouter": e["scouter"]
+            }
         return full_status
 
-    # Convert team to int if not None
     try:
         team_int = int(team)
+        match_int = int(match)
     except ValueError:
-        raise HTTPException(status_code=400, detail="Invalid team number")
+        raise HTTPException(status_code=400, detail="Invalid match or team")
 
-    exists = match in scouting_db and team_int in scouting_db[match]
-    if not exists:
+    entries = get_match_scouting(match=match_int, m_type=None, team=team_int, scouter=None)
+    if not entries:
         return {
             "exists": False,
             "scouter": None,
             "status": "unclaimed"
         }
 
-    entry = scouting_db[match][team_int]
+    entry = entries[0]
     return {
         "exists": True,
-        "lastModified": entry["lastModified"],
+        "lastModified": datetime.fromtimestamp(entry["last_modified"] / 1e9, tz=timezone.utc).isoformat(),
         "scouter": entry.get("scouter"),
         "status": entry.get("status", "error")
     }
@@ -375,15 +532,11 @@ def get_status(match: str, team: str,
 # <editor-fold desc="HTTP polling">
 
 @app.get("/poll/match/{match}/{alliance}")
-async def poll_scouter_changes(match: str, alliance: str,
+async def poll_scouter_changes(match: int, alliance: str,
                                client_ts: str = "",
                                _: dict = Depends(partial(verify_uuid, required="match_scouting"))):
-    """
-    Poll for scouter assignment changes using lastModified timestamps.
-    Returns when any of the 3 team slots have changed since client_ts.
-    """
     timeout_s = 10
-    check_interval = 0.1  # seconds
+    check_interval = 0.1
 
     def parse_ts(ts: str) -> datetime:
         try:
@@ -394,43 +547,25 @@ async def poll_scouter_changes(match: str, alliance: str,
     client_time = parse_ts(client_ts)
 
     async def get_current_state():
-        if match not in scouting_db:
-            return {}, None
-
+        entries = get_match_scouting(match=match, m_type=None, team=None, scouter=None)
+        relevant = [e for e in entries if e["alliance"] == alliance]
+        latest_ts = max((e["last_modified"] for e in relevant if e["last_modified"]), default=0)
+        max_ts = datetime.fromtimestamp(latest_ts / 1e9, tz=timezone.utc) if latest_ts else None
         team_data = {
-            str(team): {
-                "scouter": data.get("scouter")
-            }
-            for team, data in scouting_db[match].items()
-            if data.get("alliance") == alliance
+            str(e["team"]): {"scouter": e.get("scouter")} for e in relevant
         }
-
-        timestamps = [
-            datetime.fromisoformat(scouting_db[match][team]["lastModified"])
-            for team in scouting_db[match]
-            if scouting_db[match][team].get("alliance") == alliance
-            and scouting_db[match][team].get("lastModified")
-        ]
-        max_ts = max(timestamps, default=datetime.min.replace(tzinfo=timezone.utc))
         return team_data, max_ts
 
     start = asyncio.get_event_loop().time()
     while True:
         current_state, max_ts = await get_current_state()
         if max_ts and max_ts > client_time:
-            # Wait briefly to catch possible back-to-back updates
             await asyncio.sleep(0.3)
             current_state, max_ts = await get_current_state()
-            return {
-                "timestamp": max_ts.isoformat(),
-                "teams": current_state
-            }
+            return {"timestamp": max_ts.isoformat(), "teams": current_state}
 
         if asyncio.get_event_loop().time() - start > timeout_s:
-            return {
-                "timestamp": max_ts.isoformat() if max_ts else None,
-                "teams": current_state
-            }
+            return {"timestamp": max_ts.isoformat() if max_ts else None, "teams": current_state}
 
         await asyncio.sleep(check_interval)
 

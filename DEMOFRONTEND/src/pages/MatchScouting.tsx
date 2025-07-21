@@ -57,15 +57,12 @@ const initialScoutingData: ScoutingData = {
         algaeMissed: 0,
     },
 
-    endgame: {
-        climb: 'none',
-        success: false,
-    },
-
     postmatch: {
-        intake: 'none',
-        speed: 0,
         skill: 0,
+        climbSpeed: 0,
+        climbSuccess: false,
+        offense: false,
+        defense: false,
         faults: {
             system: false,
             idle: false,
@@ -109,6 +106,7 @@ export default function MatchScoutingLayout() {
             setIsSubmitting(false)
         }
          */
+        console.log(scoutingData)
         setIsSubmitting(true)
         await patchData(scoutingData.match, scoutingData.teamNumber!, {}, 'submitted')
         await new Promise((resolve) => setTimeout(resolve, 1000));

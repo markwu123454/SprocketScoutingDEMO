@@ -36,15 +36,12 @@ export type ScoutingData = {
         algaeMissed: number
     }
 
-    endgame: {
-        climb: ClimbType
-        success: boolean
-    }
-
     postmatch: {
-        intake: IntakeType
-        speed: number
         skill: number
+        climbSpeed: number
+        climbSuccess: boolean
+        offense: boolean
+        defense: boolean
         faults: {
             system: boolean
             idle: boolean
