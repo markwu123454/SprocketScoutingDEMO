@@ -20,6 +20,7 @@ export type ScoutingData = {
         l1: number
         reef: number
         barge: number
+        missAlgae: number
         moved: boolean
     }
 
@@ -42,6 +43,14 @@ export type ScoutingData = {
 
     postmatch: {
         intake: IntakeType
+        speed: number
+        skill: number
+        faults: {
+            system: boolean
+            idle: boolean
+            other: boolean
+        }
+        notes: string
     }
 }
 

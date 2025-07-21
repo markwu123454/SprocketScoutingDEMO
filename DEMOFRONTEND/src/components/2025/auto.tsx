@@ -2,7 +2,7 @@ import {useState} from "react"
 import type {ScoutingData} from "@/types"
 import {useScoutingSync} from "@/contexts/useScoutingSync"
 import ScoreBox from "@/components/ui/scoreBox"
-import fieldImage from "@/assets/2025_Field_No-Algae_Transparent.png"
+import fieldImage from "@/assets/2025_Field_No-Algae_Transparent_Blue.png"
 import * as React from "react";
 
 const coralLevels = ['l2', 'l3', 'l4'] as const
@@ -17,25 +17,39 @@ export default function AutoPhase({data, setData}: {
     const {patchData} = useScoutingSync()
     const [selectedBranch, setSelectedBranch] = useState<string | null>(null)
 
-    const [flashLevel, setFlashLevel] = useState<(typeof coralLevels)[number] | null>(null)
+    const [flash, setFlash] = useState<{ level: (typeof coralLevels)[number]; type: "add" | "remove" } | null>(null)
 
-    const handleLevelSelect = (level: (typeof coralLevels)[number]) => {
-        if (!selectedBranch) return
+    const [missedMode, setMissedMode] = useState<"inc" | "dec">("inc")
+
+    const handleLevelSelect = (level: (typeof coralLevels)[number]): "add" | "remove" => {
+        let flashType: "add" | "remove" = "add"
+
+        if (!selectedBranch) return flashType
         if (navigator.vibrate) navigator.vibrate(50)
 
         const updated = {...data.auto}
 
         if (selectedBranch === "missed") {
-            updated.missed[level] += 1
+            if (missedMode === "inc") {
+                updated.missed[level] += 1
+                flashType = "add"
+            } else {
+                updated.missed[level] = Math.max(0, updated.missed[level] - 1)
+                flashType = "remove"
+            }
         } else {
             const current = updated.branchPlacement[selectedBranch][level]
             updated.branchPlacement[selectedBranch][level] = !current
             updated.moved = true
+            flashType = current ? "remove" : "add"
         }
 
         setData(prev => ({...prev, auto: updated}))
         void patchData(data.match, data.teamNumber!, {auto: updated}, "auto")
+
+        return flashType
     }
+
 
     const toggleMoved = () => {
         const updated = {...data.auto, moved: !data.auto.moved}
@@ -92,7 +106,7 @@ export default function AutoPhase({data, setData}: {
                             ? (["l2", "l3", "l4"] as const)
                                 .filter((lvl) => data.auto.missed[lvl] > 0)
                                 .map((lvl) => `${lvl.toUpperCase()}:${data.auto.missed[lvl]}`)
-                                .join("·")
+                                .join(" · ")
                             : (["l2", "l3", "l4"] as const)
                                 .filter((lvl) => data.auto.branchPlacement[branch][lvl])
                                 .map((lvl) => lvl.toUpperCase())
@@ -101,8 +115,11 @@ export default function AutoPhase({data, setData}: {
                     return (
                         <button
                             key={branch}
-                            onClick={() => setSelectedBranch(branch)}
-                            className={`absolute w-12 h-12 aspect-square rounded-full text-[10px] text-white text-center border border-white flex flex-col items-center justify-center leading-tight ${
+                            onClick={() => {
+                                setSelectedBranch(branch)
+                                if (branch === "missed") setMissedMode("inc")
+                            }}
+                            className={`absolute w-13 h-13 aspect-square rounded-full text-[10px] text-white text-center border border-white flex flex-col items-center justify-center leading-tight ${
                                 selectedBranch === branch ? "bg-zinc-600" : "bg-zinc-800"
                             }`}
                             style={{
@@ -122,29 +139,50 @@ export default function AutoPhase({data, setData}: {
     }
 
     return (
-        <div className="p-4 w-full h-full flex flex-col gap-6">
+        <div className="px-4 w-full h-full flex flex-col gap-6 select-none">
             <div className="text-xl font-semibold">Auto</div>
 
             {renderCoralHexGrid()}
 
-            <div className="flex gap-4 justify-center">
+            <div className="flex gap-4 justify-center items-center">
                 {coralLevels.map((level) => (
                     <button
                         key={level}
                         onClick={() => {
-                            handleLevelSelect(level)
-                            setFlashLevel(level)
-                            setTimeout(() => setFlashLevel(null), 150)
+                            const type = handleLevelSelect(level)
+                            setFlash({level, type})
+                            setTimeout(() => setFlash(null), 150)
                         }}
+
                         className={`px-4 py-2 rounded text-sm transition-colors duration-150 ${
-                            flashLevel === level ? "bg-green-600" : "bg-zinc-700 hover:bg-zinc-500"
+                            flash?.level === level
+                                ? flash.type === "add"
+                                    ? "bg-green-600"
+                                    : "bg-red-600"
+                                : "bg-zinc-700 hover:bg-zinc-500"
+
                         }`}
                     >
                         {level.toUpperCase()}
                     </button>
-
                 ))}
+
+                {selectedBranch === "missed" && (
+                    <button
+                        onClick={() =>
+                            setMissedMode(prev => (prev === "inc" ? "dec" : "inc"))
+                        }
+                        className={`px-3 py-2 rounded text-sm font-medium border ${
+                            missedMode === "inc"
+                                ? "bg-green-700 border-green-800"
+                                : "bg-red-700 border-red-800"
+                        }`}
+                    >
+                        {missedMode === "inc" ? "+" : "−"}
+                    </button>
+                )}
             </div>
+
 
             <div className="grid grid-cols-2 gap-4">
                 <ScoreBox
@@ -190,17 +228,28 @@ export default function AutoPhase({data, setData}: {
                         void patchData(data.match, data.teamNumber!, {auto: updated}, "auto")
                     }}
                 />
-            </div>
+                <ScoreBox
+                    id="auto-missAlgae"
+                    label="Algae miss"
+                    value={data.auto.missAlgae}
+                    onChange={(v) => {
+                        const updated = {
+                            ...data.auto,
+                            missAlgae: v,
+                            moved: true
+                        }
+                        setData(prev => ({...prev, auto: updated}))
+                        void patchData(data.match, data.teamNumber!, {auto: updated}, "auto")
+                    }}
+                />
 
-            <div className="flex justify-between items-center">
-                <span className="text-sm">Left starting area?</span>
                 <button
                     onClick={toggleMoved}
-                    className={`w-24 py-2 rounded text-sm ${
+                    className={`text-sm px-2 py-0.5 rounded text-white ${
                         data.auto.moved ? "bg-green-600" : "bg-red-600"
                     }`}
                 >
-                    {data.auto.moved ? "Yes" : "No"}
+                    LEFT START: {data.auto.moved ? "YES" : "NO"}
                 </button>
             </div>
         </div>

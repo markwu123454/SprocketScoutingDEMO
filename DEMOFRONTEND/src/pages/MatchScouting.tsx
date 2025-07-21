@@ -42,6 +42,7 @@ const initialScoutingData: ScoutingData = {
         l1: 0,
         reef: 0,
         barge: 0,
+        missAlgae: 0,
         moved: false,
     },
 
@@ -63,6 +64,14 @@ const initialScoutingData: ScoutingData = {
 
     postmatch: {
         intake: 'none',
+        speed: 0,
+        skill: 0,
+        faults: {
+            system: false,
+            idle: false,
+            other: false
+        },
+        notes: ''
     }
 }
 
@@ -127,7 +136,7 @@ export default function MatchScoutingLayout() {
 
 
     return (
-        <div className="w-screen min-h-[100dvh] flex flex-col bg-zinc-900 text-white overflow-hidden touch-none">
+        <div className="w-screen min-h-[100dvh] flex flex-col bg-zinc-900 text-white overflow-hidden touch-none select-none">
             {/* Top Bar */}
             <div className="flex justify-between items-center p-4 bg-zinc-800 text-ml font-semibold">
                 <div>
