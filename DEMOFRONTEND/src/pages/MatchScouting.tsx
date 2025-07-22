@@ -6,17 +6,16 @@ import {useScoutingSync, getScouterName} from '@/contexts/useScoutingSync'
 import {Button} from '@/components/ui/button'
 import LoadButton from '@/components/ui/loadButton'
 
-import PreMatch from "@/pages/preMatch.tsx";
-import AutoPhase from "@/components/2025/auto.tsx";
-import TeleopPhase from "@/components/2025/teleop.tsx";
-import PostMatch from "@/components/2025/post.tsx";
+import Pre from "@/pages/pre.tsx"
+import AutoPhase from "@/components/2025/auto.tsx"
+import TeleopPhase from "@/components/2025/teleop.tsx"
+import PostMatch from "@/components/2025/post.tsx"
 
-
-const initialScoutingData: ScoutingData = {
-    match: '',
+const initialScoutingData: Omit<ScoutingData, 'scouter'> = {
+    match: null,
+    match_type: "qm",
     alliance: null,
     teamNumber: null,
-    scouter: null,
 
     auto: {
         branchPlacement: {
@@ -33,12 +32,7 @@ const initialScoutingData: ScoutingData = {
             K: {l2: false, l3: false, l4: false},
             L: {l2: false, l3: false, l4: false},
         },
-        missed: {
-            l1: 0,
-            l2: 0,
-            l3: 0,
-            l4: 0,
-        },
+        missed: {l1: 0, l2: 0, l3: 0, l4: 0},
         l1: 0,
         reef: 0,
         barge: 0,
@@ -63,83 +57,90 @@ const initialScoutingData: ScoutingData = {
         climbSuccess: false,
         offense: false,
         defense: false,
-        faults: {
-            system: false,
-            idle: false,
-            other: false
-        },
-        notes: ''
+        faults: {system: false, idle: false, other: false},
+        notes: '',
     }
 }
 
 const PHASE_ORDER: Phase[] = ['pre', 'auto', 'teleop', 'post']
 
-const scouter = getScouterName()
-
 export default function MatchScoutingLayout() {
+    const {patchData, submitData} = useScoutingSync()
+    const scouterName = getScouterName()!
+
     const [phaseIndex, setPhaseIndex] = useState(0)
     const phase = PHASE_ORDER[phaseIndex]
-    const [isSubmitting, setIsSubmitting] = useState(false)
-    const [scoutingData, setScoutingData] = useState<ScoutingData>(initialScoutingData)
 
-    const {patchData} = useScoutingSync()
+    const [scoutingData, setScoutingData] = useState<ScoutingData>({
+        ...initialScoutingData,
+        scouter: scouterName,
+    })
+
+    const [submitStatus, setSubmitStatus] =
+        useState<'idle' | 'loading' | 'success' | 'error'>('idle')
+
+    // Removed alliance restriction because of lack of null flag
+    const baseDisabled =
+        scoutingData.match === 0 ||
+        scoutingData.teamNumber === null
 
     const handleSubmit = async () => {
-        /*
-        setIsSubmitting(true)
-        try {
-            const res = await fetch("/api/scouting", {
-                method: "POST",
-                headers: {"Content-Type": "application/json"},
-                body: JSON.stringify(formData),
-            })
+        if (baseDisabled) return
 
-            if (!res.ok) throw new Error("Failed to submit")
-
-            // success → reset state
-            setFormData(initialScoutingData)
-            setPhaseIndex(0) // go back to pre-match
-        } catch (err) {
-            console.error(err)
-            // Optional: show error toast
-        } finally {
-            setIsSubmitting(false)
+        setSubmitStatus('loading')
+        const {match, match_type, teamNumber, alliance, scouter, ...rest} = scoutingData
+        const fullData = {
+            match_type: match_type,
+            alliance,
+            scouter: scouterName,
+            data: rest as Omit<ScoutingData, 'match' | 'alliance' | 'teamNumber' | 'scouter'>,
         }
-         */
-        console.log(scoutingData)
-        setIsSubmitting(true)
-        await patchData(scoutingData.match, scoutingData.teamNumber!, {}, 'submitted')
-        await new Promise((resolve) => setTimeout(resolve, 1000));
-        setScoutingData(initialScoutingData)
-        setPhaseIndex(0) // go back to pre-match
-        setIsSubmitting(false)
+
+        try {
+            const submitted = await submitData(Number(match), teamNumber!, fullData)
+            if (!submitted) {
+                console.error("submitData returned false")
+                setSubmitStatus("error")
+                return
+            }
+
+            setSubmitStatus('success')
+            setTimeout(() => {
+                setSubmitStatus('idle')
+                setScoutingData({...initialScoutingData, scouter: scouterName})
+                setPhaseIndex(0)
+            }, 1000)
+        } catch {
+            setSubmitStatus('error')
+            setTimeout(() => setSubmitStatus('idle'), 2000)
+        }
     }
 
     const handleNext = async () => {
+        if (baseDisabled) return
         const nextIndex = phaseIndex + 1
         setPhaseIndex(nextIndex)
-        await patchData(scoutingData.match, scoutingData.teamNumber!, {}, PHASE_ORDER[nextIndex])
+        await patchData(scoutingData.match!, scoutingData.teamNumber!, {
+            scouter: scouterName,
+            phase: PHASE_ORDER[nextIndex],
+        })
     }
 
     const handleBack = async () => {
-        if (phaseIndex > 0) {
-            const prevIndex = phaseIndex - 1
-            setPhaseIndex(prevIndex)
-            await patchData(scoutingData.match, scoutingData.teamNumber!, {}, PHASE_ORDER[prevIndex])
-        } else {
-            console.log("can't back")
-            await patchData(scoutingData.match, scoutingData.teamNumber!, {}, PHASE_ORDER[phaseIndex])
-        }
+        if (phaseIndex === 0) return
+        const prevIndex = phaseIndex - 1
+        setPhaseIndex(prevIndex)
+        await patchData(scoutingData.match!, scoutingData.teamNumber!, {
+            scouter: scouterName,
+            phase: PHASE_ORDER[prevIndex],
+        })
     }
 
-
     return (
-        <div className="w-screen min-h-[100dvh] flex flex-col bg-zinc-900 text-white overflow-hidden touch-none select-none">
-            {/* Top Bar */}
+        <div
+            className="w-screen min-h-[100dvh] flex flex-col bg-zinc-900 text-white overflow-hidden touch-none select-none">
             <div className="flex justify-between items-center p-4 bg-zinc-800 text-ml font-semibold">
-                <div>
-                    {scouter}
-                </div>
+                <div>{scouterName}</div>
                 <div>
                     {scoutingData.teamNumber !== null
                         ? `Team ${scoutingData.teamNumber}`
@@ -152,48 +153,46 @@ export default function MatchScoutingLayout() {
                 <div className="capitalize">{phase}</div>
             </div>
 
-            {/* Main Phase Content */}
             <div className="flex-1 flex items-center justify-center text-4xl">
-                {phase === 'pre' && <PreMatch data={scoutingData}
-                                              setData={setScoutingData}/>}
-                {phase === 'auto' && <AutoPhase data={scoutingData}
-                                                setData={setScoutingData}/>}
-                {phase === 'teleop' && <TeleopPhase data={scoutingData}
-                                                    setData={setScoutingData}/>}
-                {phase === 'post' && <PostMatch data={scoutingData}
-                                                setData={setScoutingData}/>}
+                {phase === 'pre' && (
+                    <Pre key="pre" data={scoutingData} setData={setScoutingData}/>
+                )}
+                {phase === 'auto' && (
+                    <AutoPhase key="auto" data={scoutingData} setData={setScoutingData}/>
+                )}
+                {phase === 'teleop' && (
+                    <TeleopPhase key="teleop" data={scoutingData} setData={setScoutingData}/>
+                )}
+                {phase === 'post' && (
+                    <PostMatch key="post" data={scoutingData} setData={setScoutingData}/>
+                )}
             </div>
 
-            {/* Bottom Action Bar */}
             <div className="flex justify-between items-center p-4 bg-zinc-800 text-xl font-semibold">
                 <Button
                     onClick={handleBack}
-                    disabled={isSubmitting || phaseIndex < 1}
-                    className={isSubmitting || phaseIndex < 1 ? "cursor-not-allowed opacity-50" : "cursor-pointer"}
+                    disabled={submitStatus === 'loading' || phaseIndex < 1}
+                    className={
+                        submitStatus === 'loading' || phaseIndex < 1
+                            ? 'cursor-not-allowed opacity-50'
+                            : 'cursor-pointer'
+                    }
                 >
                     Back
                 </Button>
 
                 <LoadButton
-                    loading={isSubmitting}
-                    onClick={phase === "post" ? handleSubmit : handleNext}
-                    disabled={
-                        scoutingData.match.trim() === '' ||
-                        scoutingData.alliance === null ||
-                        scoutingData.teamNumber === null
-                    }
+                    status={submitStatus}
+                    onClick={phase === 'post' ? handleSubmit : handleNext}
+                    disabled={baseDisabled}
                     className={
-                        scoutingData.match.trim() === '' ||
-                        scoutingData.alliance === null ||
-                        scoutingData.teamNumber === null
-                            ? "cursor-not-allowed opacity-50"
-                            : "cursor-pointer"
+                        baseDisabled ? 'cursor-not-allowed opacity-50' : 'cursor-pointer'
                     }
+                    message={submitStatus === 'success' ? 'Submitted!' : undefined}
                 >
-                    {phase === "post" ? "Submit" : "Next"}
+                    {phase === 'post' ? 'Submit' : 'Next'}
                 </LoadButton>
             </div>
         </div>
     )
 }
-

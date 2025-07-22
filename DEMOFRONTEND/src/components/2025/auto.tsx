@@ -1,6 +1,5 @@
 import {useState} from "react"
 import type {ScoutingData} from "@/types"
-import {useScoutingSync} from "@/contexts/useScoutingSync"
 import ScoreBox from "@/components/ui/scoreBox"
 import fieldImage from "@/assets/2025_Field_No-Algae_Transparent_Blue.png"
 import * as React from "react";
@@ -14,7 +13,6 @@ export default function AutoPhase({data, setData}: {
     data: ScoutingData,
     setData: React.Dispatch<React.SetStateAction<ScoutingData>>
 }) {
-    const {patchData} = useScoutingSync()
     const [selectedBranch, setSelectedBranch] = useState<string | null>(null)
 
     const [flash, setFlash] = useState<{ level: (typeof coralLevels)[number]; type: "add" | "remove" } | null>(null)
@@ -45,7 +43,7 @@ export default function AutoPhase({data, setData}: {
         }
 
         setData(prev => ({...prev, auto: updated}))
-        void patchData(data.match, data.teamNumber!, {auto: updated}, "auto")
+        // Add patchsave
 
         return flashType
     }
@@ -54,7 +52,7 @@ export default function AutoPhase({data, setData}: {
     const toggleMoved = () => {
         const updated = {...data.auto, moved: !data.auto.moved}
         setData(prev => ({...prev, auto: updated}))
-        void patchData(data.match, data.teamNumber!, {auto: updated}, "auto")
+        // Add patchsave
     }
 
     const renderCoralHexGrid = () => {
@@ -192,7 +190,7 @@ export default function AutoPhase({data, setData}: {
                     onChange={(v) => {
                         const updated = {...data.auto, l1: v, moved: true}
                         setData(prev => ({...prev, auto: updated}))
-                        void patchData(data.match, data.teamNumber!, {auto: updated}, "auto")
+                        // Add patchsave
                     }}
                 />
                 <ScoreBox
@@ -205,7 +203,7 @@ export default function AutoPhase({data, setData}: {
                             missed: {...data.auto.missed, l1: v}
                         }
                         setData(prev => ({...prev, auto: updated}))
-                        void patchData(data.match, data.teamNumber!, {auto: updated}, "auto")
+                        // Add patchsave
                     }}
                 />
                 <ScoreBox
@@ -215,7 +213,7 @@ export default function AutoPhase({data, setData}: {
                     onChange={(v) => {
                         const updated = {...data.auto, reef: v, moved: true}
                         setData(prev => ({...prev, auto: updated}))
-                        void patchData(data.match, data.teamNumber!, {auto: updated}, "auto")
+                        // Add patchsave
                     }}
                 />
                 <ScoreBox
@@ -225,7 +223,7 @@ export default function AutoPhase({data, setData}: {
                     onChange={(v) => {
                         const updated = {...data.auto, barge: v, moved: true}
                         setData(prev => ({...prev, auto: updated}))
-                        void patchData(data.match, data.teamNumber!, {auto: updated}, "auto")
+                        // Add patchsave
                     }}
                 />
                 <ScoreBox
@@ -239,7 +237,7 @@ export default function AutoPhase({data, setData}: {
                             moved: true
                         }
                         setData(prev => ({...prev, auto: updated}))
-                        void patchData(data.match, data.teamNumber!, {auto: updated}, "auto")
+                        // Add patchsave
                     }}
                 />
 

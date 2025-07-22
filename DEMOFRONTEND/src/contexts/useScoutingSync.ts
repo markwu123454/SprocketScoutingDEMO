@@ -1,4 +1,4 @@
-import type {TeamInfo} from '@/types'
+import type {TeamInfo, ScoutingData, MatchType, AllianceType} from '@/types'
 
 const url = `${window.location.protocol}//${window.location.hostname}:8000`;
 const UUID_COOKIE = "scouting_uuid"
@@ -39,45 +39,93 @@ export function useScoutingSync() {
 
     const getName = (): string | null => cachedName
 
-    const patchData = async (
-    match: string,
-    team: number,
-    updates: Record<string, any>, // TODO: replace with explicit `scouter` and `phase` params
-    phase?: string
-): Promise<boolean> => {
-    try {
-        const body: any = { updates: {} }
-
-        if ("scouter" in updates) {
-            body.updates.scouter = updates.scouter ?? "__UNCLAIM__"
-        }
-
-        const extraKeys = Object.keys(updates).filter(k => k !== "scouter")
-        if (extraKeys.length > 0) {
-            console.warn(`patchMetadata: Ignored unsupported keys: ${extraKeys.join(", ")}`)
-        }
-
-        if (!("scouter" in updates) && !phase) {
-            console.warn("patchMetadata: called with no valid updates.")
-            return false
-        }
-
-        if (phase) body.phase = phase
-
-        const res = await fetch(`${url}/scouting/${match}/${team}`, {
-            method: "PATCH",
-            headers: getAuthHeaders(),
-            body: JSON.stringify(body),
-        })
-
-        return res.ok
-    } catch (err) {
-        console.error("patchMetadata failed:", err)
-        return false
+    type SubmitPayload = {
+        match_type: MatchType;
+        alliance: AllianceType;
+        scouter: string;
+        data: Omit<ScoutingData,
+            'match' |
+            'alliance' |
+            'teamNumber' |
+            'scouter'
+        >;
     }
-}
+
+    const submitData = async (
+        match: number,
+        team: number,
+        fullData: SubmitPayload
+    ): Promise<boolean> => {
+        try {
+            const {match_type, alliance, scouter, data} = fullData;
+            console.log(data)
+            // flatten into the exact shape your POST endpoint expects
+            const body = {
+                match_type,
+                alliance,
+                scouter,
+                ...data,
+            };
+
+            const res = await fetch(`${url}/scouting/${match}/${team}/submit`, {
+                method: 'POST',
+                headers: {
+                    ...getAuthHeaders(),
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(body),
+            });
+
+            return res.ok;
+        } catch (err) {
+            console.error('submitData failed:', err);
+            return false;
+        }
+    };
 
 
+    const patchData = async (
+        match: number,
+        team: number,
+        updates: { scouter?: string | null; phase?: string }
+    ): Promise<boolean> => {
+        try {
+            const scouter = updates.scouter ?? "__UNCLAIM__";
+            const phase = updates.phase;
+
+            if (!updates.scouter && !phase) {
+                console.warn("patchData: called with no valid updates.");
+                return false;
+            }
+
+            const query = new URLSearchParams();
+            query.set("scouter", scouter);
+            if (phase) query.set("status", phase);
+
+            const res = await fetch(`${url}/scouting/${match}/${team}/state?${query.toString()}`, {
+                method: "PATCH",
+                headers: getAuthHeaders(),
+            });
+
+            return res.ok;
+        } catch (err) {
+            console.error("patchData failed:", err);
+            return false;
+        }
+    };
+
+
+    const getCurrentScoutingEntry = async (): Promise<any | null> => {
+        try {
+            const res = await fetch(`${url}/scouting/current`, {
+                headers: getAuthHeaders(),
+            })
+            return res.ok ? await res.json() : null
+        } catch (err) {
+            console.error("getCurrentScoutingEntry failed:", err)
+            return null
+        }
+    }
 
     const getStatus = async (
         match: string,
@@ -95,7 +143,7 @@ export function useScoutingSync() {
     }
 
     const getTeamList = async (
-        match: string,
+        match: number,
         alliance: 'red' | 'blue'
     ): Promise<TeamInfo[]> => {
         try {
@@ -146,7 +194,8 @@ export function useScoutingSync() {
             match_scouting: boolean
             pit_scouting: boolean
         }
-    }> => {
+    }> =>
+    {
         deleteCookie(UUID_COOKIE)
         deleteCookie(NAME_COOKIE)
 
@@ -185,7 +234,8 @@ export function useScoutingSync() {
             match_scouting: boolean
             pit_scouting: boolean
         }
-    }> => {
+    }> =>
+    {
         try {
             const res = await fetch(`${url}/auth/verify`, {
                 headers: getAuthHeaders(),
@@ -204,29 +254,15 @@ export function useScoutingSync() {
         }
     }
 
-    return {patchData, getStatus, getTeamList, getAllStatuses, login, verify, getName}
-}
-
-export async function unclaimTeam(match: string, team: number, alliance: string) {
-    console.log("[unclaimTeam]", {match, team, alliance})
-    try {
-        const res = await fetch(`${url}/scouting/${match}/${team}`, {
-            method: 'PATCH',
-            headers: getAuthHeaders(),
-            body: JSON.stringify({
-                updates: {
-                    match,
-                    alliance,
-                    teamNumber: team,
-                    scouter: "__UNCLAIM__",
-                },
-                phase: 'pre',
-            }),
-            keepalive: true,
-        })
-        return res.ok
-    } catch (err) {
-        console.error("unclaimTeam failed:", err)
-        return false
+    return {
+        patchData,
+        getStatus,
+        getTeamList,
+        getAllStatuses,
+        login,
+        verify,
+        getName,
+        getCurrentScoutingEntry,
+        submitData
     }
 }

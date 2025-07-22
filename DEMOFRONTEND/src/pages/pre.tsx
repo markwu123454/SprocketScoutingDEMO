@@ -1,32 +1,34 @@
 import type {ScoutingData, TeamInfo} from "@/types.ts"
 import * as React from "react"
 import {getAuthHeaders, getScouterName, useScoutingSync} from "@/contexts/useScoutingSync.ts"
-import {useEffect, useState} from "react"
+import {useEffect, useRef, useState} from "react"
 import {usePollingEffect} from "@/contexts/pollingContext.tsx"
 
-export default function PreMatch({
-                                     data,
-                                     setData,
-                                 }: {
+export default function Pre({
+                                data,
+                                setData,
+                            }: {
     data: ScoutingData
     setData: React.Dispatch<React.SetStateAction<ScoutingData>>
 }) {
     const {patchData, getTeamList} = useScoutingSync()
     const [teamList, setTeamList] = useState<TeamInfo[] | null>(null)
-    const [showCustomTeam, setShowCustomTeam] = useState(false)
 
     const {match, alliance, teamNumber} = data
-    const scouter = getScouterName() || ""
-    const isValidMatch = (m: string) => /^\d+$/.test(m)
+    const scouter = getScouterName()!
 
     const [lastTimestamp, setLastTimestamp] = useState<string>("")
+
+    const inputRef = useRef<HTMLInputElement>(null);
 
     // 1. Debounced PATCH on input change
     useEffect(() => {
         if (!match || !alliance || teamNumber === null) return
 
         const timeout = setTimeout(() => {
-            void patchData(match, teamNumber, {match, alliance, teamNumber, scouter}, "pre")
+            void patchData(match, teamNumber, {
+                scouter: scouter, phase: 'pre'
+            })
         }, 300)
 
         return () => clearTimeout(timeout)
@@ -34,7 +36,7 @@ export default function PreMatch({
 
     // 2. Initial team list load
     useEffect(() => {
-        if (!isValidMatch(match) || !alliance) {
+        if (!match || !alliance) {
             setTeamList([])
             return
         }
@@ -53,7 +55,7 @@ export default function PreMatch({
 
     // 3. Polling for updates
     usePollingEffect(
-        isValidMatch(match) && alliance
+        match && alliance
             ? `${window.location.protocol}//${window.location.hostname}:8000/poll/match/${match}/${alliance}?client_ts=${encodeURIComponent(lastTimestamp)}`
             : null,
         (data: { teams: Record<string, { scouter: string | null }>, timestamp?: string }) => {
@@ -78,7 +80,6 @@ export default function PreMatch({
 
 
     const handleTeamSelect = async (newTeamNumber: number) => {
-        setShowCustomTeam(false)
         if (match && teamNumber !== null && teamNumber !== newTeamNumber) {
             const oldTeamNumber = teamNumber
             setTeamList((prev) =>
@@ -87,11 +88,8 @@ export default function PreMatch({
                 ) ?? null
             )
             await patchData(match, oldTeamNumber, {
-                match,
-                alliance,
-                teamNumber: oldTeamNumber,
-                scouter: "__UNCLAIM__",
-            }, 'pre')
+                scouter: "__UNCLAIM__", phase: 'pre'
+            })
         }
 
         setData((d) => ({
@@ -110,24 +108,24 @@ export default function PreMatch({
                 <input
                     type="text"
                     inputMode="numeric"
-                    value={match}
+                    defaultValue=""
+                    ref={inputRef}
                     onChange={(e) => {
-                        const newMatch = e.target.value
+                        const raw = e.target.value.replace(/\s/g, '');
+                        const newMatch = /^-?\d*\.?\d+$/.test(raw) ? parseFloat(raw) : 0;
+
                         if (match && teamNumber !== null) {
-                            const oldTeamNumber = teamNumber
-                            void patchData(match, oldTeamNumber, {
-                                match,
-                                alliance,
-                                teamNumber: oldTeamNumber,
+                            void patchData(match, teamNumber, {
                                 scouter: "__UNCLAIM__",
-                            }, 'pre')
+                                phase: 'pre',
+                            });
                         }
 
                         setData((d) => ({
                             ...d,
                             match: newMatch,
                             teamNumber: null,
-                        }))
+                        }));
                     }}
                     className="w-full p-2 rounded bg-zinc-800 border border-zinc-700 text-white"
                 />
@@ -142,13 +140,9 @@ export default function PreMatch({
                             key={color}
                             onClick={() => {
                                 if (match && teamNumber !== null) {
-                                    const oldTeamNumber = teamNumber
-                                    void patchData(match, oldTeamNumber, {
-                                        match,
-                                        alliance,
-                                        teamNumber: oldTeamNumber,
-                                        scouter: "__UNCLAIM__",
-                                    }, 'pre')
+                                    void patchData(match, teamNumber, {
+                                        scouter: "__UNCLAIM__", phase: 'pre'
+                                    })
                                 }
 
                                 setData((d) => ({
@@ -207,7 +201,11 @@ export default function PreMatch({
                                     />
                                 </div>
 
-                                <span className='text-xl'>{`${team.name.nickname}(${team.number})`}</span>
+                                <div className="text-xl flex items-center gap-1 max-w-full">
+                                    <span className="truncate max-w-[10rem]">{team.name.nickname}</span>
+                                    <span>({team.number})</span>
+                                </div>
+
                                 {isClaimed && (
                                     <span className="text-sm">
                                         {`Scouting by ${team.scouter === scouter ? 'you' : team.scouter}`}
@@ -216,45 +214,6 @@ export default function PreMatch({
                             </button>
                         )
                     })}
-
-                    {!showCustomTeam ? (
-                        <button
-                            className="text-left text-sm text-zinc-400 underline mt-1"
-                            onClick={() => {
-                                if (match && teamNumber !== null) {
-                                    const oldTeamNumber = teamNumber
-                                    void patchData(match, oldTeamNumber, {
-                                        match,
-                                        alliance,
-                                        teamNumber: oldTeamNumber,
-                                        scouter: "__UNCLAIM__",
-                                    }, 'pre')
-                                }
-
-                                setShowCustomTeam(true)
-                                setData((d) => ({
-                                    ...d,
-                                    teamNumber: null,
-                                }))
-                            }}
-                        >
-                            If your team isn’t listed, enter it manually
-                        </button>
-                    ) : (
-                        <input
-                            type="text"
-                            placeholder="Custom team number"
-                            value={teamNumber?.toString() ?? ''}
-                            onChange={(e) => {
-                                const num = parseInt(e.target.value || '0')
-                                setData((d) => ({
-                                    ...d,
-                                    teamNumber: num || null,
-                                }))
-                            }}
-                            className="w-full p-2 rounded bg-zinc-800 border border-zinc-700 text-white"
-                        />
-                    )}
                 </div>
             </div>
         </div>

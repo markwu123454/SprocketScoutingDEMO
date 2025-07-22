@@ -1,9 +1,12 @@
-type ClimbType = 'none' | 'park' | 'shallow' | 'deep'
-type IntakeType = 'none' | 'ground' | 'station' | 'both'
+//type ClimbType = 'none' | 'park' | 'shallow' | 'deep'
+//type IntakeType = 'none' | 'ground' | 'station' | 'both'
+export type MatchType = 'qm' | 'sf' | 'f'
+export type AllianceType = 'red' | 'blue' | null
 
 export type ScoutingData = {
-    match: string
-    alliance: 'red' | 'blue' | null
+    match: number | null
+    match_type: MatchType
+    alliance: AllianceType
     teamNumber: number | null
     scouter: string | null
 
@@ -23,7 +26,6 @@ export type ScoutingData = {
         missAlgae: number
         moved: boolean
     }
-
 
     teleop: {
         l1: number

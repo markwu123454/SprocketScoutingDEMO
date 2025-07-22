@@ -46,17 +46,19 @@ def resolve_team_logo(team_number: int, year: str = DEFAULT_YEAR) -> str:
 def resolve_team_logo_cached(team_number: int, year: str = DEFAULT_YEAR) -> str:
     return resolve_team_logo(team_number, year)
 
-def fetch_team_logo(team_key: str, year: str) -> (Optional[str], Optional[bool]):
-    url = f"{TBA_BASE_URL}/team/{team_key}/media/{year}"
-    r = requests.get(url, headers=HEADERS)
-    if r.status_code != 200:
-        return None, None
-    media: List[Dict[str, Any]] = r.json()
-    for item in media:
-        if item.get("type") == "avatar" and "base64Image" in item.get("details", {}):
-            return item["details"]["base64Image"], True
-        elif item.get("type") == "avatar" and "direct_url" in item:
-            return item["direct_url"], False
+def fetch_team_logo(team_key: str, year: str, max_years_back: int = 10) -> (Optional[str], Optional[bool]):
+    year_int = int(year)
+    for y in range(year_int, year_int - max_years_back - 1, -1):
+        url = f"{TBA_BASE_URL}/team/{team_key}/media/{y}"
+        r = requests.get(url, headers=HEADERS)
+        if r.status_code != 200:
+            continue
+        media: List[Dict[str, Any]] = r.json()
+        for item in media:
+            if item.get("type") == "avatar" and "base64Image" in item.get("details", {}):
+                return item["details"]["base64Image"], True
+            elif item.get("type") == "avatar" and "direct_url" in item:
+                return item["direct_url"], False
     return None, None
 
 def save_logo(team_key: str, data: str, is_base64: bool) -> None:
