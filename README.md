@@ -63,7 +63,7 @@ run.py
 ## Development Setup
 
 ```bash
-python run.py
+python run.py dev
 ```
 
 

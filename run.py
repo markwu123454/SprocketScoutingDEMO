@@ -2,7 +2,6 @@ import subprocess
 import threading
 import os
 import sys
-import signal
 
 def stream_output(process, name):
     try:
@@ -36,13 +35,33 @@ def terminate_process(proc, name):
             print(f"Forcing kill on {name}")
             proc.kill()
 
-project_root = os.path.abspath(os.path.dirname(__file__))
-frontend_proc = run_process("FRONTEND", ["npm", "run", "dev"], os.path.join(project_root, "DEMOFRONTEND"))
-backend_proc = run_process("BACKEND", ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000", "--reload"], os.path.join(project_root, "DEMOBACKEND"))
+def main(mode):
+    project_root = os.path.abspath(os.path.dirname(__file__))
+    frontend_dir = os.path.join(project_root, "DEMOFRONTEND")
+    backend_dir = os.path.join(project_root, "DEMOBACKEND")
 
-try:
-    frontend_proc.wait()
-    backend_proc.wait()
-except KeyboardInterrupt:
-    terminate_process(frontend_proc, "FRONTEND")
-    terminate_process(backend_proc, "BACKEND")
+    if mode == "dev":
+        frontend_proc = run_process("FRONTEND_DEV", ["npm", "run", "dev"], frontend_dir)
+    elif mode == "prod":
+        build_proc = run_process("FRONTEND_BUILD", ["npm", "run", "build"], frontend_dir)
+        build_proc.wait()
+        frontend_proc = run_process("FRONTEND_SERVE", ["npx", "serve", "dist"], frontend_dir)
+    else:
+        print("Usage: python run.py [dev|prod]")
+        sys.exit(1)
+
+    backend_proc = run_process("BACKEND", ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000", "--reload"], backend_dir)
+
+    try:
+        frontend_proc.wait()
+        backend_proc.wait()
+    except KeyboardInterrupt:
+        terminate_process(frontend_proc, "FRONTEND")
+        terminate_process(backend_proc, "BACKEND")
+
+if __name__ == "__main__":
+    if len(sys.argv) != 2:
+        print("Usage: python run.py [dev|prod]")
+        sys.exit(1)
+
+    main(sys.argv[1].lower())

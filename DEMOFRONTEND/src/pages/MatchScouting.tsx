@@ -10,6 +10,7 @@ import Pre from "@/pages/pre.tsx"
 import AutoPhase from "@/components/2025/auto.tsx"
 import TeleopPhase from "@/components/2025/teleop.tsx"
 import PostMatch from "@/components/2025/post.tsx"
+import {useNavigate} from "react-router-dom";
 
 const initialScoutingData: Omit<ScoutingData, 'scouter'> = {
     match: null,
@@ -67,6 +68,8 @@ const PHASE_ORDER: Phase[] = ['pre', 'auto', 'teleop', 'post']
 export default function MatchScoutingLayout() {
     const {patchData, submitData} = useScoutingSync()
     const scouterName = getScouterName()!
+
+    const navigate = useNavigate()
 
     const [phaseIndex, setPhaseIndex] = useState(0)
     const phase = PHASE_ORDER[phaseIndex]
@@ -127,9 +130,14 @@ export default function MatchScoutingLayout() {
     }
 
     const handleBack = async () => {
-        if (phaseIndex === 0) return
+        if (phaseIndex === 0) {
+            navigate("/")
+            return
+        }
+
         const prevIndex = phaseIndex - 1
         setPhaseIndex(prevIndex)
+
         await patchData(scoutingData.match!, scoutingData.teamNumber!, {
             scouter: scouterName,
             phase: PHASE_ORDER[prevIndex],
@@ -171,14 +179,14 @@ export default function MatchScoutingLayout() {
             <div className="flex justify-between items-center p-4 bg-zinc-800 text-xl font-semibold">
                 <Button
                     onClick={handleBack}
-                    disabled={submitStatus === 'loading' || phaseIndex < 1}
+                    disabled={submitStatus === 'loading'}
                     className={
-                        submitStatus === 'loading' || phaseIndex < 1
+                        submitStatus === 'loading'
                             ? 'cursor-not-allowed opacity-50'
                             : 'cursor-pointer'
                     }
                 >
-                    Back
+                    {phaseIndex < 1 ? 'home' : 'back'}
                 </Button>
 
                 <LoadButton
