@@ -1,6 +1,7 @@
-import {useEffect, useState} from "react"
+import React, {useEffect, useState} from "react"
 import {useNavigate} from "react-router-dom"
 import {useScoutingSync} from "@/contexts/useScoutingSync"
+import {useClientEnvironment} from "@/contexts/useClientEnvironment"
 
 const PERMISSION_LABELS: Record<string, string> = {
     dev: "Developer",
@@ -19,15 +20,26 @@ export default function AuthGate({
     const [authorized, setAuthorized] = useState<boolean | null>(null)
     const navigate = useNavigate()
     const {verify} = useScoutingSync()
+    const {isOnline, serverOnline} = useClientEnvironment()
 
     useEffect(() => {
         const check = async () => {
+            // Allow offline access for scouting roles
+            if (!isOnline || !serverOnline) {
+                if (permission === "match_scouting" || permission === "pit_scouting") {
+                    setAuthorized(true)
+                    return
+                }
+            }
+
             const result = await verify()
-            const perms = result.permissions || {}
-            setAuthorized(result.success && perms[permission])
+            const perms = result.permissions as Partial<Record<"dev" | "admin" | "match_scouting" | "pit_scouting", boolean>>
+            setAuthorized(result.success && !!perms[permission])
+
         }
-        check()
-    }, [permission])
+
+        void check()
+    }, [permission, isOnline, serverOnline])
 
     if (authorized === null) return null
 

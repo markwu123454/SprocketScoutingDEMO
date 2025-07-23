@@ -2,7 +2,7 @@ import {BrowserRouter, Routes, Route} from 'react-router-dom'
 
 import './index.css'
 
-import HomeLayout from './pages/Home'
+import {HomeLayout} from './pages/Home'
 import MatchScoutingLayout from './pages/MatchScouting'
 import PitScoutingLayout from './pages/PitScouting'
 import DataLayout from './pages/Data'

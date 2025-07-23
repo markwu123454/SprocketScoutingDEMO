@@ -14,7 +14,7 @@ export default function Pre({
     const {patchData, getTeamList} = useScoutingSync()
     const [teamList, setTeamList] = useState<TeamInfo[] | null>(null)
 
-    const {match, alliance, teamNumber} = data
+    const {match, alliance, match_type, teamNumber} = data
     const scouter = getScouterName()!
 
     const [lastTimestamp, setLastTimestamp] = useState<string>("")
@@ -26,13 +26,13 @@ export default function Pre({
         if (!match || !alliance || teamNumber === null) return
 
         const timeout = setTimeout(() => {
-            void patchData(match, teamNumber, {
+            void patchData(match, teamNumber, match_type, {
                 scouter: scouter, phase: 'pre'
             })
         }, 300)
 
         return () => clearTimeout(timeout)
-    }, [match, alliance, teamNumber])
+    }, [match, alliance, teamNumber, match_type])
 
     // 2. Initial team list load
     useEffect(() => {
@@ -44,14 +44,14 @@ export default function Pre({
         let alive = true
         void (async () => {
             setTeamList(null)
-            const teams = await getTeamList(match, alliance)
+            const teams = await getTeamList(match, match_type, alliance)
             if (alive) setTeamList(teams)
         })()
 
         return () => {
             alive = false
         }
-    }, [match, alliance])
+    }, [match, alliance, match_type])
 
     // 3. Polling for updates
     usePollingEffect(
@@ -87,7 +87,7 @@ export default function Pre({
                     t.number === oldTeamNumber ? {...t, scouter: null} : t
                 ) ?? null
             )
-            await patchData(match, oldTeamNumber, {
+            await patchData(match, oldTeamNumber, match_type, {
                 scouter: "__UNCLAIM__", phase: 'pre'
             })
         }
@@ -101,6 +101,41 @@ export default function Pre({
     return (
         <div className="p-4 w-full h-full flex flex-col justify gap-2">
             <div>Pre-Match</div>
+            {/* Match Type Select */}
+            <div>
+                <label className="block text-lg font-medium mb-1">Match Type</label>
+                <div className="flex gap-2 grid-cols-3">
+                    {([
+                        ["qm", "Qualifications"],
+                        ["sf", "Playoffs"],
+                        ["f", "Finals"],
+                    ] as const).map(([key, label]) => (
+                        <button
+                            key={key}
+                            onClick={() => {
+                                if (match && teamNumber !== null) {
+                                    void patchData(match, teamNumber, match_type, {
+                                        scouter: "__UNCLAIM__", phase: 'pre'
+                                    })
+                                }
+
+                                setData((d) => ({
+                                    ...d,
+                                    match_type: key,
+                                    teamNumber: null, // ← reset
+                                }))
+                            }}
+                            className={`py-1 w-[33%] h-10 rounded text-base ${
+                                data.match_type === key
+                                    ? "bg-zinc-400 text-white"
+                                    : "bg-zinc-700 text-white"
+                            }`}
+                        >
+                            {label}
+                        </button>
+                    ))}
+                </div>
+            </div>
 
             {/* Match Number */}
             <div>
@@ -115,7 +150,7 @@ export default function Pre({
                         const newMatch = /^-?\d*\.?\d+$/.test(raw) ? parseFloat(raw) : 0;
 
                         if (match && teamNumber !== null) {
-                            void patchData(match, teamNumber, {
+                            void patchData(match, teamNumber, match_type, {
                                 scouter: "__UNCLAIM__",
                                 phase: 'pre',
                             });
@@ -140,7 +175,7 @@ export default function Pre({
                             key={color}
                             onClick={() => {
                                 if (match && teamNumber !== null) {
-                                    void patchData(match, teamNumber, {
+                                    void patchData(match, teamNumber, match_type, {
                                         scouter: "__UNCLAIM__", phase: 'pre'
                                     })
                                 }
@@ -202,7 +237,7 @@ export default function Pre({
                                 </div>
 
                                 <div className="text-xl flex items-center gap-1 max-w-full">
-                                    <span className="truncate max-w-[10rem]">{team.name.nickname}</span>
+                                    <span>{team.name.nickname}</span>
                                     <span>({team.number})</span>
                                 </div>
 

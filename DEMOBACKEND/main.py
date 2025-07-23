@@ -42,10 +42,6 @@ app.add_middleware(
 TOTP_SECRET = os.getenv("TOTP_SECRET", "base32secret3232")
 SESSION_DURATION = timedelta(minutes=30)
 
-
-
-
-
 uuid_sessions: Dict[str, Dict[str, Any]] = {}
 UUID_DURATION = timedelta(days=100)
 
@@ -218,6 +214,7 @@ def get_match_scouting(
         for r in rows
     ]
 
+
 # </editor-fold>
 
 # <editor-fold desc="Data Models">
@@ -376,15 +373,16 @@ def set_event(event: EventKey, _: dict = Depends(partial(verify_uuid, required="
 
 # <editor-fold desc="HTTP non-polling">
 
-@app.patch("/scouting/{match}/{team}/state")
+@app.patch("/scouting/{m_type}/{match}/{team}/state")
 def update_state(
         match: int,
         team: int,
         scouter: str,
         status: str,
+        m_type: match_type,
         _: dict = Depends(partial(verify_uuid, required="match_scouting"))
 ):
-    existing = get_match_scouting(match=match, m_type="qm", team=team)
+    existing = get_match_scouting(match=match, m_type=m_type, team=team)
     if not existing:
         raise HTTPException(status_code=404, detail="Entry not found")
     entry = existing[0]
@@ -498,24 +496,24 @@ async def get_current_scouting(
     return None
 
 
-@app.get("/match/{match}/{alliance}")
+@app.get("/match/{match}/{alliance}/{m_type}")
 def get_match_info(
         match: int,
         alliance: alliance_type,
+        m_type: match_type,
         _: dict = Depends(partial(verify_uuid, required="match_scouting"))
 ):
     event_key = "2025caoc"
-
     try:
-        team_numbers = tba_fetcher.get_match_alliance_teams(event_key, match, alliance)
+        team_numbers = tba_fetcher.get_match_alliance_teams(event_key, m_type, match, alliance)
     except (FileNotFoundError, ValueError) as e:
         raise HTTPException(status_code=404, detail=str(e))
 
     for t in team_numbers:
-        if not get_match_scouting(match=match, m_type="qm", team=str(t)):
+        if not get_match_scouting(match=match, m_type=m_type, team=str(t)):
             add_match_scouting(
                 match=match,
-                m_type="qm",
+                m_type=m_type,
                 team=t,
                 alliance=alliance,
                 scouter=None,
@@ -524,14 +522,12 @@ def get_match_info(
             )
 
     return {
-        "match": match,
-        "alliance": alliance,
         "teams": [
             {
                 "number": int(t),
                 "name": tba_fetcher.fetch_team_name_cached(f"frc{t}"),
                 "logo": tba_fetcher.resolve_team_logo_cached(int(t)),
-                "scouter": get_match_scouting(match=match, m_type="qm", team=t)[0].get("scouter")
+                "scouter": get_match_scouting(match=match, m_type=m_type, team=t)[0].get("scouter")
             }
             for t in team_numbers
         ]
@@ -598,6 +594,10 @@ def get_status(
         "status": entry.get("status", "error")
     }
 
+
+@app.get("/ping")
+def ping():
+    return {"ping": "pong"}
 
 # </editor-fold>
 

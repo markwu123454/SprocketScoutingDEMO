@@ -2,9 +2,13 @@ import {useEffect, useRef, useState} from "react"
 import {useNavigate} from "react-router-dom"
 import {useScoutingSync} from "@/contexts/useScoutingSync"
 import {Eye, EyeOff} from "lucide-react"
+import TooltipButton from "@/components/ui/tooltipButton"
+import {useClientEnvironment} from "@/contexts/useClientEnvironment.ts"
 
-export default function HomeLayout() {
+export function HomeLayout() {
     const {login, verify} = useScoutingSync()
+    const {isPWA, isOnline, serverOnline} = useClientEnvironment()
+
     const [passphrase, setPassphrase] = useState("")
     const [name, setName] = useState<string | null>(null)
     const [lastPassphrase, setLastPassphrase] = useState<string | null>(null)
@@ -39,6 +43,13 @@ export default function HomeLayout() {
         `Scouting interface ready for ${name}.`,
 
         `HIIIIIIII, ${name}, I'VE BEEN CODING NON-STOP FOR 2 MONTH, HELP.`,
+    ]
+
+    const privilegeButtons = [
+        {label: "Control", key: "dev", path: "/dev"},
+        {label: "Admin Panel & Data", key: "admin", path: "/admin"},
+        {label: "Match Scouting", key: "match_scouting", path: "/scouting/match"},
+        {label: "Pit Scouting", key: "pit_scouting", path: "/scouting/pit"},
     ]
 
     const navigate = useNavigate()
@@ -104,13 +115,6 @@ export default function HomeLayout() {
         if (e.key === "Enter") handleCheck()
     }
 
-    const privilegeButtons = [
-        {label: "Control", key: "dev", path: "/dev"},
-        {label: "Admin Panel & Data", key: "admin", path: "/admin"},
-        {label: "Match Scouting", key: "match_scouting", path: "/scouting/match"},
-        {label: "Pit Scouting", key: "pit_scouting", path: "/scouting/pit"},
-    ]
-
     return (
         <div className="min-h-screen bg-zinc-900 text-white flex items-center justify-center px-4 touch-none">
             <div className="w-full max-w-md bg-zinc-950 p-6 rounded-lg shadow-lg space-y-6 border border-zinc-800">
@@ -143,44 +147,88 @@ export default function HomeLayout() {
                     </button>
 
                 </div>
-                <button
-                    onClick={handleCheck}
-                    disabled={loginConfirmed}
-                    className={`w-full py-2 transition rounded font-semibold ${
-                        loginConfirmed
-                            ? "bg-green-600 text-white cursor-default"
-                            : "bg-blue-600 hover:bg-blue-500 text-white"
-                    }`}
-                >
-                    {loginConfirmed ? "Logged In" : "Login"}
-                </button>
-
-
-                {error && <p className="text-red-500 text-sm">{error}</p>}
-                {name && (
-                    <p className="text-sm text-zinc-400">
-                        {greetings[messageIndex!]}
-                    </p>
+                {isOnline && serverOnline ? (
+                    <button
+                        onClick={handleCheck}
+                        disabled={loginConfirmed}
+                        className={`w-full py-2 transition rounded font-semibold ${
+                            loginConfirmed
+                                ? "bg-green-600 text-white cursor-default"
+                                : "bg-blue-600 hover:bg-blue-500 text-white"
+                        }`}
+                    >
+                        {loginConfirmed ? "Logged In" : "Login"}
+                    </button>
+                ) : (
+                    <button
+                        disabled={true}
+                        className={`w-full py-2 transition rounded font-semibold bg-zinc-900 text-white cursor-not-allowed`}
+                    >
+                        {!isOnline ? "Device Offline" : "Server Offline"}
+                    </button>
                 )}
+                {isOnline && serverOnline && (
+                    <>
+                        {error && <p className="text-red-500 text-sm">{error}</p>}
+                        {name && (
+                            <p className="text-sm text-zinc-400">
+                                {greetings[messageIndex!]}
+                            </p>
+                        )}
+                    </>
+                )}
+
 
                 <div className="space-y-2 pt-2 border-t border-zinc-800">
                     <p className="text-sm text-zinc-500">Available Options</p>
                     <div className="grid grid-cols-1 gap-3">
                         {privilegeButtons.map(({label, key, path}) => {
-                            const enabled = permissions?.[key as keyof typeof permissions] ?? false
+                            const isScoutingPage = key === "match_scouting" || key === "pit_scouting"
+                            const isRestrictedOffline = key === "dev" || key === "admin"
+                            const offline = !isOnline || !serverOnline
+
+                            const tooltips: Record<string, string> = {
+                                dev_allow: "Developer tools and control systems are available.",
+                                dev_forbid: "Developer tools are not available for this account.",
+                                dev_offline: "Developer tools are unavailable in offline mode.",
+
+                                admin_allow: "Admin panel and full scouting data are available.",
+                                admin_forbid: "Admin access is not enabled for this account.",
+                                admin_offline: "Admin panel is unavailable in offline mode.",
+
+                                match_scouting_allow: "Match scouting is available.",
+                                match_scouting_forbid: "Match scouting is not permitted for this account.",
+                                match_scouting_offline: "Match scouting is available in offline mode.",
+
+                                pit_scouting_allow: "Pit scouting is available.",
+                                pit_scouting_forbid: "Pit scouting is not permitted for this account.",
+                                pit_scouting_offline: "Pit scouting is available in offline mode.",
+                            }
+
+
+                            let tooltipKey: string
+                            let enabled: boolean
+
+                            if (isScoutingPage && offline) {
+                                tooltipKey = `${key}_offline`
+                                enabled = true
+                            } else if (isRestrictedOffline && offline) {
+                                tooltipKey = `${key}_offline`
+                                enabled = false
+                            } else {
+                                const hasPermission = permissions?.[key as keyof typeof permissions] ?? false
+                                tooltipKey = `${key}_${hasPermission ? "allow" : "forbid"}`
+                                enabled = hasPermission
+                            }
+
                             return (
-                                <button
+                                <TooltipButton
                                     key={key}
-                                    onClick={() => handleNavigate(path)}
+                                    label={label}
                                     disabled={!enabled}
-                                    className={`w-full py-2 rounded font-medium transition ${
-                                        enabled
-                                            ? "bg-zinc-700 hover:bg-zinc-600 text-white"
-                                            : "bg-zinc-800 text-zinc-500 cursor-not-allowed"
-                                    }`}
-                                >
-                                    {label}
-                                </button>
+                                    tooltip={tooltips[tooltipKey]}
+                                    onClick={() => handleNavigate(path)}
+                                />
                             )
                         })}
                     </div>

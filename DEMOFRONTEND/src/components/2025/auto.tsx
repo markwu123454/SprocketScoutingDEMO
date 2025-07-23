@@ -5,9 +5,7 @@ import fieldImage from "@/assets/2025_Field_No-Algae_Transparent_Blue.png"
 import * as React from "react";
 
 const coralLevels = ['l2', 'l3', 'l4'] as const
-const coralBranches = [
-    "A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "missed"
-] as const
+const coralBranches = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "missed"] as const
 
 export default function AutoPhase({data, setData}: {
     data: ScoutingData,
@@ -48,7 +46,6 @@ export default function AutoPhase({data, setData}: {
         return flashType
     }
 
-
     const toggleMoved = () => {
         const updated = {...data.auto, moved: !data.auto.moved}
         setData(prev => ({...prev, auto: updated}))
@@ -60,7 +57,7 @@ export default function AutoPhase({data, setData}: {
             const labels = ["B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "A"] as const
             const centerTop = 20
             const centerLeft = 50
-            const radius = 30
+            const radius = 37.5
 
             return Object.fromEntries(
                 (
@@ -91,7 +88,7 @@ export default function AutoPhase({data, setData}: {
                     alt="Field"
                     className="w-full h-full object-contain pointer-events-none"
                     style={{
-                        transform: "scale(5) translate(-21%, -42%)",
+                        transform: "scale(1.7) translate(-21%, -27.5%)",
                         transformOrigin: "top left",
                     }}
                 />
@@ -137,12 +134,19 @@ export default function AutoPhase({data, setData}: {
     }
 
     return (
-        <div className="px-4 w-full h-full flex flex-col gap-6 select-none">
+        <div className="p-4 w-full h-full grid select-none gap-6"
+             style={{
+                 gridTemplateRows: 'auto 1fr auto auto'
+             }}
+        >
             <div className="text-xl font-semibold">Auto</div>
 
-            {renderCoralHexGrid()}
+            {/* Growable coral grid section */}
+            <div className="flex-1 min-h-0 flex items-center justify-center">
+                {renderCoralHexGrid()}
+            </div>
 
-            <div className="flex gap-4 justify-center items-center">
+            <div className="flex gap-4 justify-center items-center shrink-0">
                 {coralLevels.map((level) => (
                     <button
                         key={level}
@@ -181,8 +185,7 @@ export default function AutoPhase({data, setData}: {
                 )}
             </div>
 
-
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-2 gap-4 shrink-0">
                 <ScoreBox
                     id="auto-l1"
                     label="L1"

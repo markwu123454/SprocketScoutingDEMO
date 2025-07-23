@@ -37,8 +37,6 @@ export function getScouterName(): string | null {
 export function useScoutingSync() {
     let cachedName: string | null = null
 
-    const getName = (): string | null => cachedName
-
     type SubmitPayload = {
         match_type: MatchType;
         alliance: AllianceType;
@@ -50,6 +48,10 @@ export function useScoutingSync() {
             'scouter'
         >;
     }
+
+
+    const getName = (): string | null => cachedName
+
 
     const submitData = async (
         match: number,
@@ -87,6 +89,7 @@ export function useScoutingSync() {
     const patchData = async (
         match: number,
         team: number,
+        match_type: MatchType,
         updates: { scouter?: string | null; phase?: string }
     ): Promise<boolean> => {
         try {
@@ -102,7 +105,7 @@ export function useScoutingSync() {
             query.set("scouter", scouter);
             if (phase) query.set("status", phase);
 
-            const res = await fetch(`${url}/scouting/${match}/${team}/state?${query.toString()}`, {
+            const res = await fetch(`${url}/scouting/${match_type}/${match}/${team}/state?${query.toString()}`, {
                 method: "PATCH",
                 headers: getAuthHeaders(),
             });
@@ -110,6 +113,28 @@ export function useScoutingSync() {
             return res.ok;
         } catch (err) {
             console.error("patchData failed:", err);
+            return false;
+        }
+    };
+
+
+    const Ping = async (): Promise<boolean> => {
+        const controller = new AbortController();
+        const timeout = setTimeout(() => controller.abort(), 4000);
+
+        try {
+            const res = await fetch(`${url}/ping`, {
+                method: "GET",
+                signal: controller.signal,
+            });
+
+            clearTimeout(timeout);
+
+            if (!res.ok) return false;
+
+            const data = await res.json();
+            return data.ping === "pong";
+        } catch {
             return false;
         }
     };
@@ -127,6 +152,7 @@ export function useScoutingSync() {
         }
     }
 
+
     const getStatus = async (
         match: string,
         team: number
@@ -142,12 +168,14 @@ export function useScoutingSync() {
         }
     }
 
+
     const getTeamList = async (
         match: number,
+        m_type: MatchType,
         alliance: 'red' | 'blue'
     ): Promise<TeamInfo[]> => {
         try {
-            const res = await fetch(`${url}/match/${match}/${alliance}`, {
+            const res = await fetch(`${url}/match/${match}/${alliance}/${m_type}`, {
                 headers: getAuthHeaders(),
             })
             if (!res.ok) {
@@ -168,6 +196,7 @@ export function useScoutingSync() {
         }
     }
 
+
     const getAllStatuses = async (): Promise<Record<string, Record<number, {
             status: string;
             scouter: string | null
@@ -184,6 +213,7 @@ export function useScoutingSync() {
         }
     }
 
+
     const login = async (passcode: string): Promise<{
         success: boolean
         name?: string
@@ -194,8 +224,7 @@ export function useScoutingSync() {
             match_scouting: boolean
             pit_scouting: boolean
         }
-    }> =>
-    {
+    }> => {
         deleteCookie(UUID_COOKIE)
         deleteCookie(NAME_COOKIE)
 
@@ -225,6 +254,7 @@ export function useScoutingSync() {
         }
     }
 
+
     const verify = async (): Promise<{
         success: boolean
         name?: string
@@ -234,8 +264,7 @@ export function useScoutingSync() {
             match_scouting: boolean
             pit_scouting: boolean
         }
-    }> =>
-    {
+    }> => {
         try {
             const res = await fetch(`${url}/auth/verify`, {
                 headers: getAuthHeaders(),
@@ -254,6 +283,7 @@ export function useScoutingSync() {
         }
     }
 
+
     return {
         patchData,
         getStatus,
@@ -263,6 +293,7 @@ export function useScoutingSync() {
         verify,
         getName,
         getCurrentScoutingEntry,
-        submitData
+        submitData,
+        Ping
     }
 }

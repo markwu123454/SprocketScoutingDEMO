@@ -1,4 +1,5 @@
 import {useState} from 'react'
+import {useNavigate} from "react-router-dom";
 import type {ScoutingData, Phase} from '@/types'
 
 import {useScoutingSync, getScouterName} from '@/contexts/useScoutingSync'
@@ -6,62 +7,13 @@ import {useScoutingSync, getScouterName} from '@/contexts/useScoutingSync'
 import {Button} from '@/components/ui/button'
 import LoadButton from '@/components/ui/loadButton'
 
-import Pre from "@/pages/pre.tsx"
-import AutoPhase from "@/components/2025/auto.tsx"
-import TeleopPhase from "@/components/2025/teleop.tsx"
-import PostMatch from "@/components/2025/post.tsx"
-import {useNavigate} from "react-router-dom";
+import Pre from "@/pages/pre"
 
-const initialScoutingData: Omit<ScoutingData, 'scouter'> = {
-    match: null,
-    match_type: "qm",
-    alliance: null,
-    teamNumber: null,
+import AutoPhase from "@/components/2025/auto"
+import TeleopPhase from "@/components/2025/teleop"
+import PostMatch from "@/components/2025/post"
+import {initialScoutingData} from "@/components/2025/default"
 
-    auto: {
-        branchPlacement: {
-            A: {l2: false, l3: false, l4: false},
-            B: {l2: false, l3: false, l4: false},
-            C: {l2: false, l3: false, l4: false},
-            D: {l2: false, l3: false, l4: false},
-            E: {l2: false, l3: false, l4: false},
-            F: {l2: false, l3: false, l4: false},
-            G: {l2: false, l3: false, l4: false},
-            H: {l2: false, l3: false, l4: false},
-            I: {l2: false, l3: false, l4: false},
-            J: {l2: false, l3: false, l4: false},
-            K: {l2: false, l3: false, l4: false},
-            L: {l2: false, l3: false, l4: false},
-        },
-        missed: {l1: 0, l2: 0, l3: 0, l4: 0},
-        l1: 0,
-        reef: 0,
-        barge: 0,
-        missAlgae: 0,
-        moved: false,
-    },
-
-    teleop: {
-        l1: 0,
-        l2: 0,
-        l3: 0,
-        l4: 0,
-        coralMissed: 0,
-        reef: 0,
-        barge: 0,
-        algaeMissed: 0,
-    },
-
-    postmatch: {
-        skill: 0,
-        climbSpeed: 0,
-        climbSuccess: false,
-        offense: false,
-        defense: false,
-        faults: {system: false, idle: false, other: false},
-        notes: '',
-    }
-}
 
 const PHASE_ORDER: Phase[] = ['pre', 'auto', 'teleop', 'post']
 
@@ -82,9 +34,10 @@ export default function MatchScoutingLayout() {
     const [submitStatus, setSubmitStatus] =
         useState<'idle' | 'loading' | 'success' | 'error'>('idle')
 
-    // Removed alliance restriction because of lack of null flag
     const baseDisabled =
+        scoutingData.match_type === null ||
         scoutingData.match === 0 ||
+        scoutingData.alliance === null ||
         scoutingData.teamNumber === null
 
     const handleSubmit = async () => {
@@ -123,7 +76,7 @@ export default function MatchScoutingLayout() {
         if (baseDisabled) return
         const nextIndex = phaseIndex + 1
         setPhaseIndex(nextIndex)
-        await patchData(scoutingData.match!, scoutingData.teamNumber!, {
+        await patchData(scoutingData.match!, scoutingData.teamNumber!, scoutingData.match_type, {
             scouter: scouterName,
             phase: PHASE_ORDER[nextIndex],
         })
@@ -138,7 +91,7 @@ export default function MatchScoutingLayout() {
         const prevIndex = phaseIndex - 1
         setPhaseIndex(prevIndex)
 
-        await patchData(scoutingData.match!, scoutingData.teamNumber!, {
+        await patchData(scoutingData.match!, scoutingData.teamNumber!, scoutingData.match_type, {
             scouter: scouterName,
             phase: PHASE_ORDER[prevIndex],
         })
@@ -161,7 +114,7 @@ export default function MatchScoutingLayout() {
                 <div className="capitalize">{phase}</div>
             </div>
 
-            <div className="flex-1 flex items-center justify-center text-4xl">
+            <div className="flex-1 overflow-hidden text-4xl">
                 {phase === 'pre' && (
                     <Pre key="pre" data={scoutingData} setData={setScoutingData}/>
                 )}

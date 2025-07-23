@@ -1,4 +1,6 @@
 import base64
+import re
+
 import requests
 from pathlib import Path
 from datetime import datetime
@@ -7,6 +9,7 @@ import os
 from typing import List, Optional, Dict, Any
 from dotenv import load_dotenv
 from functools import lru_cache
+
 load_dotenv()
 
 TBA_BASE_URL: str = "https://www.thebluealliance.com/api/v3"
@@ -21,6 +24,7 @@ def fetch_event_matches(event_key: str) -> List[Dict[str, Any]]:
     r = requests.get(url, headers=HEADERS)
     r.raise_for_status()
     return r.json()
+
 
 def resolve_team_logo(team_number: int, year: str = DEFAULT_YEAR) -> str:
     team_key = f"frc{team_number}"
@@ -42,9 +46,11 @@ def resolve_team_logo(team_number: int, year: str = DEFAULT_YEAR) -> str:
         encoded = base64.b64encode(f.read()).decode("utf-8")
     return f"data:image/png;base64,{encoded}"
 
+
 @lru_cache(maxsize=512)
 def resolve_team_logo_cached(team_number: int, year: str = DEFAULT_YEAR) -> str:
     return resolve_team_logo(team_number, year)
+
 
 def fetch_team_logo(team_key: str, year: str, max_years_back: int = 10) -> (Optional[str], Optional[bool]):
     year_int = int(year)
@@ -61,6 +67,7 @@ def fetch_team_logo(team_key: str, year: str, max_years_back: int = 10) -> (Opti
                 return item["direct_url"], False
     return None, None
 
+
 def save_logo(team_key: str, data: str, is_base64: bool) -> None:
     LOGO_DIR.mkdir(exist_ok=True)
     path: Path = LOGO_DIR / f"{team_key}.png"
@@ -72,6 +79,7 @@ def save_logo(team_key: str, data: str, is_base64: bool) -> None:
         if r.status_code == 200:
             with open(path, "wb") as f:
                 f.write(r.content)
+
 
 def fetch_team_name(team_key: str) -> Dict[str, Optional[str]]:
     url = f"{TBA_BASE_URL}/team/{team_key}"
@@ -87,40 +95,47 @@ def fetch_team_name(team_key: str) -> Dict[str, Optional[str]]:
         "country": team_info.get("country")
     }
 
+
 @lru_cache(maxsize=512)
 def fetch_team_name_cached(team_key: str) -> dict:
     return fetch_team_name(team_key)
 
-_cached_matches: dict[int, dict[str, list[str]]] = {}
+
+_cached_matches: Dict[str, Dict[int, Dict[str, list[str]]]] = {}
+
 
 def load_event_data(event_key: str):
     event_csv = Path(f"{event_key}.csv")
     if not event_csv.exists():
         raise FileNotFoundError(f"CSV file for event '{event_key}' not found.")
 
-    matches = {}
+    matches: Dict[str, Dict[int, Dict[str, list[str]]]] = {}
     with open(event_csv, newline='', encoding="utf-8") as f:
         reader = csv.DictReader(f)
         for row in reader:
-            if row["comp_level"] == "qm":
-                match_num = int(row["match_number"])
-                matches[match_num] = {
-                    "red": [t[3:] if t.startswith("frc") else t for t in row["red"].split(",")],
-                    "blue": [t[3:] if t.startswith("frc") else t for t in row["blue"].split(",")],
-                }
+            comp_level = row["comp_level"]
+            match_num = int(row["match_number"])
+            red = [t[3:] if t.startswith("frc") else t for t in row["red"].split(",")]
+            blue = [t[3:] if t.startswith("frc") else t for t in row["blue"].split(",")]
+
+            if comp_level not in matches:
+                matches[comp_level] = {}
+            matches[comp_level][match_num] = {"red": red, "blue": blue}
     return matches
 
-def get_match_alliance_teams(event_key: str, match_number: int, alliance: str) -> list[str]:
+
+def get_match_alliance_teams(event_key: str, match_type: str, match_number: int, alliance: str) -> list[str]:
     if not _cached_matches:
         _cached_matches.update(load_event_data(event_key))
 
     if alliance not in ("red", "blue"):
         raise ValueError("Alliance must be 'red' or 'blue'")
 
-    if match_number not in _cached_matches:
-        raise ValueError(f"Quals match {match_number} not found")
+    if match_type not in _cached_matches or match_number not in _cached_matches[match_type]:
+        raise ValueError(f"Match {match_type}{match_number} not found")
 
-    return _cached_matches[match_number][alliance]
+    return _cached_matches[match_type][match_number][alliance]
+
 
 def get_event_data(event_key: str) -> Dict[str, Any]:
     year = event_key[:4]
@@ -154,6 +169,11 @@ def get_event_data(event_key: str) -> Dict[str, Any]:
     else:
         # Fetch from TBA
         matches_raw = fetch_event_matches(event_key)
+        for match in matches_raw:
+            match["match_number"] = int(re.search(r"_(?:sf|qm)(\d+)", match["key"]).group(1)) \
+                if "_sf" in match["key"] or "_qm" in match["key"] \
+                else int(re.search(r"m(\d+)$", match["key"]).group(1))
+
         matches_raw.sort(key=lambda m: (m["comp_level"], m["match_number"]))
 
         with open(event_csv, "w", newline='', encoding="utf-8") as f:
@@ -200,7 +220,7 @@ def get_event_data(event_key: str) -> Dict[str, Any]:
 
 
 if __name__ == "__main__":
-    event_key = "2025hop"
+    event_key = "2025caoc"
     year = event_key[:4]
     data = get_event_data(event_key)
     print("Match details loaded")
