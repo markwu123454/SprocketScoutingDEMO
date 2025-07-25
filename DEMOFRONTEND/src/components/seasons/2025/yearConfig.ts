@@ -43,7 +43,19 @@ export type ScoutingData = {
     }
 }
 
-// Do this *after* defining the type:
+export type UIInfo = {
+    red: {
+        score: number
+        coral: number
+        algae: number
+    }
+    blue: {
+        score: number
+        coral: number
+        algae: number
+    }
+}
+
 export const initialScoutingData: Omit<ScoutingData, 'scouter'> = {
     match: null,
     match_type: null,
@@ -99,4 +111,17 @@ export const initialScoutingData: Omit<ScoutingData, 'scouter'> = {
         },
         notes: '',
     },
+}
+
+export const defaultUIINFO = {
+    red: {
+        score: 0,
+        coral: 0,
+        algae: 0
+    },
+    blue: {
+        score: 0,
+        coral: 0,
+        algae: 0
+    }
 }

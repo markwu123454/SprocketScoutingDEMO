@@ -3,7 +3,7 @@ import csv
 import json
 import sqlite3
 import time
-from fastapi import FastAPI, Header, Depends, HTTPException
+from fastapi import FastAPI, Header, Depends, HTTPException, Body
 from pydantic import BaseModel
 from typing import Dict, Any, Optional, Literal, cast
 from datetime import datetime, timedelta, timezone
@@ -32,7 +32,8 @@ app = FastAPI(lifespan=lifespan)
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://192.168.1.22:5173", "http://10.176.209.233:5173"],
+    allow_origins=["http://192.168.1.22:5173", "http://10.176.209.233:5173", "http://192.168.1.194:5173",
+                   "http://192.168.1.106:5173"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -456,6 +457,26 @@ def update_state(
     return {"status": "patched", "scouter": original_scouter, "phase": status}
 
 
+@app.patch("/scouting/{m_type}/{match}/{team}/{scouter}")
+def update_match(
+        match: int,
+        team: int,
+        scouter: str,
+        m_type: match_type,
+        data: dict = Body(...),
+        _: dict = Depends(partial(verify_uuid, required="match_scouting"))
+):
+    update_match_scouting(
+        match=match,
+        m_type=m_type,
+        team=team,
+        scouter=scouter,
+        data=data
+    )
+
+    return {"status": "patched"}
+
+
 @app.post("/scouting/{match}/{team}/submit")
 def submit_data(
         match: int,
@@ -468,6 +489,27 @@ def submit_data(
     data.pop("scouter", None)
     data.pop("match_type", None)
 
+    # Check if entry exists
+    existing = get_match_scouting(
+        match=match,
+        m_type=full_data.match_type,
+        team=team,
+        scouter=full_data.scouter
+    )
+
+    if not existing:
+        # Add it first
+        add_match_scouting(
+            match=match,
+            m_type=full_data.match_type,
+            team=team,
+            alliance=full_data.alliance,
+            scouter=full_data.scouter,
+            status="post",  # Initial status before submit
+            data={}  # Start with empty data
+        )
+
+    # Then update it with the submitted data
     update_match_scouting(
         match=match,
         m_type=full_data.match_type,
@@ -505,7 +547,7 @@ def get_match_info(
 ):
     event_key = "2025caoc"
     try:
-        team_numbers = tba_fetcher.get_match_alliance_teams(event_key, m_type, match, alliance)
+        team_numbers = tba_fetcher.get_match_alliance_teams_cached(event_key, m_type, match, alliance)
     except (FileNotFoundError, ValueError) as e:
         raise HTTPException(status_code=404, detail=str(e))
 
@@ -599,13 +641,17 @@ def get_status(
 def ping():
     return {"ping": "pong"}
 
+
 # </editor-fold>
 
 # <editor-fold desc="HTTP polling">
-@app.get("/poll/match/{match}/{alliance}")
-async def poll_scouter_changes(match: int, alliance: str,
-                               client_ts: str = "",
-                               _: dict = Depends(partial(verify_uuid, required="match_scouting"))):
+@app.get("/poll/match/{match}/{match_type}/{alliance}")
+async def poll_scouter_changes(
+        match: int,
+        m_type: match_type,
+        alliance: str,
+        client_ts: str = "",
+        _: dict = Depends(partial(verify_uuid, required="match_scouting"))):
     timeout_ns = 10 * 1_000_000_000  # 10 seconds in nanoseconds
     check_interval = 0.2  # seconds
 
@@ -618,7 +664,7 @@ async def poll_scouter_changes(match: int, alliance: str,
     client_ns = parse_ts(client_ts)
 
     async def get_current_state():
-        entries = get_match_scouting(match=match)
+        entries = get_match_scouting(match=match, m_type=m_type)
         relevant = [e for e in entries if e["alliance"] == alliance]
         latest_ns = max((e["last_modified"] for e in relevant if e["last_modified"]), default=0)
         team_data = {
@@ -642,6 +688,50 @@ async def poll_scouter_changes(match: int, alliance: str,
             return {
                 "timestamp": str(latest_ns) if latest_ns else None,
                 "teams": current_state
+            }
+
+        await asyncio.sleep(check_interval)
+
+
+@app.get("/poll/admin_match/{match}/{match_type}")
+async def poll_admin_match_changes(
+        match: int,
+        match_type: str,
+        client_ts: str = "",
+        _: dict = Depends(partial(verify_uuid, required="admin")),
+):
+    timeout_ns = 10 * 1_000_000_000  # 10 seconds
+    check_interval = 0.2  # seconds
+
+    def parse_ts(ts: str) -> int:
+        try:
+            return int(ts)
+        except Exception:
+            return 0
+
+    client_ns = parse_ts(client_ts)
+
+    async def get_current_state():
+        entries = get_match_scouting(match=match)
+        relevant = [e for e in entries if e["match_type"] == match_type]
+        latest_ns = max((e["last_modified"] for e in relevant if e["last_modified"]), default=0)
+        return relevant, latest_ns
+
+    start = time.time_ns()
+    while True:
+        current_state, latest_ns = await get_current_state()
+        if latest_ns > client_ns:
+            await asyncio.sleep(0.3)
+            current_state, latest_ns = await get_current_state()
+            return {
+                "timestamp": str(latest_ns),
+                "entries": current_state  # full list of match_scouting dicts
+            }
+
+        if time.time_ns() - start > timeout_ns:
+            return {
+                "timestamp": str(latest_ns) if latest_ns else None,
+                "entries": current_state
             }
 
         await asyncio.sleep(check_interval)

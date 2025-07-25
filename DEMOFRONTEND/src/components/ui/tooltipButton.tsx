@@ -75,7 +75,7 @@ export default function TooltipButton({
                 <div
                     ref={tooltipRef}
                     style={{top: pos.top, left: pos.left}}
-                    className="absolute z-10 w-64 text-xs text-zinc-300 bg-zinc-800 rounded px-3 py-2 shadow-lg"
+                    className="absolute z-10 w-64 text-xs text-zinc-300 bg-zinc-800 rounded px-3 py-2 shadow-lg border border-zinc-600"
                     onClick={() => setShowTooltip(false)}
                 >
                     {tooltip}

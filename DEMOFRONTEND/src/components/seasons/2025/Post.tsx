@@ -1,6 +1,6 @@
 import React from "react"
-import type {ScoutingData} from "@/types.ts"
-import RatingSlider from "@/components/ui/ratingSlider"
+import type {ScoutingData} from "@/types"
+import RatingSlider from "@/components/ui/ratingSlider.tsx"
 import InfoToggle from "@/components/ui/infoToggle.tsx" // adjust path if needed
 
 export default function PostMatch({

@@ -1,7 +1,13 @@
 import React, {useEffect, useState} from "react"
 import {useNavigate} from "react-router-dom"
-import {useScoutingSync} from "@/contexts/useScoutingSync"
-import {useClientEnvironment} from "@/contexts/useClientEnvironment"
+import {useAPI} from "@/api/API.ts"
+import {useClientEnvironment} from "@/hooks/useClientEnvironment.ts"
+
+// --- MODULE-SCOPED OFFLINE ENTRY FLAG ---
+let enteredOfflineFlag = false
+export function clearEnteredOfflineFlag() {
+    enteredOfflineFlag = false
+}
 
 const PERMISSION_LABELS: Record<string, string> = {
     dev: "Developer",
@@ -11,37 +17,42 @@ const PERMISSION_LABELS: Record<string, string> = {
 }
 
 export default function AuthGate({
-                                     permission,
-                                     children,
-                                 }: {
+    permission,
+    children,
+}: {
     permission: "dev" | "admin" | "match_scouting" | "pit_scouting"
     children: React.ReactNode
 }) {
     const [authorized, setAuthorized] = useState<boolean | null>(null)
     const navigate = useNavigate()
-    const {verify} = useScoutingSync()
+    const {verify} = useAPI()
     const {isOnline, serverOnline} = useClientEnvironment()
 
     useEffect(() => {
         const check = async () => {
-            // Allow offline access for scouting roles
-            if (!isOnline || !serverOnline) {
+            const offlineAccess = !isOnline || !serverOnline
+
+            if (offlineAccess) {
                 if (permission === "match_scouting" || permission === "pit_scouting") {
                     setAuthorized(true)
+                    enteredOfflineFlag = true
                     return
                 }
             }
 
             const result = await verify()
-            const perms = result.permissions as Partial<Record<"dev" | "admin" | "match_scouting" | "pit_scouting", boolean>>
-            setAuthorized(result.success && !!perms[permission])
+            const perms = result.permissions as Partial<Record<typeof permission, boolean>>
+            const allowed = result.success && !!perms[permission]
 
+            setAuthorized(allowed)
         }
 
         void check()
     }, [permission, isOnline, serverOnline])
 
+    // Gate bypassed if entered offline
     if (authorized === null) return null
+    if (enteredOfflineFlag) return <>{children}</>
 
     if (!authorized) {
         return (
@@ -49,11 +60,9 @@ export default function AuthGate({
                 <div className="bg-zinc-800 rounded-xl p-8 text-center max-w-sm shadow-xl border border-zinc-700">
                     <h2 className="text-2xl font-bold mb-4">Access Denied</h2>
                     <p className="mb-6">
-                        You lack <span
-                        className="font-semibold text-red-400">{PERMISSION_LABELS[permission]}</span> permission or your
+                        You lack <span className="font-semibold text-red-400">{PERMISSION_LABELS[permission]}</span> permission or your
                         session expired.
                     </p>
-
                     <button
                         onClick={() => navigate("/")}
                         className="px-4 py-2 bg-red-600 rounded-md hover:bg-red-700 transition"

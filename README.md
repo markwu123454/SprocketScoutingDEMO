@@ -47,23 +47,44 @@ Planned features:
 DEMOFRONTEND/
 ├─ public/
 ├─ src/
-│ ├─ assets/
-│ ├─ components/
-│ ├─ ├─ 2025/
-│ ├─ ├─ ui/
-│ ├─ context/
-│ ├─ pages/
-│ ├─ ├─ Home.tsx
-│ ├─ ├─ MatchScouting.tsx
-│ └─ App.tsx
-└─ vite.config.ts
+│  ├─ assets/                      # Static images, icons, etc.
+│  ├─ components/
+│  │  ├─ seasons/
+│  │  │  └─ 2025/                  # Year-specific components (Auto, Teleop, etc.)
+│  │  ├─ ui/                       # Reusable UI elements (buttons, dialogs, etc.)
+│  │  └─ AuthGate.tsx             # Route protection wrapper
+│  ├─ context/
+│  │  └─ pollingContext.tsx       # React context for polling backend communication
+│  ├─ hooks/
+│  │  └─ useClientEnvironment.tsx # Hook for SSR-aware env detection
+│  ├─ api/
+│  │  └─ api.ts                   # All non-polling backend communication (auth, submit, fetch)
+│  ├─ db/
+│  │  ├─ db.ts                    # Local storage for match and pit scouting
+│  │  └─ settingsDb.ts            # Dexie wrapper for Settings
+│  ├─ types/
+│  │  ├─ index.ts                 # Types for global use
+│  ├─ utils/
+│  │  └─ cn.ts                    # Tailwind class merging (clsx + twMerge)
+│  ├─ pages/
+│  │  ├─ Home.tsx
+│  │  ├─ MatchScouting.tsx
+│  │  ├─ PitScouting.tsx
+│  │  ├─ MatchMonitor.tsx
+│  │  ├─ Data.tsx
+│  │  └─ Pre.tsx
+│  ├─ main.tsx                    # React app entry point
+│  ├─ App.tsx                     # Root component
+│  ├─ index.css                   # Global styles
+│  └─ vite-env.d.ts               # Vite’s environment declarations
+└─ vite.config.ts                 # Vite project config
 
 DEMOBACKEND/
-├─ main.py
-├─ tba_fetcher.py
-├─ logos/
+├─ main.py                        # FastAPI entry point
+├─ tba_fetcher.py                 # Blue Alliance integration
+├─ logos/                         # Static/logo assets
 
-run.py
+run.py                         # use dev or prod to run whole app
 ```
 
 ## Development Setup

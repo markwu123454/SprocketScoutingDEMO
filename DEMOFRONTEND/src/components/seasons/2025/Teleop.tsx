@@ -1,7 +1,7 @@
 import {useState} from "react"
 import type {ScoutingData} from "@/types"
-import ScoreBox from "@/components/ui/scoreBox"
-import fieldImage from "@/assets/2025_Field_No-Algae_Transparent_Blue.png"
+import ScoreBox from "@/components/ui/scoreBox.tsx"
+import fieldImage from "@/assets/2025_Reef_Transparent_No-Tape_Blue.png"
 import * as React from "react";
 
 const coralLevels = ['l2', 'l3', 'l4'] as const

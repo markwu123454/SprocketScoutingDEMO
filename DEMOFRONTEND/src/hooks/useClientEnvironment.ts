@@ -1,5 +1,5 @@
 import {useEffect, useState} from "react"
-import {useScoutingSync} from "@/contexts/useScoutingSync"
+import {useAPI} from "../api/API.ts"
 
 export interface ClientEnvironment {
     // App/Platform Info
@@ -62,7 +62,7 @@ export function useClientEnvironment(): ClientEnvironment {
         batteryCharging: null,
     })
 
-    const {Ping} = useScoutingSync()
+    const {ping} = useAPI()
 
     useEffect(() => {
         const updateNetworkStatus = () => {
@@ -105,14 +105,14 @@ export function useClientEnvironment(): ClientEnvironment {
         }
 
         const pingServer = async () => {
-            const result = await Ping()
+            const result = await ping()
             setEnv(prev => ({...prev, serverOnline: result}))
         }
 
         updateNetworkStatus()
         void pingServer()
 
-        const interval = setInterval(pingServer, 6000)
+        const interval = setInterval(pingServer, 4500)
 
         window.addEventListener("online", updateNetworkStatus)
         window.addEventListener("offline", updateNetworkStatus)

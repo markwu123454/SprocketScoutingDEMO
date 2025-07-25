@@ -25,7 +25,7 @@ export function useUpdateContext(): UpdateContextType {
     return ctx
 }
 
-export function UpdateProvider({ children }: { children: ReactNode }) {
+export function UpdateProvider({children}: { children: ReactNode }) {
     const registerPolling: UpdateContextType["registerPolling"] = (
         endpoint,
         callback,
@@ -35,10 +35,11 @@ export function UpdateProvider({ children }: { children: ReactNode }) {
         let active = true
 
         const poll = async () => {
+            const origin = `${window.location.protocol}//${window.location.hostname}:8000`
             while (active) {
                 const startTime = Date.now()
                 try {
-                    const res = await fetch(endpoint, { headers })
+                    const res = await fetch(origin + endpoint, {headers})
                     if (!res.ok) console.error(res)
                     const data = await res.json()
                     callback(data)
@@ -59,7 +60,7 @@ export function UpdateProvider({ children }: { children: ReactNode }) {
     }
 
     return (
-        <UpdateContext.Provider value={{ registerPolling }}>
+        <UpdateContext.Provider value={{registerPolling}}>
             {children}
         </UpdateContext.Provider>
     )
@@ -72,7 +73,7 @@ export function usePollingEffect(
     intervalMs = 300,
     headers?: HeadersInit
 ) {
-    const { registerPolling } = useUpdateContext()
+    const {registerPolling} = useUpdateContext()
 
     useEffect(() => {
         if (!endpoint) return

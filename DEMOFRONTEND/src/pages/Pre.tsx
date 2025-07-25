@@ -1,8 +1,9 @@
-import type {ScoutingData, TeamInfo} from "@/types.ts"
+import type {ScoutingData, TeamInfo} from "@/types"
 import * as React from "react"
-import {getAuthHeaders, getScouterName, useScoutingSync} from "@/contexts/useScoutingSync.ts"
 import {useEffect, useRef, useState} from "react"
+import {getAuthHeaders, getScouterName, useAPI} from "@/api/API.ts"
 import {usePollingEffect} from "@/contexts/pollingContext.tsx"
+import {useClientEnvironment} from "@/hooks/useClientEnvironment.ts";
 
 export default function Pre({
                                 data,
@@ -11,7 +12,9 @@ export default function Pre({
     data: ScoutingData
     setData: React.Dispatch<React.SetStateAction<ScoutingData>>
 }) {
-    const {patchData, getTeamList} = useScoutingSync()
+    const {patchData, getTeamList} = useAPI()
+    const {isOnline, serverOnline} = useClientEnvironment()
+
     const [teamList, setTeamList] = useState<TeamInfo[] | null>(null)
 
     const {match, alliance, match_type, teamNumber} = data
@@ -36,27 +39,30 @@ export default function Pre({
 
     // 2. Initial team list load
     useEffect(() => {
-        if (!match || !alliance) {
+        if (!(isOnline && serverOnline) || !match || !alliance) {
             setTeamList([])
             return
         }
 
         let alive = true
+
         void (async () => {
             setTeamList(null)
             const teams = await getTeamList(match, match_type, alliance)
+            console.log(teams)
             if (alive) setTeamList(teams)
         })()
 
         return () => {
             alive = false
         }
-    }, [match, alliance, match_type])
+    }, [match, alliance, match_type, isOnline, serverOnline])
+
 
     // 3. Polling for updates
     usePollingEffect(
         match && alliance
-            ? `${window.location.protocol}//${window.location.hostname}:8000/poll/match/${match}/${alliance}?client_ts=${encodeURIComponent(lastTimestamp)}`
+            ? `/poll/match/${match}/${alliance}?client_ts=${encodeURIComponent(lastTimestamp)}`
             : null,
         (data: { teams: Record<string, { scouter: string | null }>, timestamp?: string }) => {
             // Update team list
@@ -101,6 +107,7 @@ export default function Pre({
     return (
         <div className="p-4 w-full h-full flex flex-col justify gap-2">
             <div>Pre-Match</div>
+
             {/* Match Type Select */}
             <div>
                 <label className="block text-lg font-medium mb-1">Match Type</label>
@@ -113,7 +120,7 @@ export default function Pre({
                         <button
                             key={key}
                             onClick={() => {
-                                if (match && teamNumber !== null) {
+                                if ((isOnline && serverOnline) && match && teamNumber !== null) {
                                     void patchData(match, teamNumber, match_type, {
                                         scouter: "__UNCLAIM__", phase: 'pre'
                                     })
@@ -122,8 +129,9 @@ export default function Pre({
                                 setData((d) => ({
                                     ...d,
                                     match_type: key,
-                                    teamNumber: null, // ← reset
+                                    teamNumber: d.match_type === key ? d.teamNumber : null,
                                 }))
+
                             }}
                             className={`py-1 w-[33%] h-10 rounded text-base ${
                                 data.match_type === key
@@ -143,24 +151,24 @@ export default function Pre({
                 <input
                     type="text"
                     inputMode="numeric"
-                    defaultValue=""
+                    defaultValue={match === 0 ? "" : match!}
                     ref={inputRef}
                     onChange={(e) => {
                         const raw = e.target.value.replace(/\s/g, '');
                         const newMatch = /^-?\d*\.?\d+$/.test(raw) ? parseFloat(raw) : 0;
 
-                        if (match && teamNumber !== null) {
+                        if ((isOnline && serverOnline) && match && teamNumber !== null) {
                             void patchData(match, teamNumber, match_type, {
-                                scouter: "__UNCLAIM__",
-                                phase: 'pre',
-                            });
+                                scouter: "__UNCLAIM__", phase: 'pre'
+                            })
                         }
 
                         setData((d) => ({
                             ...d,
                             match: newMatch,
-                            teamNumber: null,
-                        }));
+                            teamNumber: d.match === newMatch ? d.teamNumber : null,
+                        }))
+
                     }}
                     className="w-full p-2 rounded bg-zinc-800 border border-zinc-700 text-white"
                 />
@@ -174,7 +182,7 @@ export default function Pre({
                         <button
                             key={color}
                             onClick={() => {
-                                if (match && teamNumber !== null) {
+                                if ((isOnline && serverOnline) && match && teamNumber !== null) {
                                     void patchData(match, teamNumber, match_type, {
                                         scouter: "__UNCLAIM__", phase: 'pre'
                                     })
@@ -183,10 +191,11 @@ export default function Pre({
                                 setData((d) => ({
                                     ...d,
                                     alliance: color,
-                                    teamNumber: null,
+                                    teamNumber: d.alliance === color ? d.teamNumber : null,
                                 }))
+
                             }}
-                            className={`w-16 h-16 rounded ${alliance === color ? 'outline-2 outline-white' : ''} ${color === 'red' ? 'bg-red-600' : 'bg-blue-600'}`}
+                            className={`w-16 h-16 rounded ${alliance === color ? 'outline-2 ' : ''} ${color === 'red' ? 'bg-red-600 outline-red-300' : 'bg-blue-600 outline-blue-300'}`}
                         />
                     ))}
                 </div>
@@ -196,62 +205,95 @@ export default function Pre({
             <div>
                 <label className="block text-lg font-medium mb-1">Select Team</label>
                 <div className="flex flex-col gap-2">
-                    {(teamList === null
-                            ? Array(3).fill(null)
-                            : teamList.length > 0
-                                ? teamList
-                                : Array(3).fill(undefined)
-                    ).map((team, i) => {
-                        if (!team) {
+                    {!(isOnline && serverOnline) ? (
+                        <>
+                            <input
+                                type="number"
+                                inputMode="numeric"
+                                placeholder="Enter team number"
+                                onChange={(e) => {
+                                    const num = parseInt(e.target.value)
+                                    if (!isNaN(num)) {
+                                        setData((d) => ({
+                                            ...d,
+                                            teamNumber: num
+                                        }))
+                                    }
+                                }}
+                                className="w-full p-2 rounded bg-zinc-800 border border-zinc-700 text-white"
+                            />
+                            <button
+                                disabled
+                                className="w-full py-2 rounded bg-zinc-800 opacity-50"
+                            >
+                                ---
+                            </button>
+                            <button
+                                disabled
+                                className="w-full py-2 rounded bg-zinc-800 opacity-50"
+                            >
+                                ---
+                            </button>
+                        </>
+                    ) : (
+                        (teamList === null
+                                ? Array(3).fill(null)
+                                : teamList.length > 0
+                                    ? teamList
+                                    : Array(3).fill(undefined)
+                        ).map((team, i) => {
+                            if (!team) {
+                                return (
+                                    <button
+                                        key={i}
+                                        disabled
+                                        className="w-full py-2 rounded bg-zinc-800 opacity-50"
+                                    >
+                                        ---
+                                    </button>
+                                )
+                            }
+
+                            const isSelected = teamNumber === team.number
+                            const isClaimed = team.scouter !== null && team.number !== teamNumber
+
                             return (
                                 <button
-                                    key={i}
-                                    disabled
-                                    className="w-full py-2 rounded bg-zinc-800 opacity-50"
+                                    key={team.number}
+                                    disabled={isClaimed}
+                                    onClick={() => handleTeamSelect(team.number)}
+                                    className={`w-full py-2 px-4 rounded flex items-center justify-center gap-3 ${isSelected ? 'bg-zinc-500' : 'bg-zinc-700'} ${isClaimed ? 'opacity-50 cursor-not-allowed' : ''}`}
                                 >
-                                    ---
-                                </button>
-                            )
-                        }
+                                    <div
+                                        className={`w-10 h-10 rounded flex items-center justify-center ${
+                                            alliance === 'red' ? 'bg-red-700' : alliance === 'blue' ? 'bg-blue-700' : 'bg-zinc-600'
+                                        }`}
+                                    >
+                                        <img
+                                            src={team.logo}
+                                            alt={team.name}
+                                            className="w-8 h-8 rounded"
+                                        />
+                                    </div>
 
-                        const isSelected = teamNumber === team.number
-                        const isClaimed = team.scouter !== null && team.number !== teamNumber
+                                    <div className="text-xl flex items-center gap-1 max-w-full">
+                                        <span>{team.name.nickname}</span>
+                                        <span>({team.number})</span>
+                                    </div>
 
-                        return (
-                            <button
-                                key={team.number}
-                                disabled={isClaimed}
-                                onClick={() => handleTeamSelect(team.number)}
-                                className={`w-full py-2 px-4 rounded flex items-center justify-center gap-3 ${isSelected ? 'bg-zinc-500' : 'bg-zinc-700'} ${isClaimed ? 'opacity-50 cursor-not-allowed' : ''}`}
-                            >
-                                <div
-                                    className={`w-10 h-10 rounded flex items-center justify-center ${
-                                        alliance === 'red' ? 'bg-red-700' : alliance === 'blue' ? 'bg-blue-700' : 'bg-zinc-600'
-                                    }`}
-                                >
-                                    <img
-                                        src={team.logo}
-                                        alt={team.name}
-                                        className="w-8 h-8 rounded"
-                                    />
-                                </div>
-
-                                <div className="text-xl flex items-center gap-1 max-w-full">
-                                    <span>{team.name.nickname}</span>
-                                    <span>({team.number})</span>
-                                </div>
-
-                                {isClaimed && (
-                                    <span className="text-sm">
+                                    {isClaimed && (
+                                        <span className="text-sm">
                                         {`Scouting by ${team.scouter === scouter ? 'you' : team.scouter}`}
                                     </span>
-                                )}
-                            </button>
-                        )
-                    })}
+                                    )}
+                                </button>
+                            )
+                        })
+                    )}
                 </div>
             </div>
         </div>
     )
+
 }
 

@@ -1,6 +1,6 @@
 import type {TeamInfo, ScoutingData, MatchType, AllianceType} from '@/types'
 
-const url = `${window.location.protocol}//${window.location.hostname}:8000`;
+const BASE_URL = `${window.location.protocol}//${window.location.hostname}:8000`;
 const UUID_COOKIE = "scouting_uuid"
 const NAME_COOKIE = "scouting_name"
 
@@ -34,7 +34,7 @@ export function getScouterName(): string | null {
 
 
 // --- Hook ---
-export function useScoutingSync() {
+export function useAPI() {
     let cachedName: string | null = null
 
     type SubmitPayload = {
@@ -50,7 +50,7 @@ export function useScoutingSync() {
     }
 
 
-    const getName = (): string | null => cachedName
+    const getCachedName = (): string | null => cachedName
 
 
     const submitData = async (
@@ -69,7 +69,7 @@ export function useScoutingSync() {
                 ...data,
             };
 
-            const res = await fetch(`${url}/scouting/${match}/${team}/submit`, {
+            const res = await fetch(`${BASE_URL}/scouting/${match}/${team}/submit`, {
                 method: 'POST',
                 headers: {
                     ...getAuthHeaders(),
@@ -105,7 +105,7 @@ export function useScoutingSync() {
             query.set("scouter", scouter);
             if (phase) query.set("status", phase);
 
-            const res = await fetch(`${url}/scouting/${match_type}/${match}/${team}/state?${query.toString()}`, {
+            const res = await fetch(`${BASE_URL}/scouting/${match_type}/${match}/${team}/state?${query.toString()}`, {
                 method: "PATCH",
                 headers: getAuthHeaders(),
             });
@@ -118,23 +118,29 @@ export function useScoutingSync() {
     };
 
 
-    const Ping = async (): Promise<boolean> => {
-        const controller = new AbortController();
-        const timeout = setTimeout(() => controller.abort(), 4000);
-
+    const updateMatchData = async (
+        match: number,
+        team: number,
+        match_type: MatchType,
+        scouter: string,
+        data: Partial<ScoutingData>
+    ): Promise<boolean> => {
         try {
-            const res = await fetch(`${url}/ping`, {
-                method: "GET",
-                signal: controller.signal,
-            });
+            const res = await fetch(
+                `${BASE_URL}/scouting/${match_type}/${match}/${team}/${encodeURIComponent(scouter)}`,
+                {
+                    method: "PATCH",
+                    headers: {
+                        ...getAuthHeaders(),
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify(data),
+                }
+            );
 
-            clearTimeout(timeout);
-
-            if (!res.ok) return false;
-
-            const data = await res.json();
-            return data.ping === "pong";
-        } catch {
+            return res.ok;
+        } catch (err) {
+            console.error("updateMatchData failed:", err);
             return false;
         }
     };
@@ -142,7 +148,7 @@ export function useScoutingSync() {
 
     const getCurrentScoutingEntry = async (): Promise<any | null> => {
         try {
-            const res = await fetch(`${url}/scouting/current`, {
+            const res = await fetch(`${BASE_URL}/scouting/current`, {
                 headers: getAuthHeaders(),
             })
             return res.ok ? await res.json() : null
@@ -158,7 +164,7 @@ export function useScoutingSync() {
         team: number
     ): Promise<any | null> => {
         try {
-            const res = await fetch(`${url}/status/${match}/${team}`, {
+            const res = await fetch(`${BASE_URL}/status/${match}/${team}`, {
                 headers: getAuthHeaders(),
             })
             return res.ok ? await res.json() : null
@@ -175,7 +181,7 @@ export function useScoutingSync() {
         alliance: 'red' | 'blue'
     ): Promise<TeamInfo[]> => {
         try {
-            const res = await fetch(`${url}/match/${match}/${alliance}/${m_type}`, {
+            const res = await fetch(`${BASE_URL}/match/${match}/${alliance}/${m_type}`, {
                 headers: getAuthHeaders(),
             })
             if (!res.ok) {
@@ -203,7 +209,7 @@ export function useScoutingSync() {
         }>>
         | null> => {
         try {
-            const res = await fetch(`${url}/status/All/All`, {
+            const res = await fetch(`${BASE_URL}/status/All/All`, {
                 headers: getAuthHeaders(),
             })
             return res.ok ? await res.json() : null
@@ -224,12 +230,13 @@ export function useScoutingSync() {
             match_scouting: boolean
             pit_scouting: boolean
         }
-    }> => {
+    }> =>
+    {
         deleteCookie(UUID_COOKIE)
         deleteCookie(NAME_COOKIE)
 
         try {
-            const res = await fetch(`${url}/auth/login`, {
+            const res = await fetch(`${BASE_URL}/auth/login`, {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
                 body: JSON.stringify({passcode}),
@@ -254,7 +261,6 @@ export function useScoutingSync() {
         }
     }
 
-
     const verify = async (): Promise<{
         success: boolean
         name?: string
@@ -264,9 +270,10 @@ export function useScoutingSync() {
             match_scouting: boolean
             pit_scouting: boolean
         }
-    }> => {
+    }> =>
+    {
         try {
-            const res = await fetch(`${url}/auth/verify`, {
+            const res = await fetch(`${BASE_URL}/auth/verify`, {
                 headers: getAuthHeaders(),
             })
             if (!res.ok) return {success: false}
@@ -283,17 +290,40 @@ export function useScoutingSync() {
         }
     }
 
+    const ping = async (): Promise<boolean> => {
+        const controller = new AbortController();
+        const timeout = setTimeout(() => controller.abort(), 4000);
+
+        try {
+            const res = await fetch(`${BASE_URL}/ping`, {
+                method: "GET",
+                signal: controller.signal,
+            });
+
+            clearTimeout(timeout);
+
+            if (!res.ok) return false;
+
+            const data = await res.json();
+            return data.ping === "pong";
+        } catch {
+            return false;
+        }
+    };
+
 
     return {
         patchData,
+        updateMatchData,
+        submitData,
         getStatus,
         getTeamList,
         getAllStatuses,
+        getCachedName,
+        getCurrentScoutingEntry,
+
         login,
         verify,
-        getName,
-        getCurrentScoutingEntry,
-        submitData,
-        Ping
+        ping
     }
 }

@@ -137,6 +137,11 @@ def get_match_alliance_teams(event_key: str, match_type: str, match_number: int,
     return _cached_matches[match_type][match_number][alliance]
 
 
+@lru_cache(maxsize=512)
+def get_match_alliance_teams_cached(event_key: str, match_type: str, match_number: int, alliance: str) -> list[str]:
+    return get_match_alliance_teams(event_key, match_type, match_number, alliance)
+
+
 def get_event_data(event_key: str) -> Dict[str, Any]:
     year = event_key[:4]
     event_csv = Path(f"{event_key}.csv")

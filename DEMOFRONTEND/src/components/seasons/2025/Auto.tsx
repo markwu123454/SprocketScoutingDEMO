@@ -1,7 +1,7 @@
 import {useState} from "react"
 import type {ScoutingData} from "@/types"
-import ScoreBox from "@/components/ui/scoreBox"
-import fieldImage from "@/assets/2025_Field_No-Algae_Transparent_Blue.png"
+import ScoreBox from "@/components/ui/scoreBox.tsx"
+import fieldImage from "@/assets/2025_Reef_Transparent_No-Tape_Blue.png"
 import * as React from "react";
 
 const coralLevels = ['l2', 'l3', 'l4'] as const
@@ -55,7 +55,7 @@ export default function AutoPhase({data, setData}: {
     const renderCoralHexGrid = () => {
         const generatePositions = () => {
             const labels = ["B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "A"] as const
-            const centerTop = 20
+            const centerTop = 40
             const centerLeft = 50
             const radius = 37.5
 
@@ -67,7 +67,7 @@ export default function AutoPhase({data, setData}: {
                         const top = centerTop - radius * Math.sin(rad)
                         const left = centerLeft + radius * Math.cos(rad)
                         return [label, {
-                            top: `${(2 * top).toFixed(1)}%`,
+                            top: `${top.toFixed(1)}%`,
                             left: `${left.toFixed(1)}%`,
                         }] as [string, { top: string; left: string }]
                     }) as [string, { top: string; left: string }][]
@@ -77,12 +77,10 @@ export default function AutoPhase({data, setData}: {
             )
         }
 
-
         const positions: Record<string, { top: string; left: string }> = generatePositions()
 
-
         return (
-            <div className="relative w-full aspect-[2/1] max-w-4xl mx-auto">
+            <div className="relative w-full aspect-1">
                 <img
                     src={fieldImage}
                     alt="Field"
@@ -134,125 +132,119 @@ export default function AutoPhase({data, setData}: {
     }
 
     return (
-        <div className="p-4 w-full h-full grid select-none gap-6"
-             style={{
-                 gridTemplateRows: 'auto 1fr auto auto'
-             }}
-        >
-            <div className="text-xl font-semibold">Auto</div>
-
-            {/* Growable coral grid section */}
-            <div className="flex-1 min-h-0 flex items-center justify-center">
-                {renderCoralHexGrid()}
+        <div className="w-screen h-max flex flex-col p-4 select-none">
+            {/* Top: fixed height */}
+            <div className="text-xl font-semibold">
+                Auto
             </div>
 
-            <div className="flex gap-4 justify-center items-center shrink-0">
-                {coralLevels.map((level) => (
-                    <button
-                        key={level}
-                        onClick={() => {
-                            const type = handleLevelSelect(level)
-                            setFlash({level, type})
-                            setTimeout(() => setFlash(null), 150)
+            {/* Middle: expands to fill space */}
+            <div className="items-center justify-center gap-6 overflow-hidden">
+                <div className="flex-1 min-h-0 flex items-center justify-center w-full">
+                    {renderCoralHexGrid()}
+                </div>
+
+                <div className="flex gap-4 justify-center items-center shrink-0">
+                    {coralLevels.map((level) => (
+                        <button
+                            key={level}
+                            onClick={() => {
+                                const type = handleLevelSelect(level)
+                                setFlash({level, type})
+                                setTimeout(() => setFlash(null), 150)
+                            }}
+                            className={`px-4 py-2 rounded text-sm transition-colors duration-150 ${
+                                flash?.level === level
+                                    ? flash.type === "add"
+                                        ? "bg-green-600"
+                                        : "bg-red-600"
+                                    : "bg-zinc-700 hover:bg-zinc-500"
+                            }`}
+                        >
+                            {level.toUpperCase()}
+                        </button>
+                    ))}
+
+                    {selectedBranch === "missed" && (
+                        <button
+                            onClick={() =>
+                                setMissedMode((prev) => (prev === "inc" ? "dec" : "inc"))
+                            }
+                            className={`px-3 py-2 rounded text-sm font-medium border ${
+                                missedMode === "inc"
+                                    ? "bg-green-700 border-green-800"
+                                    : "bg-red-700 border-red-800"
+                            }`}
+                        >
+                            {missedMode === "inc" ? "+" : "−"}
+                        </button>
+                    )}
+                </div>
+            </div>
+
+            {/* Bottom: pinned to bottom by flex layout */}
+            <div className="grid grid-cols-2 gap-4 pt-4">
+                    <ScoreBox
+                        id="auto-l1"
+                        label="L1"
+                        value={data.auto.l1}
+                        onChange={(v) => {
+                            const updated = {...data.auto, l1: v, moved: true}
+                            setData((prev) => ({...prev, auto: updated}))
                         }}
-
-                        className={`px-4 py-2 rounded text-sm transition-colors duration-150 ${
-                            flash?.level === level
-                                ? flash.type === "add"
-                                    ? "bg-green-600"
-                                    : "bg-red-600"
-                                : "bg-zinc-700 hover:bg-zinc-500"
-
-                        }`}
-                    >
-                        {level.toUpperCase()}
-                    </button>
-                ))}
-
-                {selectedBranch === "missed" && (
+                    />
+                    <ScoreBox
+                        id="auto-missed-l1"
+                        label="Missed L1"
+                        value={data.auto.missed.l1}
+                        onChange={(v) => {
+                            const updated = {
+                                ...data.auto,
+                                missed: {...data.auto.missed, l1: v}
+                            }
+                            setData((prev) => ({...prev, auto: updated}))
+                        }}
+                    />
+                    <ScoreBox
+                        id="auto-reef"
+                        label="Reef"
+                        value={data.auto.reef}
+                        onChange={(v) => {
+                            const updated = {...data.auto, reef: v, moved: true}
+                            setData((prev) => ({...prev, auto: updated}))
+                        }}
+                    />
+                    <ScoreBox
+                        id="auto-barge"
+                        label="Barge"
+                        value={data.auto.barge}
+                        onChange={(v) => {
+                            const updated = {...data.auto, barge: v, moved: true}
+                            setData((prev) => ({...prev, auto: updated}))
+                        }}
+                    />
+                    <ScoreBox
+                        id="auto-missAlgae"
+                        label="Algae miss"
+                        value={data.auto.missAlgae}
+                        onChange={(v) => {
+                            const updated = {
+                                ...data.auto,
+                                missAlgae: v,
+                                moved: true
+                            }
+                            setData((prev) => ({...prev, auto: updated}))
+                        }}
+                    />
                     <button
-                        onClick={() =>
-                            setMissedMode(prev => (prev === "inc" ? "dec" : "inc"))
-                        }
-                        className={`px-3 py-2 rounded text-sm font-medium border ${
-                            missedMode === "inc"
-                                ? "bg-green-700 border-green-800"
-                                : "bg-red-700 border-red-800"
+                        onClick={toggleMoved}
+                        className={`text-sm h-full px-2 py-0.5 rounded text-white ${
+                            data.auto.moved ? "bg-green-600" : "bg-red-600"
                         }`}
                     >
-                        {missedMode === "inc" ? "+" : "−"}
+                        LEFT START: {data.auto.moved ? "YES" : "NO"}
                     </button>
-                )}
-            </div>
-
-            <div className="grid grid-cols-2 gap-4 shrink-0">
-                <ScoreBox
-                    id="auto-l1"
-                    label="L1"
-                    value={data.auto.l1}
-                    onChange={(v) => {
-                        const updated = {...data.auto, l1: v, moved: true}
-                        setData(prev => ({...prev, auto: updated}))
-                        // Add patchsave
-                    }}
-                />
-                <ScoreBox
-                    id="auto-missed-l1"
-                    label="Missed L1"
-                    value={data.auto.missed.l1}
-                    onChange={(v) => {
-                        const updated = {
-                            ...data.auto,
-                            missed: {...data.auto.missed, l1: v}
-                        }
-                        setData(prev => ({...prev, auto: updated}))
-                        // Add patchsave
-                    }}
-                />
-                <ScoreBox
-                    id="auto-reef"
-                    label="Reef"
-                    value={data.auto.reef}
-                    onChange={(v) => {
-                        const updated = {...data.auto, reef: v, moved: true}
-                        setData(prev => ({...prev, auto: updated}))
-                        // Add patchsave
-                    }}
-                />
-                <ScoreBox
-                    id="auto-barge"
-                    label="Barge"
-                    value={data.auto.barge}
-                    onChange={(v) => {
-                        const updated = {...data.auto, barge: v, moved: true}
-                        setData(prev => ({...prev, auto: updated}))
-                        // Add patchsave
-                    }}
-                />
-                <ScoreBox
-                    id="auto-missAlgae"
-                    label="Algae miss"
-                    value={data.auto.missAlgae}
-                    onChange={(v) => {
-                        const updated = {
-                            ...data.auto,
-                            missAlgae: v,
-                            moved: true
-                        }
-                        setData(prev => ({...prev, auto: updated}))
-                        // Add patchsave
-                    }}
-                />
-
-                <button
-                    onClick={toggleMoved}
-                    className={`text-sm px-2 py-0.5 rounded text-white ${
-                        data.auto.moved ? "bg-green-600" : "bg-red-600"
-                    }`}
-                >
-                    LEFT START: {data.auto.moved ? "YES" : "NO"}
-                </button>
-            </div>
+                </div>
         </div>
     )
 }

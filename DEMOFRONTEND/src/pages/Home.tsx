@@ -1,13 +1,13 @@
 import {useEffect, useRef, useState} from "react"
 import {useNavigate} from "react-router-dom"
-import {useScoutingSync} from "@/contexts/useScoutingSync"
+import {useAPI} from "@/api/API.ts"
 import {Eye, EyeOff} from "lucide-react"
 import TooltipButton from "@/components/ui/tooltipButton"
-import {useClientEnvironment} from "@/contexts/useClientEnvironment.ts"
+import {useClientEnvironment} from "@/hooks/useClientEnvironment.ts"
 
 export function HomeLayout() {
-    const {login, verify} = useScoutingSync()
-    const {isPWA, isOnline, serverOnline} = useClientEnvironment()
+    const {login, verify} = useAPI()
+    const {isOnline, serverOnline} = useClientEnvironment()
 
     const [passphrase, setPassphrase] = useState("")
     const [name, setName] = useState<string | null>(null)
@@ -115,8 +115,11 @@ export function HomeLayout() {
         if (e.key === "Enter") handleCheck()
     }
 
+
+    // <div className="min-h-screen text-white flex items-center justify-center px-4 touch-none
+    //     bg-[url('@/assets/2026_background.webp')] bg-[length:200px_200px] bg-repeat bg-top w-full">
     return (
-        <div className="min-h-screen bg-zinc-900 text-white flex items-center justify-center px-4 touch-none">
+        <div className="min-h-screen bg-zinc-900 text-white flex items-center justify-center px-4 touch-none\">
             <div className="w-full max-w-md bg-zinc-950 p-6 rounded-lg shadow-lg space-y-6 border border-zinc-800">
                 <div className="space-y-1">
                     <h1 className="text-2xl font-bold">Login</h1>

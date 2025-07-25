@@ -1,10 +1,12 @@
 import {useEffect, useState} from 'react'
-import {useScoutingSync} from '@/contexts/useScoutingSync'
+import {useAPI} from '@/api/API.ts'
 import {Badge} from '@/components/ui/badge'
-import type {TeamInfo} from '@/types'
+import type {TeamInfo, UIInfo} from '@/types'
+import field_overlay from '@/assets/FMS_In-Match.png'
+import {defaultUIINFO} from "@/components/seasons/2025/yearConfig.ts";
 
 export default function MatchMonitoringLayout() {
-    const {getAllStatuses, getTeamList} = useScoutingSync()
+    const {getAllStatuses, getTeamList} = useAPI()
     const [teamStatuses, setTeamStatuses] = useState<
         { match: string; team: number; status: string; scouter: string | null }[]
     >([])
@@ -13,44 +15,46 @@ export default function MatchMonitoringLayout() {
     >([])
 
     const [matchNum, setMatchNum] = useState(2)
+    const [matchType, setMatchType] = useState("sf")
     const [matchRed, setMatchRed] = useState<TeamInfo[]>([])
     const [matchBlue, setMatchBlue] = useState<TeamInfo[]>([])
 
+    const [matchInfo, setMatchInfo] = useState<UIInfo>(defaultUIINFO);
+
     const loadStatuses = async () => {
-    const all = await getAllStatuses()
-    if (!all) return
+        const all = await getAllStatuses()
+        if (!all) return
 
-    const allTeams = []
-    const active = []
+        const allTeams = []
+        const active = []
 
-    for (const match in all) {
-        for (const teamStr in all[match]) {
-            const { status, scouter } = all[match][teamStr]
-            const entry = {
-                match,
-                team: Number(teamStr),
-                status,
-                scouter,
-            }
+        for (const match in all) {
+            for (const teamStr in all[match]) {
+                const {status, scouter} = all[match][teamStr]
+                const entry = {
+                    match,
+                    team: Number(teamStr),
+                    status,
+                    scouter,
+                }
 
-            if (status !== 'unclaimed') {
-                allTeams.push(entry)
-            }
+                if (status !== 'unclaimed') {
+                    allTeams.push(entry)
+                }
 
-            if (status !== 'unclaimed' && status !== 'submitted') {
-                active.push(entry)
+                if (status !== 'unclaimed' && status !== 'submitted') {
+                    active.push(entry)
+                }
             }
         }
+
+        setTeamStatuses(allTeams) // full list
+        setActiveOnly(active)     // active only
     }
 
-    setTeamStatuses(allTeams) // full list
-    setActiveOnly(active)     // active only
-}
-
-
     const loadTeams = async (m: number) => {
-        const red = await getTeamList(String(m), 'red')
-        const blue = await getTeamList(String(m), 'blue')
+        const red = await getTeamList(m, "qm", 'red')
+        const blue = await getTeamList(m, "qm", 'blue')
         setMatchRed(red)
         setMatchBlue(blue)
     }
@@ -95,29 +99,104 @@ export default function MatchMonitoringLayout() {
     }
 
     const renderTeamStatus = (team: TeamInfo) => {
-    const entry = teamStatuses.find(
-        (e) => e.match === String(matchNum) && e.team === team.number
-    )
+        const entry = teamStatuses.find(
+            (e) => e.match === String(matchNum) && e.team === team.number
+        )
 
-    let bg = 'bg-red-700 text-red-100'
-    if (entry) {
-        if (entry.status === 'submitted') {
-            bg = 'bg-green-700 text-green-100'
-        } else {
-            bg = 'bg-blue-700 text-blue-100'
+        let bg = 'bg-red-700 text-red-100'
+        if (entry) {
+            if (entry.status === 'submitted') {
+                bg = 'bg-green-700 text-green-100'
+            } else {
+                bg = 'bg-blue-700 text-blue-100'
+            }
         }
+
+        return (
+            <div
+                key={team.number}
+                className={`p-3 rounded text-center text-white font-bold ${bg}`}
+            >
+                {team.number}
+            </div>
+        )
     }
 
-    return (
-        <div
-            key={team.number}
-            className={`p-3 rounded text-center text-white font-bold ${bg}`}
-        >
-            {team.number}
-        </div>
-    )
-}
+    const renderfieldoverlay = () => {
+        return (
+            <div className="font-roboto w-full aspect-[1260/75] relative text-[1em] px-4 select-none">
+                <img
+                    src={field_overlay}
+                    alt="Scoreboard Background"
+                    className="w-full h-auto"
+                />
+                <div className="absolute inset-0 text-white text-sm h-full w-full">
+                    {/* Top label */}
+                    <div
+                        className="absolute top-[1%] left-1/2 -translate-x-1/2 px-2 py-0.5 rounded text-[1.4cqw]">
+                        {(() => {
+                            if (matchType === "qm") return `Qualification ${matchNum} of 84`
+                            if (matchType === "f") return `Finals ${matchNum}`
 
+                            if (matchType === "sf") {
+                                if (matchNum <= 4) return `Upper Bracket – Round 1 – Match ${matchNum}`
+                                if (matchNum <= 6) return `Lower Bracket – Round 2 – Match ${matchNum}`
+                                if (matchNum <= 8) return `Upper Bracket – Round 2 – Match ${matchNum}`
+                                if (matchNum <= 10) return `Lower Bracket – Round 3 – Match ${matchNum}`
+                                if (matchNum === 11) return `Lower Bracket – Round 4 – Match 11`
+                                if (matchNum === 12) return `Upper Bracket – Round 4 – Match 12`
+                                if (matchNum === 13) return `Lower Bracket – Round 5 – Match 13`
+                            }
+
+                            return `${matchType} ${matchNum} of 84`
+                        })()}
+                    </div>
+
+                    {/* Red algae count */}
+                    <div className="absolute top-[50%] left-[13.6%] -translate-x-1/2 flex flex-col gap-1 text-center text-[1.6cqw]">
+                        <div className="w-8">{matchInfo.red.algae}</div>
+                    </div>
+                    {/* Red coral count */}
+                    <div className="absolute top-[50%] left-[5.8%] -translate-x-1/2 flex flex-col gap-1 text-center text-[1.6cqw]">
+                        <div className="w-8">{matchInfo.red.coral}</div>
+                    </div>
+
+                    {/* Blue algae count */}
+                    <div className="absolute top-[50%] right-[3.5%] -translate-x-1/2 flex flex-col gap-1 text-center text-[1.6cqw]">
+                        <div className="w-8">{matchInfo.blue.algae}</div>
+                    </div>
+                    {/* Blue coral count */}
+                    <div className="absolute top-[50%] right-[11.2%] -translate-x-1/2 flex flex-col gap-1 text-center text-[1.6cqw]">
+                        <div className="w-8">{matchInfo.blue.coral}</div>
+                    </div>
+
+                    {/* Red alliance info */}
+                    <div className="absolute top-[65%] left-[30%] flex gap-2 items-center text-[1cqw]">
+                        <span>0</span>
+                        <span>2583</span>
+                        <span>2915</span>
+                    </div>
+
+                    {/* Blue alliance info */}
+                    <div className="absolute top-[65%] right-[30%] flex gap-2 items-center text-[1cqw]">
+                        <span>3026</span>
+                        <span>1595</span>
+                        <span>2048</span>
+                    </div>
+
+                    {/* Red score */}
+                    <div className="absolute top-[35%] left-[43.6%] -translate-x-1/2 flex gap-2 items-center text-[3cqw]">
+                        <span className="font-bold ml-2">{matchInfo.red.score}</span>
+                    </div>
+
+                    {/* Blue score */}
+                    <div className="absolute top-[35%] right-[41.8%] -translate-x-1/2 flex gap-2 items-center text-[3cqw]">
+                        <span className="font-bold ml-2">{matchInfo.blue.score}</span>
+                    </div>
+                </div>
+            </div>
+        )
+    }
 
 
     return (
@@ -179,6 +258,7 @@ export default function MatchMonitoringLayout() {
                     Next match
                 </button>
             </div>
+            {renderfieldoverlay()}
         </div>
     )
 }

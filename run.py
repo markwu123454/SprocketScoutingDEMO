@@ -3,6 +3,7 @@ import threading
 import os
 import sys
 
+
 def stream_output(process, name):
     try:
         for line in iter(process.stdout.readline, b''):
@@ -11,6 +12,7 @@ def stream_output(process, name):
         pass
     finally:
         process.stdout.close()
+
 
 def run_process(name, cmd, cwd):
     proc = subprocess.Popen(
@@ -25,6 +27,7 @@ def run_process(name, cmd, cwd):
     thread.start()
     return proc
 
+
 def terminate_process(proc, name):
     if proc.poll() is None:
         print(f"Terminating {name}...")
@@ -34,6 +37,7 @@ def terminate_process(proc, name):
         except subprocess.TimeoutExpired:
             print(f"Forcing kill on {name}")
             proc.kill()
+
 
 def main(mode):
     project_root = os.path.abspath(os.path.dirname(__file__))
@@ -45,7 +49,12 @@ def main(mode):
     elif mode == "prod":
         build_proc = run_process("FRONTEND_BUILD", ["npm", "run", "build"], frontend_dir)
         build_proc.wait()
-        frontend_proc = run_process("FRONTEND_SERVE", ["npx", "serve", "dist"], frontend_dir)
+        frontend_proc = run_process(
+            "FRONTEND_SERVE",
+            ["npx", "serve", "dist", "-s", "--listen", "http://0.0.0.0:3000"],
+            frontend_dir
+        )
+
     else:
         print("Usage: python run.py [dev|prod]")
         sys.exit(1)
@@ -59,6 +68,7 @@ def main(mode):
     except KeyboardInterrupt:
         terminate_process(frontend_proc, "FRONTEND")
         terminate_process(backend_proc, "BACKEND")
+
 
 if __name__ == "__main__":
     if len(sys.argv) != 2:

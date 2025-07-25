@@ -3,12 +3,12 @@ import {BrowserRouter, Routes, Route} from 'react-router-dom'
 import './index.css'
 
 import {HomeLayout} from './pages/Home'
-import MatchScoutingLayout from './pages/MatchScouting'
+import {MatchScoutingLayout} from './pages/MatchScouting'
 import PitScoutingLayout from './pages/PitScouting'
 import DataLayout from './pages/Data'
 import MatchMonitoringLayout from './pages/MatchMonitoring'
 
-import AuthGate from "@/components/ui/authGate.tsx";
+import AuthGate from "@/components/AuthGate.tsx";
 import {UpdateProvider} from "@/contexts/pollingContext.tsx"
 
 // import ScoutingSyncProvider from './contexts/useScoutingSync.ts'
