@@ -12,7 +12,7 @@ export type ScoutingData = {
         algaePlacement: Record<string, boolean>
         missed: { l2: number; l3: number; l4: number; l1: number }
         l1: number
-        reef: number
+        processor: number
         barge: number
         missAlgae: number
         moved: boolean
@@ -23,7 +23,7 @@ export type ScoutingData = {
         algaePlacement: Record<string, boolean>
         missed: { l2: number; l3: number; l4: number; l1: number }
         l1: number
-        reef: number
+        processor: number
         barge: number
         missAlgae: number
     }
@@ -56,7 +56,7 @@ export type UIInfo = {
     }
 }
 
-export const initialScoutingData: Omit<ScoutingData, 'scouter'> = {
+export const defaultScoutingData: Omit<ScoutingData, 'scouter'> = {
     match: null,
     match_type: null,
     alliance: null,
@@ -75,7 +75,7 @@ export const initialScoutingData: Omit<ScoutingData, 'scouter'> = {
         },
         missed: { l1: 0, l2: 0, l3: 0, l4: 0 },
         l1: 0,
-        reef: 0,
+        processor: 0,
         barge: 0,
         missAlgae: 0,
         moved: false,
@@ -94,7 +94,7 @@ export const initialScoutingData: Omit<ScoutingData, 'scouter'> = {
         },
         missed: { l1: 0, l2: 0, l3: 0, l4: 0 },
         l1: 0,
-        reef: 0,
+        processor: 0,
         barge: 0,
         missAlgae: 0,
     },

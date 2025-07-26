@@ -60,7 +60,7 @@ def main(mode):
         sys.exit(1)
 
     # removed , "--reload"
-    backend_proc = run_process("BACKEND", ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"], backend_dir)
+    backend_proc = run_process("BACKEND", ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000", "--workers", "4"], backend_dir)
 
     try:
         frontend_proc.wait()

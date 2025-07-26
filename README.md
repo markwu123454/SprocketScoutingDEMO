@@ -5,23 +5,23 @@ interactive match input, and TBA integration.
 
 ## Features
 
-- Mobile and desktop compatible (no scrolling required on mobile)
-- Full match phase flow: Pre-match → Auto → Teleop → Endgame + Post-match
-- Manual/automatic authorization per match
+- Using PWA for a persistent semi-native app
+- Live match syncing and local caching
 - TBA API integration: match/team fetching, team logos
 - Live admin control and sync across devices
-- Visual UI with phase transitions and interactive controls
+- Visual scouting interface
 - Modular component-based architecture (React + TypeScript)
-- Only front end changes necessary to be used every season
+- Minimal changes required per season
+- HTTP Polling for "bidirectional" push message
 
-Planned features:
+### TODO:
 
-- Live mobile notifications
-- Match schedule auto-matching and validation
+- Push mobile notifications
+- Reorder match monitoring page
 - Pit scouting
 - Data export and visualization
 - Complete admin control
-- Integration with websocket for low latency communications
+- Rethink mobile caching and sync logic
 
 ## Architecture
 
@@ -32,7 +32,10 @@ Planned features:
 
 ### Backend
 * Python FastAPI server
-* Stateful
+* polling requests use time.time_ns()
+* non-polling requests use unix timestamp in seconds
+  * inter-worker communication via SQLite
+* Stateless
 
 ### Communication
 * HTTP Client-Server communication

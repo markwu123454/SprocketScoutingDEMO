@@ -8,6 +8,7 @@ export default function InfoToggle({
     infoBox,
     trueLabel = "Yes",
     falseLabel = "No",
+    className = ""
 }: {
     value: boolean
     onToggle: () => void
@@ -15,6 +16,7 @@ export default function InfoToggle({
     infoBox?: React.ReactNode
     trueLabel?: string
     falseLabel?: string
+    className?: string
 }) {
     const [showInfo, setShowInfo] = useState(false)
     const [pos, setPos] = useState({ top: 0, left: 0 })
@@ -65,7 +67,7 @@ export default function InfoToggle({
     }, [showInfo])
 
     return (
-        <div ref={containerRef} className="relative w-fit">
+        <div ref={containerRef} className={`relative w-max ${className}`}>
             {showInfo && (
                 <div
                     ref={tooltipRef}

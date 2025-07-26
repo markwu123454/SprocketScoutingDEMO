@@ -64,7 +64,7 @@ export default function PostMatch({
     }
 
     return (
-        <div className="p-4 w-full max-w-sm">
+        <div className="p-4 w-full">
             <div className="text-xl font-semibold mb-4">Post-Match Screen</div>
             <RatingSlider
                 value={data.postmatch.skill}
@@ -102,7 +102,7 @@ export default function PostMatch({
             <div className="flex gap-2 mt-4">
                 <button
                     onClick={togglePlayedRole("offense")}
-                    className={`flex items-center justify-center gap-1 px-2 py-1 rounded text-sm w-28 ${
+                    className={`flex items-center justify-center gap-1 px-2 py-1 rounded text-sm w-[33%] ${
                         data.postmatch.offense ? "bg-green-600" : "bg-red-600"
                     }`}
                 >
@@ -110,7 +110,7 @@ export default function PostMatch({
                 </button>
                 <button
                     onClick={togglePlayedRole("defense")}
-                    className={`flex items-center justify-center gap-1 px-2 py-1 rounded text-sm w-28 ${
+                    className={`flex items-center justify-center gap-1 px-2 py-1 rounded text-sm w-[33%] ${
                         data.postmatch.defense ? "bg-green-600" : "bg-red-600"
                     }`}
                 >
@@ -118,7 +118,7 @@ export default function PostMatch({
                 </button>
                 <button
                     onClick={toggleClimbSuccess}
-                    className={`flex items-center justify-center gap-1 px-2 py-1 rounded text-sm w-28 ${
+                    className={`flex items-center justify-center gap-1 px-2 py-1 rounded text-sm w-[33%] ${
                         data.postmatch.climbSuccess ? "bg-green-600" : "bg-red-600"
                     }`}
                 >
@@ -131,6 +131,7 @@ export default function PostMatch({
             </div>
             <div className="flex gap-2 mt-2">
                 <InfoToggle
+                    className="w-[33%]"
                     value={data.postmatch.faults.system}
                     onToggle={toggleFault("system")}
                     label="Sys"

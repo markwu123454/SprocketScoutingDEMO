@@ -20,7 +20,7 @@ export default function Pre({
     const {match, alliance, match_type, teamNumber} = data
     const scouter = getScouterName()!
 
-    const [lastTimestamp, setLastTimestamp] = useState<string>("")
+    const [lastTimestamp, setLastTimestamp] = useState<string>("0")
 
     const inputRef = useRef<HTMLInputElement>(null);
 
@@ -62,7 +62,7 @@ export default function Pre({
     // 3. Polling for updates
     usePollingEffect(
         match && alliance
-            ? `/poll/match/${match}/${alliance}?client_ts=${encodeURIComponent(lastTimestamp)}`
+            ? `/poll/match/${match}/${match_type}/${alliance}?client_ts=${encodeURIComponent(lastTimestamp)}`
             : null,
         (data: { teams: Record<string, { scouter: string | null }>, timestamp?: string }) => {
             // Update team list

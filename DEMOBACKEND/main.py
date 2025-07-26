@@ -3,6 +3,8 @@ import csv
 import json
 import sqlite3
 import time
+
+import redis
 from fastapi import FastAPI, Header, Depends, HTTPException, Body
 from pydantic import BaseModel
 from typing import Dict, Any, Optional, Literal, cast
@@ -244,6 +246,20 @@ class PasscodeBody(BaseModel):
 # </editor-fold>
 
 # <editor-fold desc="Auth">
+
+def init_sessions_table():
+    with sqlite3.connect("sessions.db") as conn:
+        conn.execute("""
+            CREATE TABLE IF NOT EXISTS sessions (
+                uuid TEXT PRIMARY KEY,
+                data TEXT NOT NULL,
+                expires TEXT NOT NULL
+            )
+        """)
+
+init_sessions_table()
+
+
 @app.post("/auth/login")
 def login(body: PasscodeBody):
     """
@@ -255,36 +271,54 @@ def login(body: PasscodeBody):
             for row in reader:
                 if row["passcode"] == body.passcode:
                     session_id = str(uuid.uuid4())
-                    uuid_sessions[session_id] = {
+                    expires_dt = datetime.now(timezone.utc) + UUID_DURATION
+                    expires_iso = expires_dt.isoformat()
+                    session_data = {
                         "name": row["name"],
                         "dev": row["dev"].lower() == "true",
                         "admin": row["admin"].lower() == "true",
                         "match_scouting": row["match_scouting"].lower() == "true",
                         "pit_scouting": row["pit_scouting"].lower() == "true",
-                        "expires": datetime.now(timezone.utc) + UUID_DURATION
+                        "expires": expires_iso
                     }
+                    # store in sqlite
+                    with sqlite3.connect("sessions.db") as conn:
+                        conn.execute(
+                            "INSERT OR REPLACE INTO sessions (uuid, data, expires) VALUES (?, ?, ?)",
+                            (session_id, json.dumps(session_data), expires_iso)
+                        )
+                        conn.commit()
                     return {
                         "uuid": session_id,
-                        "name": row["name"],
-                        "expires": uuid_sessions[session_id]["expires"].isoformat(),
+                        "name": session_data["name"],
+                        "expires": expires_iso,
                         "permissions": {
-                            "dev": uuid_sessions[session_id]["dev"],
-                            "admin": uuid_sessions[session_id]["admin"],
-                            "match_scouting": uuid_sessions[session_id]["match_scouting"],
-                            "pit_scouting": uuid_sessions[session_id]["pit_scouting"],
+                            "dev": session_data["dev"],
+                            "admin": session_data["admin"],
+                            "match_scouting": session_data["match_scouting"],
+                            "pit_scouting": session_data["pit_scouting"],
                         }
                     }
     except FileNotFoundError:
         raise HTTPException(status_code=500, detail="User file not found")
-
     raise HTTPException(status_code=401, detail="Invalid passcode")
 
 
 @app.get("/auth/verify")
 def verify_session(x_uuid: str = Header(...)):
-    session = uuid_sessions.get(x_uuid)
-    if not session or session["expires"] < datetime.now(timezone.utc):
+    with sqlite3.connect("sessions.db") as conn:
+        cur = conn.execute("SELECT data, expires FROM sessions WHERE uuid = ?", (x_uuid,))
+        row = cur.fetchone()
+    if not row:
         raise HTTPException(status_code=403, detail="Invalid or expired UUID")
+    data_json, expires_iso = row
+    if datetime.fromisoformat(expires_iso) < datetime.now(timezone.utc):
+        # session expired
+        with sqlite3.connect("sessions.db") as conn:
+            conn.execute("DELETE FROM sessions WHERE uuid = ?", (x_uuid,))
+            conn.commit()
+        raise HTTPException(status_code=403, detail="Invalid or expired UUID")
+    session = json.loads(data_json)
     return {
         "name": session["name"],
         "permissions": {
@@ -297,25 +331,37 @@ def verify_session(x_uuid: str = Header(...)):
 
 
 def verify_uuid(
-        x_uuid: str = Header(..., alias="x-uuid"),
-        required: Optional[str] = None
+    x_uuid: str = Header(..., alias="x-uuid"),
+    required: Optional[str] = None
 ) -> Dict[str, Any]:
-    """
-    Verifies UUID session and required permission.
-    """
-    session = uuid_sessions.get(x_uuid)
-    if not session or session["expires"] < datetime.now(timezone.utc):
+    with sqlite3.connect("sessions.db") as conn:
+        cur = conn.execute("SELECT data, expires FROM sessions WHERE uuid = ?", (x_uuid,))
+        row = cur.fetchone()
+    if not row:
         raise HTTPException(status_code=403, detail="Invalid or expired UUID")
-
+    data_json, expires_iso = row
+    if datetime.fromisoformat(expires_iso) < datetime.now(timezone.utc):
+        with sqlite3.connect("sessions.db") as conn:
+            conn.execute("DELETE FROM sessions WHERE uuid = ?", (x_uuid,))
+            conn.commit()
+        raise HTTPException(status_code=403, detail="Invalid or expired UUID")
+    session = json.loads(data_json)
     if required and not session.get(required, False):
         raise HTTPException(status_code=403, detail=f"Missing '{required}' permission")
-
-    return session  # can be used in route handler
+    return session
 
 
 def get_scouter_from_uuid(uuid: str) -> Optional[str]:
-    session = uuid_sessions.get(uuid)
-    return session.get("scouter") if session else None
+    with sqlite3.connect("sessions.db") as conn:
+        cur = conn.execute("SELECT data, expires FROM sessions WHERE uuid = ?", (uuid,))
+        row = cur.fetchone()
+    if not row:
+        return None
+    data_json, expires_iso = row
+    if datetime.fromisoformat(expires_iso) < datetime.now(timezone.utc):
+        return None
+    session = json.loads(data_json)
+    return session.get("name")
 
 
 # </editor-fold>
@@ -326,8 +372,10 @@ def expire_uuid(session_id: str, _: dict = Depends(partial(verify_uuid, required
     """
     Expires a single UUID session.
     """
-    if session_id in uuid_sessions:
-        del uuid_sessions[session_id]
+    with sqlite3.connect("sessions.db") as conn:
+        cur = conn.execute("DELETE FROM sessions WHERE uuid = ?", (session_id,))
+        conn.commit()
+    if cur.rowcount:
         return {"status": "expired"}
     raise HTTPException(status_code=404, detail="Session ID not found")
 
@@ -337,8 +385,11 @@ def expire_all(_: dict = Depends(partial(verify_uuid, required="admin"))):
     """
     Expires all UUID sessions.
     """
-    uuid_sessions.clear()
+    with sqlite3.connect("sessions.db") as conn:
+        conn.execute("DELETE FROM sessions")
+        conn.commit()
     return {"status": "all expired"}
+# </editor-fold>
 
 
 @app.post("/admin/set_event")
@@ -645,7 +696,7 @@ def ping():
 # </editor-fold>
 
 # <editor-fold desc="HTTP polling">
-@app.get("/poll/match/{match}/{match_type}/{alliance}")
+@app.get("/poll/match/{match}/{m_type}/{alliance}")
 async def poll_scouter_changes(
         match: int,
         m_type: match_type,
@@ -723,6 +774,7 @@ async def poll_admin_match_changes(
         if latest_ns > client_ns:
             await asyncio.sleep(0.3)
             current_state, latest_ns = await get_current_state()
+            print(latest_ns, client_ns)
             return {
                 "timestamp": str(latest_ns),
                 "entries": current_state  # full list of match_scouting dicts

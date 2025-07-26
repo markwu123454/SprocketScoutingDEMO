@@ -3,12 +3,6 @@ import {useNavigate} from "react-router-dom"
 import {useAPI} from "@/api/API.ts"
 import {useClientEnvironment} from "@/hooks/useClientEnvironment.ts"
 
-// --- MODULE-SCOPED OFFLINE ENTRY FLAG ---
-let enteredOfflineFlag = false
-export function clearEnteredOfflineFlag() {
-    enteredOfflineFlag = false
-}
-
 const PERMISSION_LABELS: Record<string, string> = {
     dev: "Developer",
     admin: "Administrator",
@@ -30,14 +24,10 @@ export default function AuthGate({
 
     useEffect(() => {
         const check = async () => {
-            const offlineAccess = !isOnline || !serverOnline
-
-            if (offlineAccess) {
-                if (permission === "match_scouting" || permission === "pit_scouting") {
-                    setAuthorized(true)
-                    enteredOfflineFlag = true
-                    return
-                }
+            // Allow offline access for match/pit scouting
+            if ((!isOnline || !serverOnline) && (permission === "match_scouting" || permission === "pit_scouting")) {
+                setAuthorized(true)
+                return
             }
 
             const result = await verify()
@@ -48,11 +38,15 @@ export default function AuthGate({
         }
 
         void check()
-    }, [permission, isOnline, serverOnline])
+    }, [permission, isOnline, serverOnline, verify])
 
-    // Gate bypassed if entered offline
-    if (authorized === null) return null
-    if (enteredOfflineFlag) return <>{children}</>
+    if (authorized === null) {
+        return (
+            <div className="w-screen h-screen bg-zinc-950 text-white flex items-center justify-center">
+                <div>Checking access…</div>
+            </div>
+        )
+    }
 
     if (!authorized) {
         return (
@@ -74,5 +68,5 @@ export default function AuthGate({
         )
     }
 
-    return <>{children}</>
+    return <div>{children}</div>
 }

@@ -1,9 +1,11 @@
 import {useEffect, useState} from 'react'
-import {useAPI} from '@/api/API.ts'
+import {getAuthHeaders, useAPI} from '@/api/API.ts'
 import {Badge} from '@/components/ui/badge'
-import type {TeamInfo, UIInfo} from '@/types'
-import field_overlay from '@/assets/FMS_In-Match.png'
+import type {TeamInfo, UIInfo, ScoutingData, MatchType} from '@/types'
+import field_overlay from '@/assets/2025_FMS_In-Match.png'
 import {defaultUIINFO} from "@/components/seasons/2025/yearConfig.ts";
+import {usePollingEffect} from '@/contexts/pollingContext'
+
 
 export default function MatchMonitoringLayout() {
     const {getAllStatuses, getTeamList} = useAPI()
@@ -15,11 +17,14 @@ export default function MatchMonitoringLayout() {
     >([])
 
     const [matchNum, setMatchNum] = useState(2)
-    const [matchType, setMatchType] = useState("sf")
+    const [matchType, setMatchType] = useState<MatchType>("f")
     const [matchRed, setMatchRed] = useState<TeamInfo[]>([])
     const [matchBlue, setMatchBlue] = useState<TeamInfo[]>([])
+    const [lastTimestamp, setLastTimestamp] = useState<string>("0")
 
     const [matchInfo, setMatchInfo] = useState<UIInfo>(defaultUIINFO);
+
+    const [fullMatchInfo, setFullMatchInfo] = useState<ScoutingData[]>([])
 
     const loadStatuses = async () => {
         const all = await getAllStatuses()
@@ -53,8 +58,8 @@ export default function MatchMonitoringLayout() {
     }
 
     const loadTeams = async (m: number) => {
-        const red = await getTeamList(m, "qm", 'red')
-        const blue = await getTeamList(m, "qm", 'blue')
+        const red = await getTeamList(m, matchType, 'red')
+        const blue = await getTeamList(m, matchType, 'blue')
         setMatchRed(red)
         setMatchBlue(blue)
     }
@@ -122,6 +127,100 @@ export default function MatchMonitoringLayout() {
         )
     }
 
+    usePollingEffect(
+        `/poll/admin_match/${matchNum}/${matchType}?client_ts=${encodeURIComponent(lastTimestamp)}`,
+        (data: { entries: ScoutingData[]; timestamp?: string }) => {
+            if (data.timestamp) setLastTimestamp(data.timestamp)
+            setFullMatchInfo(data.entries)
+        },
+        [matchNum, matchType, lastTimestamp],
+        300,
+        getAuthHeaders()
+    )
+
+    useEffect(() => {
+        const alliances: ("red" | "blue")[] = ["red", "blue"]
+
+        const info: UIInfo = {
+            red: {score: 0, coral: 0, algae: 0},
+            blue: {score: 0, coral: 0, algae: 0},
+        }
+
+        for (const alliance of alliances) {
+            const entries = fullMatchInfo.filter(e => e.alliance === alliance)
+
+            let algae = 0
+            let coral = 0
+
+            for (const entry of entries) {
+                const phases: ("auto" | "teleop")[] = ["auto", "teleop"]
+
+                for (const phase of phases) {
+                    // @ts-ignore
+                    // It works fine, TODO:figure out error
+                    const phaseData = entry.data?.[phase]
+                    if (!phaseData) continue
+
+                    if (typeof phaseData.barge === "number") {
+                        algae += phaseData.barge
+                    }
+
+                    if (phaseData.branchPlacement && typeof phaseData.branchPlacement === "object") {
+                        for (const branch of Object.values(phaseData.branchPlacement)) {
+                            if (branch && typeof branch === "object") {
+                                coral += Object.values(branch).filter(Boolean).length
+                            }
+                        }
+                    }
+
+                    if (typeof phaseData.l1 === "number") {
+                        coral += phaseData.l1
+                    }
+
+                    // ─── Score Calculation ─────────────────────────────────────────────
+                    let scoreAdd = 0
+
+                    if (phase === "auto") {
+                        // Branch placements
+                        for (const branch of Object.values(phaseData.branchPlacement ?? {})) {
+                            if (!branch) continue
+                            if (branch.l4) scoreAdd += 7
+                            if (branch.l3) scoreAdd += 6
+                            if (branch.l2) scoreAdd += 4
+                        }
+                        // Flat placements
+                        scoreAdd += (phaseData.l1 ?? 0) * 3
+                        scoreAdd += (phaseData.processor ?? 0) * 6
+                        scoreAdd += (phaseData.barge ?? 0) * 4
+                        if (phaseData.moved) scoreAdd += 3
+                    } else {
+                        // Teleop scoring
+                        for (const branch of Object.values(phaseData.branchPlacement ?? {})) {
+                            if (!branch) continue
+                            if (branch.l4) scoreAdd += 5
+                            if (branch.l3) scoreAdd += 4
+                            if (branch.l2) scoreAdd += 3
+                            if (branch.l1) scoreAdd += 2
+                        }
+                        scoreAdd += (phaseData.l1 ?? 0) * 2
+                        scoreAdd += (phaseData.processor ?? 0) * 6
+                        scoreAdd += (phaseData.barge ?? 0) * 4
+                    }
+
+                    // Apply to total alliance score
+                    info[alliance].score += scoreAdd
+
+                }
+            }
+
+            info[alliance].algae = algae
+            info[alliance].coral = coral
+        }
+
+        setMatchInfo(info)
+    }, [fullMatchInfo])
+
+
     const renderfieldoverlay = () => {
         return (
             <div className="font-roboto w-full aspect-[1260/75] relative text-[1em] px-4 select-none">
@@ -153,44 +252,60 @@ export default function MatchMonitoringLayout() {
                     </div>
 
                     {/* Red algae count */}
-                    <div className="absolute top-[50%] left-[13.6%] -translate-x-1/2 flex flex-col gap-1 text-center text-[1.6cqw]">
+                    <div
+                        className="absolute top-[50%] left-[13.6%] -translate-x-1/2 flex flex-col gap-1 text-center text-[1.6cqw]">
                         <div className="w-8">{matchInfo.red.algae}</div>
                     </div>
                     {/* Red coral count */}
-                    <div className="absolute top-[50%] left-[5.8%] -translate-x-1/2 flex flex-col gap-1 text-center text-[1.6cqw]">
+                    <div
+                        className="absolute top-[50%] left-[5.8%] -translate-x-1/2 flex flex-col gap-1 text-center text-[1.6cqw]">
                         <div className="w-8">{matchInfo.red.coral}</div>
                     </div>
 
                     {/* Blue algae count */}
-                    <div className="absolute top-[50%] right-[3.5%] -translate-x-1/2 flex flex-col gap-1 text-center text-[1.6cqw]">
+                    <div
+                        className="absolute top-[50%] right-[3.5%] -translate-x-1/2 flex flex-col gap-1 text-center text-[1.6cqw]">
                         <div className="w-8">{matchInfo.blue.algae}</div>
                     </div>
                     {/* Blue coral count */}
-                    <div className="absolute top-[50%] right-[11.2%] -translate-x-1/2 flex flex-col gap-1 text-center text-[1.6cqw]">
+                    <div
+                        className="absolute top-[50%] right-[11.2%] -translate-x-1/2 flex flex-col gap-1 text-center text-[1.6cqw]">
                         <div className="w-8">{matchInfo.blue.coral}</div>
                     </div>
 
                     {/* Red alliance info */}
-                    <div className="absolute top-[65%] left-[30%] flex gap-2 items-center text-[1cqw]">
-                        <span>0</span>
-                        <span>2583</span>
-                        <span>2915</span>
+                    <div className="absolute top-[57%] left-[32%] -translate-x-1/2 flex gap-2 items-center text-[1cqw]">
+                        {matchRed.map(team => (
+                            <div key={team.number} className="flex items-center gap-1 pl-2">
+                                <img src={team.logo} alt={`Team ${team.number}`}
+                                     className="w-[2cqw] h-[2cqw] object-contain"/>
+                                <span className="font-mono text-[1cqw] min-w-[4ch] text-center">{team.number}</span>
+                            </div>
+                        ))}
                     </div>
 
                     {/* Blue alliance info */}
-                    <div className="absolute top-[65%] right-[30%] flex gap-2 items-center text-[1cqw]">
-                        <span>3026</span>
-                        <span>1595</span>
-                        <span>2048</span>
+                    <div
+                        className="absolute top-[57%] right-[16.5%] -translate-x-1/2 flex gap-2 items-center text-[1cqw]">
+                        {matchBlue.map(team => (
+                            <div key={team.number} className="flex items-center gap-1 pl-2">
+                                <img src={team.logo} alt={`Team ${team.number}`}
+                                     className="w-[2cqw] h-[2cqw] object-contain"/>
+                                <span className="font-mono text-[1cqw] min-w-[4ch] text-center">{team.number}</span>
+                            </div>
+                        ))}
                     </div>
 
+
                     {/* Red score */}
-                    <div className="absolute top-[35%] left-[43.6%] -translate-x-1/2 flex gap-2 items-center text-[3cqw]">
+                    <div
+                        className="absolute top-[35%] left-[43.6%] -translate-x-1/2 flex gap-2 items-center text-[3cqw]">
                         <span className="font-bold ml-2">{matchInfo.red.score}</span>
                     </div>
 
                     {/* Blue score */}
-                    <div className="absolute top-[35%] right-[41.8%] -translate-x-1/2 flex gap-2 items-center text-[3cqw]">
+                    <div
+                        className="absolute top-[35%] right-[44.4%] translate-x-1/2 flex gap-2 items-center text-[3cqw]">
                         <span className="font-bold ml-2">{matchInfo.blue.score}</span>
                     </div>
                 </div>
@@ -200,65 +315,65 @@ export default function MatchMonitoringLayout() {
 
 
     return (
-        <div className="p-4 h-screen space-y-6 bg-zinc-900 overflow-y-auto">
-            <h1 className="text-2xl font-bold text-white">Active Scouting</h1>
-            {activeOnly.length === 0 ? (
-                <p className="text-zinc-500">No active teams</p>
-            ) : (
-                <div className="grid gap-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
-                    {activeOnly.map(({match, team, status, scouter}) => (
-                        <div
-                            key={`${match}-${team}`}
-                            className="flex flex-col gap-1 p-3 rounded bg-zinc-800 border border-zinc-700 hover:bg-zinc-700 transition"
-                        >
-                            <div className="text-sm text-zinc-400 font-mono">
-                                Match {match} – Team {team}
-                            </div>
-                            <div className="flex justify-between items-center">
-                                {scouter ? (
-                                    <Badge className="text-sm text-zinc-300 italic">by {scouter}</Badge>
-                                ) : (
-                                    <Badge className="text-sm text-zinc-500">—</Badge>
-                                )}
-                                <Badge className={`text-xs px-2 py-1 rounded ${statusColor(status)}`}>
-                                    {status.toUpperCase()}
-                                </Badge>
-                            </div>
-                        </div>
-                    ))}
-                </div>
-            )}
-
-            <div className="mt-8 space-y-4 space-x-5">
-                <h2 className="text-xl font-semibold text-white">Match {matchNum} Robot Claims</h2>
-                <div>
-                    <h3 className="text-lg text-red-400 mb-1">Red Alliance</h3>
-                    <div className="grid grid-cols-3 gap-4">
-                        {matchRed.map(renderTeamStatus)}
-                    </div>
-                </div>
-                <div>
-                    <h3 className="text-lg text-blue-400 mb-1">Blue Alliance</h3>
-                    <div className="grid grid-cols-3 gap-4">
-                        {matchBlue.map(renderTeamStatus)}
-                    </div>
-                </div>
-
-                <button
-                    onClick={prevMatch}
-                    className="mt-4 px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded"
-                >
-                    Last match
-                </button>
-
-                <button
-                    onClick={nextMatch}
-                    className="mt-4 px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded"
-                >
-                    Next match
-                </button>
+        <div className="flex flex-col h-screen bg-zinc-900">
+            {/* Scoreboard Header */}
+            <div className="p-6">
+                {renderfieldoverlay()}
             </div>
-            {renderfieldoverlay()}
+            {/* Scrollable Main Content */}
+            <div className="flex-1 overflow-y-auto p-6 space-y-6">
+                {/* 3-Column Match Layout */}
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div>
+                        <h3 className="text-red-400 text-xl font-semibold mb-2">Red Alliance</h3>
+                        <div className="space-y-2">
+                            {matchRed.map(renderTeamStatus)}
+                        </div>
+                    </div>
+                    <div>
+                        <h3 className="text-white text-xl font-semibold mb-2">Active Scouting</h3>
+                        {activeOnly.length === 0 ? (
+                            <p className="text-zinc-500">No active teams</p>
+                        ) : (
+                            <div className="grid gap-2">
+                                {activeOnly.map(({match, team, status, scouter}) => (
+                                    <div
+                                        key={`${match}-${team}`}
+                                        className="flex flex-col gap-1 p-3 rounded bg-zinc-800 border border-zinc-700 hover:bg-zinc-700 transition"
+                                    >
+                                        <div className="text-sm text-zinc-400 font-mono">
+                                            Match {match} – Team {team}
+                                        </div>
+                                        <div className="flex justify-between items-center">
+                                            {scouter ? (
+                                                <Badge className="text-sm text-zinc-300 italic">by {scouter}</Badge>
+                                            ) : (
+                                                <Badge className="text-sm text-zinc-500">—</Badge>
+                                            )}
+                                            <Badge className={`text-xs px-2 py-1 rounded ${statusColor(status)}`}>
+                                                {status.toUpperCase()}
+                                            </Badge>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        )}
+                    </div>
+                    <div>
+                        <h3 className="text-blue-400 text-xl font-semibold mb-2">Blue Alliance</h3>
+                        <div className="space-y-2">
+                            {matchBlue.map(renderTeamStatus)}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            {/* Sticky Bottom Controls */}
+            <div className="flex justify-between items-center px-6 py-4 bg-zinc-950 text-white text-lg">
+                <button onClick={prevMatch} className="px-4 py-2 bg-red-600 hover:bg-red-700 rounded">Prev</button>
+                <span>Match Monitoring — Powered by Scouting System</span>
+                <button onClick={nextMatch} className="px-4 py-2 bg-green-600 hover:bg-green-700 rounded">Next</button>
+            </div>
         </div>
     )
 }

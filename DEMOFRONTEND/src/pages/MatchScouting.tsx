@@ -1,31 +1,23 @@
-// 1. React built-ins
 import {useState, useEffect} from 'react'
 
-// 2. Routing
 import {useNavigate} from "react-router-dom"
 
-// 3. Types
 import type {ScoutingData, Phase, ScoutingStatus} from '@/types'
 
-// 4. Contexts and utilities
 import {useAPI, getScouterName} from '@/api/API.ts'
 import {useClientEnvironment} from "@/hooks/useClientEnvironment.ts"
 import {saveScoutingData, deleteScoutingData, db, type ScoutingDataWithKey, updateScoutingStatus} from "@/db/db.ts"
-import {clearEnteredOfflineFlag} from "@/components/AuthGate.tsx"
 
-// 5. UI components
 import {Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter} from "@/components/ui/dialog"
 import {Button} from '@/components/ui/button'
 import LoadButton from '@/components/ui/loadButton'
 
-// 6. Pages
 import Pre from "@/pages/Pre.tsx"
 
-// 7. App-specific components
 import AutoPhase from "@/components/seasons/2025/Auto.tsx"
 import TeleopPhase from "@/components/seasons/2025/Teleop.tsx"
 import PostMatch from "@/components/seasons/2025/Post.tsx"
-import {initialScoutingData} from "@/components/seasons/2025/yearConfig.ts"
+import {defaultScoutingData} from "@/components/seasons/2025/yearConfig.ts"
 
 const PHASE_ORDER: Phase[] = ['pre', 'auto', 'teleop', 'post']
 
@@ -33,14 +25,14 @@ export function MatchScoutingLayout() {
     // 1. External hooks
     const navigate = useNavigate()
 
-    const {patchData, submitData, verify} = useAPI()
+    const {patchData, submitData, verify, updateMatchData} = useAPI()
     const {isOnline, serverOnline} = useClientEnvironment()
     const scouterName = getScouterName()!
 
     // 2. State
     const [phaseIndex, setPhaseIndex] = useState(0)
     const [scoutingData, setScoutingData] = useState<ScoutingData>({
-        ...initialScoutingData,
+        ...defaultScoutingData,
         scouter: scouterName,
     })
     const [submitStatus, setSubmitStatus] = useState<'idle' | 'loading' | 'success' | 'local' | 'error' | 'warning'>('idle')
@@ -69,12 +61,11 @@ export function MatchScoutingLayout() {
                 setResumeCandidate(active)
                 setShowResumeDialog(true)
             } else {
-                setScoutingData({...initialScoutingData, scouter: scouterName})
+                setScoutingData({...defaultScoutingData, scouter: scouterName})
                 setPhaseIndex(0)
             }
         })()
     }, [])
-
 
     useEffect(() => {
         const interval = setInterval(() => {
@@ -83,13 +74,21 @@ export function MatchScoutingLayout() {
 
             const status = PHASE_ORDER[phaseIndex] as ScoutingStatus
 
+            // Always save locally
             saveScoutingData(scoutingData, status).catch(err => {
                 console.error("Autosave failed", err)
             })
+
+            // If online, also update server
+            if (isOnline && serverOnline) {
+                updateMatchData(match, teamNumber, match_type, getScouterName()!, scoutingData).catch(err => {
+                    console.error("updateMatchData failed", err)
+                })
+            }
         }, 3000)
 
         return () => clearInterval(interval)
-    }, [scoutingData, phaseIndex])
+    }, [scoutingData, phaseIndex, isOnline, serverOnline])
 
 
     // 5. Event handlers
@@ -115,8 +114,6 @@ export function MatchScoutingLayout() {
                 setSubmitStatus("local")
 
                 setTimeout(async () => {
-                    // Clear the offline flag *before* verify so AuthGate kicks if invalid
-                    clearEnteredOfflineFlag()
 
                     const result = await verify()
                     const allowed = result.success && result.permissions?.match_scouting
@@ -124,7 +121,7 @@ export function MatchScoutingLayout() {
 
                     // Reset after local save
                     setSubmitStatus("idle")
-                    setScoutingData({...initialScoutingData, scouter: scouterName})
+                    setScoutingData({...defaultScoutingData, scouter: scouterName})
                     setPhaseIndex(0)
                 }, 1000)
             } else {
@@ -135,14 +132,12 @@ export function MatchScoutingLayout() {
                     return
                 }
 
-                clearEnteredOfflineFlag()
-
                 await deleteScoutingData(match_type!, match!, teamNumber!)
 
                 setSubmitStatus("success")
                 setTimeout(() => {
                     setSubmitStatus("idle")
-                    setScoutingData({...initialScoutingData, scouter: scouterName})
+                    setScoutingData({...defaultScoutingData, scouter: scouterName})
                     setPhaseIndex(0)
                 }, 1000)
             }
@@ -151,12 +146,11 @@ export function MatchScoutingLayout() {
             setSubmitStatus("warning")
 
             setTimeout(async () => {
-                clearEnteredOfflineFlag()
                 const result = await verify()
                 const allowed = result.success && result.permissions?.match_scouting
                 if (!allowed) return
                 setSubmitStatus("idle")
-                setScoutingData({...initialScoutingData, scouter: scouterName})
+                setScoutingData({...defaultScoutingData, scouter: scouterName})
                 setPhaseIndex(0)
             }, 1000)
         }
@@ -208,7 +202,7 @@ export function MatchScoutingLayout() {
                                 if (resumeCandidate) {
                                     await db.scouting.delete(resumeCandidate.key)
                                 }
-                                setScoutingData({...initialScoutingData, scouter: scouterName})
+                                setScoutingData({...defaultScoutingData, scouter: scouterName})
                                 setPhaseIndex(0)
                                 setShowResumeDialog(false)
                             }}
@@ -232,7 +226,8 @@ export function MatchScoutingLayout() {
                 </DialogContent>
             </Dialog>
 
-            <div className="w-screen min-h-0 h-screen flex flex-col overflow-hidden bg-zinc-900 text-white touch-none select-none">
+            <div
+                className="w-screen min-h-0 h-screen flex flex-col overflow-hidden bg-zinc-900 text-white touch-none select-none">
                 {/* Top Bar */}
                 <div className="h-12 flex justify-between items-center px-4 bg-zinc-800 text-ml font-semibold shrink-0">
                     <div>{scouterName}</div>
@@ -264,7 +259,8 @@ export function MatchScoutingLayout() {
                 </div>
 
                 {/* Bottom Bar */}
-                <div className="h-16 relative flex justify-between items-center px-4 bg-zinc-800 text-xl font-semibold shrink-0">
+                <div
+                    className="h-16 relative flex justify-between items-center px-4 bg-zinc-800 text-xl font-semibold shrink-0">
                     <Button
                         onClick={handleBack}
                         disabled={submitStatus === 'loading'}
