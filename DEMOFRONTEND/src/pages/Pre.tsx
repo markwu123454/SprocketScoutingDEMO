@@ -1,4 +1,4 @@
-import type {ScoutingData, TeamInfo} from "@/types"
+import type {MatchScoutingData, TeamInfo} from "@/types"
 import * as React from "react"
 import {useEffect, useRef, useState} from "react"
 import {getAuthHeaders, getScouterName, useAPI} from "@/api/API.ts"
@@ -9,8 +9,8 @@ export default function Pre({
                                 data,
                                 setData,
                             }: {
-    data: ScoutingData
-    setData: React.Dispatch<React.SetStateAction<ScoutingData>>
+    data: MatchScoutingData
+    setData: React.Dispatch<React.SetStateAction<MatchScoutingData>>
 }) {
     const {patchData, getTeamList} = useAPI()
     const {isOnline, serverOnline} = useClientEnvironment()

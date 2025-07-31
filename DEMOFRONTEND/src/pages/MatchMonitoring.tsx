@@ -1,7 +1,7 @@
 import {useEffect, useState} from 'react'
 import {getAuthHeaders, useAPI} from '@/api/API.ts'
 import {Badge} from '@/components/ui/badge'
-import type {TeamInfo, UIInfo, ScoutingData, MatchType} from '@/types'
+import type {TeamInfo, UIInfo, MatchScoutingData, MatchType} from '@/types'
 import field_overlay from '@/assets/2025_FMS_In-Match.png'
 import {defaultUIINFO} from "@/components/seasons/2025/yearConfig.ts";
 import {usePollingEffect} from '@/contexts/pollingContext'
@@ -24,7 +24,7 @@ export default function MatchMonitoringLayout() {
 
     const [matchInfo, setMatchInfo] = useState<UIInfo>(defaultUIINFO);
 
-    const [fullMatchInfo, setFullMatchInfo] = useState<ScoutingData[]>([])
+    const [fullMatchInfo, setFullMatchInfo] = useState<MatchScoutingData[]>([])
 
     const loadStatuses = async () => {
         const all = await getAllStatuses()
@@ -129,7 +129,7 @@ export default function MatchMonitoringLayout() {
 
     usePollingEffect(
         `/poll/admin_match/${matchNum}/${matchType}?client_ts=${encodeURIComponent(lastTimestamp)}`,
-        (data: { entries: ScoutingData[]; timestamp?: string }) => {
+        (data: { entries: MatchScoutingData[]; timestamp?: string }) => {
             if (data.timestamp) setLastTimestamp(data.timestamp)
             setFullMatchInfo(data.entries)
         },
@@ -156,7 +156,6 @@ export default function MatchMonitoringLayout() {
                 const phases: ("auto" | "teleop")[] = ["auto", "teleop"]
 
                 for (const phase of phases) {
-                    // @ts-ignore
                     // It works fine, TODO:figure out error
                     const phaseData = entry.data?.[phase]
                     if (!phaseData) continue

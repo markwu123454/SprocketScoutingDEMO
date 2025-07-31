@@ -2,7 +2,7 @@ import {useState, useEffect} from 'react'
 
 import {useNavigate} from "react-router-dom"
 
-import type {ScoutingData, Phase, ScoutingStatus} from '@/types'
+import type {MatchScoutingData, Phase, ScoutingStatus} from '@/types'
 
 import {useAPI, getScouterName} from '@/api/API.ts'
 import {useClientEnvironment} from "@/hooks/useClientEnvironment.ts"
@@ -31,7 +31,7 @@ export function MatchScoutingLayout() {
 
     // 2. State
     const [phaseIndex, setPhaseIndex] = useState(0)
-    const [scoutingData, setScoutingData] = useState<ScoutingData>({
+    const [scoutingData, setScoutingData] = useState<MatchScoutingData>({
         ...defaultScoutingData,
         scouter: scouterName,
     })
@@ -102,7 +102,7 @@ export function MatchScoutingLayout() {
             match_type,
             alliance,
             scouter: scouterName,
-            data: rest as Omit<ScoutingData, "match" | "alliance" | "teamNumber" | "scouter">,
+            data: rest as Omit<MatchScoutingData, "match" | "alliance" | "teamNumber" | "scouter">,
         }
 
         const offlineAtSubmit = !isOnline || !serverOnline

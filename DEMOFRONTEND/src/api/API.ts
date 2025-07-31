@@ -1,4 +1,4 @@
-import type {TeamInfo, ScoutingData, MatchType, AllianceType} from '@/types'
+import type {TeamInfo, MatchScoutingData, MatchType, AllianceType} from '@/types'
 
 const BASE_URL = `${window.location.protocol}//${window.location.hostname}:8000`;
 const UUID_COOKIE = "scouting_uuid"
@@ -41,7 +41,7 @@ export function useAPI() {
         match_type: MatchType;
         alliance: AllianceType;
         scouter: string;
-        data: Omit<ScoutingData,
+        data: Omit<MatchScoutingData,
             'match' |
             'alliance' |
             'teamNumber' |
@@ -123,7 +123,7 @@ export function useAPI() {
         team: number,
         match_type: MatchType,
         scouter: string,
-        data: Partial<ScoutingData>
+        data: Partial<MatchScoutingData>
     ): Promise<boolean> => {
         try {
             const res = await fetch(

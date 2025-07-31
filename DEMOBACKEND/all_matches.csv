@@ -1,0 +1,720 @@
+_id,Pre Match.teanNum,Pre Match.match_type,Pre Match.match_num,Pre Match.allianceColor,Auton.autonLeave,Auton.autonCoralMissed,Auton.autonCoral L4,Auton.autonCoral L3,Auton.autonCoral L2,Auton.autonCoral L1,Auton.autonProc,Auton.autonNet,Auton.autonAlgRemL3,Auton.autonAlgRemL2,Match.MatchCoralMissed,Match.matchCoral L4,Match.matchCoral L3,Match.matchCoral L2,Match.matchCoral L1,Match.matchProc,Match.matchNet,Match.matchAlgRemL3,Match.matchAlgRemL2,Match.matchAlgae,Endgame.Park,Endgame.Climb,Endgame.climbSuccess,Endgame.climbTime,Post Match.Intake,Post Match.intakeFrom,Post Match.driverSkill,Post Match.robotSpeed,Post Match.Defense,Post Match.defenseSkill,Post Match.Review,Post Match.comments,scouter.name,scouter.email
+6801022a5efdd0eb5f00c940,3045,Qualification,1,blueAlliance,Yes,0,3,,,,,,,,,2,3,4,0,0,1,,1,,Yes,Did not climb,No,,Both,Source,4,3,No,,No,,Lyn,allynsong08@gmail.com
+680102375efdd0eb5f00c941,9496,Qualification,1,redAlliance,Yes,,3,,,,,,,,,2,4,3,3,,,1,,,Yes,Deep climb,Yes,2181,Both,Both,4,4,No,,No,,exie1,emilyxie666@gmail.com
+680102495efdd0eb5f00c942,6647,Qualification,1,blueAlliance,Yes,,1,,,,,,,,,,,,,,,,,,Yes,Did not climb,No,,None,None,3,2,Yes,4,No,Can only defend. ,Zihanli,zihanli.purifiedwater@gmail.com
+680102545efdd0eb5f00c943,1241,Qualification,1,blueAlliance,Yes,0,4,,,,,,,,1,1,6,6,1,2,,2,1,,Yes,Did not climb,No,,Both,Source,3,3,No,,No,,cind,cinlin480@gmail.com
+6801028b5efdd0eb5f00c944,4907,Qualification,1,redAlliance,Yes,,3,,,,,,,,,2,6,3,,1,1,,1,,No,Deep climb,Yes,9234,Both,Source,5,3,No,,No,,ashlyn,ashlynmlai@gmail.com
+6802987838e90da8dbade80b,6324,Qualification,1,redAlliance,Yes,0,1,0,0,0,0,2,0,0,1,1,6,5,0,0,2,0,0,0,No,Deep climb,Yes,0,Both,Source,3,3,No,0,No,0,ashlyn,ashlynmlai@gmail.com
+680103dbf5ebc99ab2a4a507,2080,Qualification,2,blueAlliance,Yes,,,,,,,,,,1,3,1,,,,,,,,No,Did not climb,No,,Coral,Source,2,2,No,,No,,Zihanli,zihanli.purifiedwater@gmail.com
+680103dcf5ebc99ab2a4a508,7421,Qualification,2,blueAlliance,Yes,2,1,,,,,,,,6,2,2,2,,,,2,,0,Yes,Did not climb,No,11118.999999999942,Both,Both,2,2,No,,No,,cind,cinlin480@gmail.com
+680103e8f5ebc99ab2a4a509,10224,Qualification,2,redAlliance,Yes,,,,,,,,,,1,2,4,2,,,,0,0,,Yes,Deep climb,No,,Coral,Source,3,3,No,,No,,exie1,emilyxie666@gmail.com
+68010400f5ebc99ab2a4a50a,2470,Qualification,2,blueAlliance,Yes,,,,,,,,,,,1,,,,2,2,1,2,,No,Shallow climb,No,,Both,Source,1,2,No,1,No,,Lyn,allynsong08@gmail.com
+68010419f5ebc99ab2a4a50b,5985,Qualification,2,redAlliance,Yes,,,,,,,,,,,,2,,,2,,1,1,,Yes,Deep climb,Yes,,Both,Source,3,3,No,,Yes,they were just ok. i wasn’t able to get red 1 for qual 1.,ashlyn,ashlynmlai@gmail.com
+6801044bf5ebc99ab2a4a50c,51,Qualification,2,redAlliance,Yes,,1,,,,,,,,3,3,,3,,,2,1,1,,No,Deep climb,Yes,8798,Both,Both,2,2,No,,No,slow and wobbly bot. coral is also not that consistent ,ashlyn,ashlynmlai@gmail.com
+680105d26a8e605ecb83b653,2075,Qualification,3,blueAlliance,Yes,,3,0,,,,,,,,4,,,,,1,,1,,No,Shallow climb,Yes,5504,Both,Source,2,2,No,1,No,,Lyn,allynsong08@gmail.com
+680105de6a8e605ecb83b654,9450,Qualification,3,redAlliance,Yes,1,1,1,,,,,,,,1,6,5,,,1,1,2,,Yes,Deep climb,Yes,2888,Both,Both,4,4,No,1,No,,exie1,emilyxie666@gmail.com
+680105e56a8e605ecb83b655,4728,Qualification,3,blueAlliance,Yes,0,,,,,,,,,,3,3,2,,,,2,,,No,Deep climb,Yes,,Coral,Source,2,3,Yes,1,No,,cind,cinlin480@gmail.com
+6801060f6a8e605ecb83b656,3656,Qualification,3,blueAlliance,Yes,,1,,,,,,,,,2,,4,1,1,,1,,1,Yes,Shallow climb,Yes,2097,Both,Source,4,2,No,,No,,Zihanli,zihanli.purifiedwater@gmail.com
+680106306a8e605ecb83b657,2706,Qualification,3,redAlliance,Yes,,1,,,,,,,,,,,,,,,,,,Yes,Did not climb,No,0,None,None,3,3,Yes,4,No,defense bot. parked in front of the other teams source. it was effective but i think there was a penalty ,ashlyn,ashlynmlai@gmail.com
+680106376a8e605ecb83b658,3339,Qualification,3,redAlliance,Yes,0,3,,,,,,,,1,5,7,4,,,2,2,1,,Yes,Deep climb,Yes,6511,Both,Source,3,4,No,1,No,their cycle times are really really fast when there is no defense. removed 3 algae and one is L3 but idk if the other 2 are L3 or L2.,ashlyn,ashlynmlai@gmail.com
+680107a6dfb4a1823edb620e,86,Qualification,4,redAlliance,Yes,1,,,,,,,,,,,,,,,,,,,Yes,Deep climb,Yes,3438,Coral,Source,2,3,No,,No,Robot stopped working,exie1,emilyxie666@gmail.com
+680107a9dfb4a1823edb620f,3473,Qualification,4,blueAlliance,Yes,0,1,,,,,,,,,1,,,,,,,,,Yes,Shallow climb,Yes,3951,Coral,Source,4,3,Yes,3,No,,Zihanli,zihanli.purifiedwater@gmail.com
+680107aadfb4a1823edb6210,2783,Qualification,4,blueAlliance,Yes,,3,,,,,,,,1,5,3,,,2,,2,1,,No,Deep climb,Yes,10013,Both,Source,3,1,No,,No,,cind,cinlin480@gmail.com
+680107c5dfb4a1823edb6211,2485,Qualification,4,redAlliance,Yes,0,,,,1,,,,,3,2,,,2,1,,1,2,,Yes,Deep climb,No,13258,Both,Source,3,3,No,,No,they weren’t very good.they kept missing L4 but it ended up in L1 twice so it looks like they missed less.,ashlyn,ashlynmlai@gmail.com
+68010810dfb4a1823edb6212,801,Qualification,4,redAlliance,Yes,1,1,,,,,,,,3,4,,,,1,,1,1,,Yes,Did not climb,No,0,Both,Source,4,3,No,1,No,0,ashlyn,ashlynmlai@gmail.com
+6802cfb54506b96286c6dbed,3882,Qualification,4,blueAlliance,Yes,0,1,0,0,0,0,0,0,0,0,3,3,2,0,0,0,0,1,0,No,Shallow climb,Yes,7970.5999999940395,Both,Source,4,3,No,1,No,0,Lyn,allynsong08@gmail.com
+68010b9374830a546b5a80c0,5181,Qualification,5,blueAlliance,Yes,,,,,,,,,,3,5,,,,1,,,1,,Yes,Did not climb,No,,Both,Source,1,2,No,1,No,,Lyn,allynsong08@gmail.com
+68010ba50ac39aacd325afc8,540,Qualification,5,redAlliance,No,,,,,,,,,,,,,,,,,,,,No,Did not climb,No,,None,None,1,1,No,,No,Robot not on field (broken/issues),exie1,emilyxie666@gmail.com
+68010bc10ac39aacd325afca,6621,Qualification,5,blueAlliance,Yes,2,1,,,,,,,,,4,4,6,,,,,,,Yes,Shallow climb,No,0,Both,Source,4,5,No,,No,,Zihanli,zihanli.purifiedwater@gmail.com
+68010bc70ac39aacd325afcb,6652,Qualification,5,blueAlliance,Yes,,,,,,,,,,1,,2,0,,,,,,,Yes,Did not climb,No,,Coral,Source,2,1,No,,No,"bad intake, source guys were struggling",cind,cinlin480@gmail.com
+68010be00ac39aacd325afcc,2767,Qualification,5,redAlliance,Yes,,3,,,,,,,,4,1,4,4,,2,,,,,Yes,Deep climb,Yes,14411,Both,Source,3,3,No,,No,all of their missed coral came from missing L2 coral. the robot moves very smoothly. they remove algae and place coral in one cycle. ,ashlyn,ashlynmlai@gmail.com
+68010be50ac39aacd325afcd,8177,Qualification,5,redAlliance,Yes,,1,,,,,,,,3,,3,2,,,1,2,1,,No,Deep climb,Yes,14849,Both,Source,4,3,No,,No,intake is slow and inconsistent ,ashlyn,ashlynmlai@gmail.com
+68010d700ac39aacd325afce,9134,Qualification,6,blueAlliance,Yes,,,,,,,,,,,1,,1,,,,2,,,Yes,Deep climb,No,20858,Coral,Source,1,1,No,,No,,cind,cinlin480@gmail.com
+68010d730ac39aacd325afcf,5013,Qualification,6,blueAlliance,Yes,1,,,,,,,,,0,5,3,,1,,,,1,,Yes,Did not climb,No,0,Both,Source,4,3,No,,No,,Zihanli,zihanli.purifiedwater@gmail.com
+68010d8a0ac39aacd325afd0,781,Qualification,6,redAlliance,Yes,,1,,,,,,,,2,8,,,,,3,,1,,Yes,Did not climb,No,0,Both,Source,4,4,No,1,Yes,idk where they got the algae from,ashlyn,ashlynmlai@gmail.com
+68010dc10ac39aacd325afd1,7902,Qualification,6,redAlliance,Yes,2,,,,,,,,,1,1,3,,1,,1,,,,Yes,Deep climb,Yes,,Both,Source,3,3,No,,Yes,started off a little rocky but was able to speed up their cycles a the game progressed,ashlyn,ashlynmlai@gmail.com
+6802d13f4506b96286c6dbf2,5987,Qualification,6,blueAlliance,Yes,1,1,0,0,0,0,0,0,0,0,3,4,0,0,0,1,0,1,0,No,Shallow climb,Yes,15708.699999988079,Both,Source,3,3,No,0,No,0,Lyn,allynsong08@gmail.com
+68010fe28392aed6457c7246,2200,Qualification,7,redAlliance,Yes,2,1,,,,,,,,,6,4,4,,,,2,,,Yes,Deep climb,Yes,6156,Both,Source,4,4,No,,No,,exie1,emilyxie666@gmail.com
+68010fe78392aed6457c7247,2539,Qualification,7,blueAlliance,Yes,,3,,,,,,,,,6,,4,,,,,,,No,Deep climb,Yes,7212.000000000029,Coral,Source,3,3,No,,No,,cind,cinlin480@gmail.com
+68010ffa8392aed6457c7248,230,Qualification,7,blueAlliance,Yes,1,1,,,1,,,,,,1,4,3,,2,,2,2,,Yes,Shallow climb,Yes,10105.000000000116,Both,Source,4,2,No,,No,,Zihanli,zihanli.purifiedwater@gmail.com
+68010ffe8392aed6457c7249,3794,Qualification,7,redAlliance,Yes,,,,,,,,,,,,1,,,,,,1,,Yes,Deep climb,No,15346,Both,Source,3,3,Yes,2,No,not very good,ashlyn,ashlynmlai@gmail.com
+6801100d8392aed6457c724a,3970,Qualification,7,redAlliance,Yes,,0,,,,,,,,,6,5,3,,1,1,2,1,,No,Deep climb,Yes,6373,Both,Floor,5,4,No,,No,really fast floor intake 🤯,ashlyn,ashlynmlai@gmail.com
+6802d23f4506b96286c6dbf8,1700,Qualification,7,blueAlliance,Yes,0,1,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,No,Shallow climb,Yes,3682.7000000029802,Coral,Source,1,3,Yes,1,No,0,Lyn,allynsong08@gmail.com
+6801121d9fe70cf1974c3a2c,1768,Qualification,8,redAlliance,Yes,,3,,,,,,,,2,3,5,6,,,,1,,,Yes,Did not climb,No,,Both,Source,3,4,No,1,No,,exie1,emilyxie666@gmail.com
+680112259fe70cf1974c3a2d,973,Qualification,8,blueAlliance,Yes,,3,,,,,,,,4,8,,,,1,,,,,No,Deep climb,Yes,11456,Both,Both,4,4,No,1,No,,cind,cinlin480@gmail.com
+6801122d9fe70cf1974c3a2e,8595,Qualification,8,blueAlliance,Yes,,,1,0,,,,,1,,,,,,1,,,,,Yes,Did not climb,No,,Both,Source,1,3,Yes,2,No,Intake physically broke. ,Zihanli,zihanli.purifiedwater@gmail.com
+6801122d9fe70cf1974c3a2f,8595,Qualification,8,blueAlliance,Yes,,,1,0,,,,,1,,,,,,1,,,,,Yes,Did not climb,No,,Both,Source,1,3,Yes,2,No,Intake physically broke. ,Zihanli,zihanli.purifiedwater@gmail.com
+6801125c9fe70cf1974c3a30,4145,Qualification,8,redAlliance,Yes,1,1,,,,,,,,1,1,5,1,1,,,,,,No,Deep climb,Yes,9931,Coral,Source,5,4,No,,No,,ashlyn,ashlynmlai@gmail.com
+68011df04a86f3f20cdc2657,1153,Qualification,8,redAlliance,Yes,,,2,,,,3,,,,1,3,1,,2,3,,1,,Yes,Deep climb,Yes,6365,Both,Source,3,3,No,,No,they r a good bot to start in the middle with a very accurate net scoring. decent coral cycle time but mostly focuses on algae.poop,ashlyn,ashlynmlai@gmail.com
+680114329fe70cf1974c3a32,7632,Qualification,9,redAlliance,Yes,,3,,,,,,,,1,3,4,5,,,1,,,,Yes,Deep climb,Yes,2241,Coral,Source,4,4,No,,No,,aash,ashleycbb123@gmail.com
+680114539fe70cf1974c3a33,2877,Qualification,9,redAlliance,Yes,,3,,,,,,,,1,3,,2,4,,1,1,2,1,No,Deep climb,Yes,,Both,Both,4,3,No,3,No,,mayukaan,emilyluo0127@gmail.com
+680114549fe70cf1974c3a34,2383,Qualification,9,blueAlliance,Yes,,1,,,,0,,,1,1,,2,,5,1,,1,,,Yes,Deep climb,Yes,3754.399999976158,Both,Both,2,2,No,,No,0,delia,lilahhoan@gmail.com
+680114569fe70cf1974c3a35,3928,Qualification,9,blueAlliance,Yes,,1,,,,,,,,1,3,1,2,0,,,,,,Yes,Deep climb,Yes,0,Both,Source,3,4,No,1,No,,ZZoe,zzhaoozoe@gmail.com
+6801145a9fe70cf1974c3a36,467,Qualification,9,blueAlliance,Yes,,2,1,,,,,,,2,5,4,3,,,,,,,Yes,Deep climb,Yes,4223,Coral,Source,5,3,No,,No,,CCandace,323535@stu.wvusd.org
+680115359fe70cf1974c3a37,1902,Qualification,9,redAlliance,Yes,,,,,,,,,1,3,,6,4,2,2,,1,,,Yes,Deep climb,No,8375,Both,Floor,3,2,No,1,No,Nice ground intake,aash,ashleycbb123@gmail.com
+680116269fe70cf1974c3a38,3814,Qualification,10,redAlliance,Yes,,,,,,,,,,1,2,,,4,,,,,,Yes,Did not climb,No,,Coral,Source,3,3,No,1,No,,mayukaan,emilyluo0127@gmail.com
+680116319fe70cf1974c3a39,2491,Qualification,10,redAlliance,Yes,1,2,,,,,,,,2,1,2,,,,,,,,Yes,Deep climb,No,,Coral,Source,3,3,No,,No,,aash,ashleycbb123@gmail.com
+680116359fe70cf1974c3a3a,5193,Qualification,10,blueAlliance,Yes,,,,2,,,,1,0,1,,,,4,,,,,,Yes,Deep climb,Yes,11438.899999976158,Coral,Source,2,3,Yes,2,No,,delia,lilahhoan@gmail.com
+680116499fe70cf1974c3a3c,1506,Qualification,10,redAlliance,Yes,,3,0,0,,,,0,,1,2,4,2,,,,2,,,Yes,Deep climb,No,22175,Both,Source,3,3,No,,No,Can do barge but missed,Mark,mark.wu123454@gmail.com
+680116639fe70cf1974c3a3d,9245,Qualification,10,blueAlliance,Yes,,,2,2,,,,,1,1,,8,4,,,,1,1,2,Yes,Deep climb,Yes,3783,Both,Source,5,3,No,,No,,CCandace,323535@stu.wvusd.org
+6801167a9fe70cf1974c3a3e,9635,Qualification,10,blueAlliance,Yes,,,,,,,,,,,,,,,,2,,1,,Yes,Did not climb,No,,Algae,Floor,2,3,No,,No,,ZZoe,zzhaoozoe@gmail.com
+680117cd9fe70cf1974c3a3f,2960,Qualification,11,blueAlliance,Yes,1,,,,,,,,,2,2,1,,,,4,1,,,Yes,Deep climb,Yes,,Both,Both,4,4,No,,No,,ZZoe,zzhaoozoe@gmail.com
+680117d39fe70cf1974c3a40,5736,Qualification,11,redAlliance,Yes,1,,,,,,1,1,,2,,3,5,,,2,1,1,,Yes,Deep climb,Yes,1981.9999999999418,Both,Source,4,4,No,,No,,aash,ashleycbb123@gmail.com
+680117df9fe70cf1974c3a41,5817,Qualification,11,redAlliance,Yes,1,,,,,,1,,,1,3,2,,2,1,3,1,1,,Yes,Did not climb,No,,Both,Both,3,3,No,,No,,mayukaan,emilyluo0127@gmail.com
+680117e29fe70cf1974c3a42,3130,Qualification,11,blueAlliance,Yes,1,1,,,,,,,,1,3,7,4,,,,1,1,,Yes,Deep climb,Yes,7341.799999952316,Coral,Source,4,4,No,,No,,delia,lilahhoan@gmail.com
+680117ef9fe70cf1974c3a43,888,Qualification,11,redAlliance,Yes,1,2,,,,,,,,4,1,3,2,1,,,,,,No,Did not climb,No,,Both,Source,2,1,No,,No,"Can do floor intake, but only l1, didn’t have limelight in the beginning",Mark,mark.wu123454@gmail.com
+680117f19fe70cf1974c3a44,195,Qualification,11,blueAlliance,Yes,,3,,,,,,,,,3,3,7,,,,1,1,1,Yes,Did not climb,No,,Both,Source,5,4,No,,No,,CCandace,323535@stu.wvusd.org
+680119e4dc4b5ed9fdbf0b58,10479,Qualification,12,redAlliance,Yes,1,1,,,,,,,,2,6,2,6,,,,,,,Yes,Deep climb,Yes,12292.000000000058,Coral,Source,3,2,No,,No,,Mark,mark.wu123454@gmail.com
+680119e4dc4b5ed9fdbf0b59,70,Qualification,12,redAlliance,Yes,,1,,,,,,,,,1,2,0,,,1,1,2,,Yes,Did not climb,No,,Both,Source,3,2,No,,No,,aash,ashleycbb123@gmail.com
+680119e5dc4b5ed9fdbf0b5a,3197,Qualification,12,blueAlliance,Yes,1,,,,,,2,2,,,1,2,,,3,,,,,Yes,Deep climb,No,12352.099999964237,Both,Source,2,2,No,1,No,,delia,lilahhoan@gmail.com
+680119f9dc4b5ed9fdbf0b5b,33,Qualification,12,blueAlliance,Yes,0,,,,1,,,,,3,5,2,,,,1,,,,No,Did not climb,No,20581,Both,Both,3,4,No,,No,,ZZoe,zzhaoozoe@gmail.com
+68011a00dc4b5ed9fdbf0b5c,4009,Qualification,12,blueAlliance,Yes,1,,,,,,,,,7,1,2,3,,,,,1,,Yes,Deep climb,No,7422,Both,Source,4,3,No,,No,,CCandace,323535@stu.wvusd.org
+68011a72dc4b5ed9fdbf0b5d,9545,Qualification,12,redAlliance,Yes,1,,,,,,,,,,,,,,,,,,,No,Deep climb,No,,Coral,None,3,3,Yes,1,No,Ngl the robot was kinda weak while playing defense for instance like the robot just got pushed outta the way. Made it look like this team was implying following the opponent. Caused ton of penalty (18 pts),mayukaan,emilyluo0127@gmail.com
+68011cb34a86f3f20cdc2651,86,Qualification,13,blueAlliance,Yes,,2,,,,,,,,3,3,1,,1,,,,1,,Yes,Deep climb,Yes,5502.300000011921,Coral,Source,3,3,No,,No,,delia,lilahhoan@gmail.com
+68011cd14a86f3f20cdc2652,2522,Qualification,13,redAlliance,Yes,,3,,,,,,,,,2,5,2,,,,1,,,Yes,Deep climb,No,7783,Coral,Floor,2,2,No,,No,Coral from station bounced in their drive base for a bit before they got it out,Mark,mark.wu123454@gmail.com
+68011cd24a86f3f20cdc2653,2706,Qualification,13,blueAlliance,Yes,,1,,,,,,,,,6,3,,,,,,,,Yes,Did not climb,No,,Coral,Source,5,3,No,,No,,CCandace,323535@stu.wvusd.org
+68011cdf4a86f3f20cdc2654,1038,Qualification,13,redAlliance,Yes,,,,,,,,,,,,,,,,,,,,No,Did not climb,No,,None,None,2,2,Yes,2,No,Algae fell into drive base and got stuck there. Unable to intake the rest of the match ,aash,ashleycbb123@gmail.com
+68011ce14a86f3f20cdc2655,6652,Qualification,13,redAlliance,Yes,,,,,,,,,,1,,,2,,,,,,,No,Did not climb,No,,Coral,Source,1,2,No,1,No,Never tried L3 or L4. Spent a minute at source. ,Terrance,323728@stu.wvusd.org
+68011cf44a86f3f20cdc2656,10157,Qualification,13,blueAlliance,Yes,,1,,,,,,,,,,,,,,,,,,Yes,Deep climb,Yes,,Coral,Source,5,4,Yes,4,No,,ZZoe,zzhaoozoe@gmail.com
+68011e7d4a86f3f20cdc2658,4728,Qualification,14,redAlliance,Yes,,2,,,,,,,,1,2,5,4,2,,2,1,,,Yes,Deep climb,Yes,10232,Both,Source,2,2,No,,No,Can intake algae from floor and source,Mark,mark.wu123454@gmail.com
+68011e884a86f3f20cdc2659,6647,Qualification,14,blueAlliance,Yes,,,,,,,,,,,1,3,4,,,1,,,,Yes,Deep climb,Yes,17972,Both,Both,4,4,No,,No,,ZZoe,zzhaoozoe@gmail.com
+68011e8c4a86f3f20cdc265a,2767,Qualification,14,redAlliance,Yes,,3,,,,,,,,,3,3,3,0,1,4,2,1,,Yes,Deep climb,Yes,4061.999999999942,Both,Both,4,4,No,,No,10/10,aash,ashleycbb123@gmail.com
+68011e8c4a86f3f20cdc265b,3882,Qualification,14,redAlliance,Yes,,1,,,,,,,,1,2,2,,1,,,1,1,,Yes,Deep climb,Yes,10318,Both,Source,3,2,No,1,No,,Terrance,323728@stu.wvusd.org
+68011e8f4a86f3f20cdc265c,5987,Qualification,14,blueAlliance,Yes,,2,,,,,,,,1,4,5,3,,,1,3,1,,Yes,Did not climb,No,10479,Both,Source,3,4,No,,No,,delia,lilahhoan@gmail.com
+68011ea74a86f3f20cdc265d,2080,Qualification,14,blueAlliance,Yes,,,,,,,,,,2,2,1,1,,,,,,,Yes,Did not climb,No,,Coral,Source,4,4,No,,No,unstable when reaching coral L4,CCandace,323535@stu.wvusd.org
+6801203a9ac3a0fca618060f,3339,Qualification,15,blueAlliance,Yes,,2,,,,,,,,,5,7,8,,,3,1,1,,Yes,Deep climb,Yes,3509.7999999523163,Both,Source,5,5,No,,No,Elevator fast af,delia,lilahhoan@gmail.com
+6801203b966a9a8450508c76,230,Qualification,15,blueAlliance,Yes,,3,,,,,,,,,2,3,3,0,1,1,2,,,Yes,Deep climb,Yes,,Both,Both,5,4,No,,No,,ZZoe,zzhaoozoe@gmail.com
+6801203e966a9a8450508c77,2783,Qualification,15,redAlliance,Yes,,2,,,,,,,,,4,3,5,,,,,,,Yes,Deep climb,Yes,2316.000000000058,Coral,Source,5,4,No,,No,,aash,ashleycbb123@gmail.com
+68012041966a9a8450508c78,51,Qualification,15,redAlliance,Yes,,1,,,,,,,1,,,2,2,1,,1,,1,,Yes,Deep climb,Yes,9701,Both,Source,2,3,No,,No,,mayukaan,emilyluo0127@gmail.com
+6801204d966a9a8450508c79,7902,Qualification,15,blueAlliance,Yes,,,1,,,,,,1,,,,,,,,,,1,Yes,Deep climb,Yes,4487,Algae,Source,5,4,Yes,5,No,,CCandace,323535@stu.wvusd.org
+6801204d966a9a8450508c7a,4907,Qualification,15,redAlliance,Yes,,3,,,,,,,,,2,5,2,,,3,2,,,Yes,Deep climb,Yes,2652.000000000058,Both,Source,2,2,No,,No,Got defense,Mark,mark.wu123454@gmail.com
+68012226966a9a8450508c7b,10224,Qualification,16,redAlliance,Yes,,,,,,,,,,1,2,2,2,,1,,1,1,,Yes,Deep climb,No,,Both,Source,4,3,No,,No,,aash,ashleycbb123@gmail.com
+6801222f966a9a8450508c7c,6873,Qualification,16,redAlliance,Yes,,,,,,,,,,1,,3,5,,,,1,1,,No,Did not climb,No,,Coral,Source,1,1,No,,No,I think limelight?,Mark,mark.wu123454@gmail.com
+68012250966a9a8450508c7d,1241,Qualification,16,blueAlliance,Yes,,2,,,,,,,,1,3,4,4,3,1,1,1,1,0,Yes,Did not climb,No,,Both,Both,4,4,No,,No,,ZZoe,zzhaoozoe@gmail.com
+68012272966a9a8450508c7e,2075,Qualification,16,blueAlliance,Yes,1,,,,,,2,1,1,1,,2,2,,0,1,1,,5,Yes,Deep climb,Yes,7327,Both,Both,5,5,No,,No,,CCandace,323535@stu.wvusd.org
+6801228d966a9a8450508c7f,540,Qualification,16,redAlliance,Yes,0,,,,,,,,,4,0,2,2,,,,,,,Yes,Did not climb,No,,Coral,Source,3,4,No,,No,Kept missing l4s and then like idk y but in the first like 40 secs of teleop they just stood there,mayukaan,emilyluo0127@gmail.com
+680122c4966a9a8450508c80,1768,Qualification,16,blueAlliance,Yes,,3,,,,,,,,4,3,3,5,1,,1,0,,,Yes,Deep climb,Yes,6159.5,Both,Source,4,5,No,,No,"Climb may have fallen last second, but it counted",delia,lilahhoan@gmail.com
+680123f2dc0c921ef1a5a83c,6324,Qualification,17,redAlliance,Yes,0,1,0,0,0,0,2,0,0,2,3,5,3,1,0,1,0,1,0,Yes,Deep climb,Yes,6605.29999999702,Both,Source,4,4,No,1,Yes,missed a lot of the coral.,,
+680123f6dc0c921ef1a5a83d,9450,Qualification,17,blueAlliance,Yes,,2,1,,,,1,0,,,6,1,2,0,,3,1,,,Yes,Deep climb,Yes,,Both,Both,4,4,No,1,No,,mayukaan,emilyluo0127@gmail.com
+68012414dc0c921ef1a5a83e,2877,Qualification,17,redAlliance,Yes,,1,0,0,,0,0,,,3,2,2,3,2,1,1,,,,No,Deep climb,Yes,4899,Coral,Source,2,2,No,1,Yes,elevator slightly unstable,J.Reyhart,rodanthefiretitan@gmail.com
+68012428dc0c921ef1a5a83f,973,Qualification,17,redAlliance,Yes,,3,,,,,,,,1,1,3,1,,3,,,,,No,Shallow climb,Yes,,Both,Both,4,3,No,,Yes,"High CG, wobbles when switching directions",James Shu,jamesshu57@gmail.com
+68012445dc0c921ef1a5a840,3473,Qualification,17,blueAlliance,Yes,,1,,,,,,,,1,,,,,,,,,,Yes,Did not climb,No,,Coral,Source,5,3,Yes,5,No,Nice driving ,Henry_Y,henry.yang.xz@gmail.com
+680124b5dc0c921ef1a5a841,5181,Qualification,17,blueAlliance,Yes,,2,,,,,,,,,4,4,,3,,2,1,1,,Yes,Did not climb,No,,Both,Source,4,3,No,4,No,,Bmannveer@gmail.com,bmannveer@gmail.com
+680125e8dc0c921ef1a5a842,8177,Qualification,18,blueAlliance,Yes,,1,,,,,,,,1,4,3,1,,,,,,,Yes,Deep climb,Yes,4134,Coral,Source,4,4,No,1,No,,Terrance,323728@stu.wvusd.org
+6801260ddc0c921ef1a5a843,1902,Qualification,18,redAlliance,Yes,,,,1,,,,,,,,7,5,2,,,,,,Yes,Shallow climb,No,,Both,Both,4,4,No,,Yes,Can not reach L4,James Shu,jamesshu57@gmail.com
+68012623dc0c921ef1a5a844,3814,Qualification,18,redAlliance,Yes,,,,,,,,,,0,4,,,,,,,,,No,Shallow climb,Yes,2575.999999999942,Coral,Source,1,1,No,1,No,"intake is difficult to drop coral into, human player missed coral multiple times",J.Reyhart,rodanthefiretitan@gmail.com
+68012644dc0c921ef1a5a845,7421,Qualification,18,redAlliance,Yes,2,1,0,0,0,0,0,0,0,4,4,3,0,0,0,2,2,1,0,Yes,Deep climb,No,0,Both,Source,4,3,No,,Yes,instability,344882@stu.wvusd.org,344882@stu.wvusd.org
+68012654dc0c921ef1a5a847,8570,Qualification,18,blueAlliance,Yes,,,0,0,,,,,,,,3,1,1,,,,,,Yes,Did not climb,No,,Coral,Source,3,5,No,2,No,,Bmannveer@gmail.com,bmannveer@gmail.com
+6801266bdc0c921ef1a5a848,3656,Qualification,18,blueAlliance,Yes,,2,,,,,,,,2,3,4,,1,,2,1,1,,Yes,Deep climb,Yes,9166,Both,Source,3,2,No,,No,They were a pretty slow bot. Accuracy is there but they take a while to score. Pretty sturdy bot. About to do 3 l4 auton but it was off by 1-2 seconds,Henry_Y,henry.yang.xz@gmail.com
+6801281f2d96137c15d4dd7d,5817,Qualification,19,redAlliance,Yes,3,0,0,0,0,0,0,0,0,1,7,2,0,0,0,5,3,2,0,No,Did not climb,No,0,Both,Source,4,3,No,1,Yes,0,344882@stu.wvusd.org,344882@stu.wvusd.org
+680128202d96137c15d4dd7e,8595,Qualification,19,redAlliance,Yes,,,1,,,,,1,,,,,,,2,,1,,0,Yes,Did not climb,No,,Coral,Source,1,1,Yes,2,No,0,J.Reyhart,rodanthefiretitan@gmail.com
+680128282d96137c15d4dd7f,781,Qualification,19,blueAlliance,Yes,,2,,,,,,,,1,3,3,1,,,4,,,,Yes,Did not climb,No,0,Both,Source,5,4,No,1,No,,Terrance,323728@stu.wvusd.org
+680128322d96137c15d4dd80,467,Qualification,19,redAlliance,No,,,,,,,,,,1,1,,,,,,,,,Yes,Did not climb,No,,None,Source,3,3,No,,No,Did not move until 1:25,James Shu,jamesshu57@gmail.com
+680128332d96137c15d4dd81,9496,Qualification,19,blueAlliance,Yes,,3,,,,,,,,,3,5,4,,3,,2,1,3,Yes,Deep climb,Yes,3419,Both,Source,4,4,No,,No,"A good hybrid, ",Henry_Y,henry.yang.xz@gmail.com
+6801286a2d96137c15d4dd82,5193,Qualification,19,blueAlliance,No,,,,,,,,,,,,2,2,1,,,,,,Yes,Did not climb,No,,Coral,Source,2,2,No,2,No,,Bmannveer@gmail.com,bmannveer@gmail.com
+680129e800a9bf1a685a822d,4009,Qualification,20,redAlliance,Yes,2,0,0,0,0,0,0,0,,3,4,4,1,0,0,1,2,1,0,No,Did not climb,No,,Both,Source,4,3,No,,Yes,,344882@stu.wvusd.org,344882@stu.wvusd.org
+680129e900a9bf1a685a822e,801,Qualification,20,redAlliance,Yes,,1,,,,,,,1,1,3,1,,,2,1,2,1,,No,Shallow climb,Yes,2525,Both,Both,2,2,Yes,,No,,J.Reyhart,rodanthefiretitan@gmail.com
+680129ef00a9bf1a685a822f,2383,Qualification,20,redAlliance,Yes,,1,,,,,,,,,4,5,3,,,,,,,Yes,Shallow climb,Yes,2260,Coral,Source,4,4,No,,No,,James Shu,jamesshu57@gmail.com
+68012a0f00a9bf1a685a8230,4145,Qualification,20,blueAlliance,Yes,,1,,,,,,,,0,2,,2,,,2,1,1,,Yes,Deep climb,Yes,2679,Both,Source,4,4,No,2,No,,Bmannveer@gmail.com,bmannveer@gmail.com
+68012a5700a9bf1a685a8231,2539,Qualification,20,blueAlliance,Yes,,2,,,,,,,,,6,7,4,,,,,,,Yes,Deep climb,Yes,5520,Coral,Source,5,4,No,,No,,Terrance,323728@stu.wvusd.org
+68012a5800a9bf1a685a8232,3197,Qualification,20,blueAlliance,Yes,1,,,,,,,,,,3,2,3,,,6,1,1,,Yes,Deep climb,Yes,2349.4000000059605,Both,Source,3,3,No,,Yes,"Their auton is very unstable and then it almost fell, their climb also is kinda not that reliable because it was almost touching the ground.",Henry_Y,henry.yang.xz@gmail.com
+68012bc03e16ecef224a5cde,3928,Qualification,21,blueAlliance,Yes,,,,,,,,,,,2,3,4,0,1,,,1,1,Yes,Deep climb,Yes,6241,Both,Source,4,4,No,,No,,Terrance,323728@stu.wvusd.org
+68012bc93e16ecef224a5cdf,3045,Qualification,21,redAlliance,Yes,2,,,,,,,,,1,3,4,5,,1,,,,,Yes,Shallow climb,Yes,4808,Both,Source,4,3,No,,No,,James Shu,jamesshu57@gmail.com
+68012bc93e16ecef224a5ce0,5013,Qualification,21,redAlliance,Yes,,2,,,,,,,,4,5,2,0,0,,,,,,Yes,Did not climb,No,,Coral,Source,3,3,No,1,No,,J.Reyhart,rodanthefiretitan@gmail.com
+68012beb3e16ecef224a5ce1,2491,Qualification,21,redAlliance,Yes,1,0,1,0,0,0,2,0,0,3,5,4,3,0,0,2,1,1,0,Yes,Deep climb,Yes,6236.399999991059,Both,Source,4,5,No,,Yes,,344882@stu.wvusd.org,344882@stu.wvusd.org
+68012bfe3e16ecef224a5ce2,195,Qualification,21,blueAlliance,Yes,,,,,,,,,,,2,2,1,2,,,,,,Yes,Did not climb,No,,Coral,Source,3,3,No,2,No,,Bmannveer@gmail.com,bmannveer@gmail.com
+68012c103e16ecef224a5ce3,33,Qualification,21,blueAlliance,No,1,1,,,1,,,,,,5,3,1,,,6,2,1,,No,Deep climb,Yes,1999.300000011921,Both,Source,5,4,No,,No,"Their strat is to get a wall cleared of algae and then they speedly put the coal on from l4 l3 and then l2. Very good in terms of algea, expect when collecting, might be a bit slow (sometimes)",Henry_Y,henry.yang.xz@gmail.com
+68012d673e16ecef224a5ce4,3130,Qualification,22,redAlliance,Yes,,2,,,,,,,,1,7,5,,,,,,,,No,Deep climb,Yes,4093,Coral,Source,4,3,No,1,Yes,,J.Reyhart,rodanthefiretitan@gmail.com
+68012d7b3e16ecef224a5ce5,1038,Qualification,22,redAlliance,Yes,,,,,,,2,,1,,,,,,1,4,,,,Yes,Shallow climb,Yes,3144,Algae,Both,4,4,No,,No,,James Shu,jamesshu57@gmail.com
+68012d7e3e16ecef224a5ce6,9134,Qualification,22,blueAlliance,Yes,,1,,0,,,,,1,,,,,,2,,2,,,Yes,Deep climb,Yes,19244,Both,Source,3,3,No,,No,,Terrance,323728@stu.wvusd.org
+68012d863e16ecef224a5ce7,10479,Qualification,22,blueAlliance,Yes,,2,,,,,,,,1,1,2,3,,,,,,,Yes,Deep climb,Yes,2923.999999999971,Coral,Source,4,4,No,2,No,,Bmannveer@gmail.com,bmannveer@gmail.com
+68012db23e16ecef224a5ce8,2200,Qualification,22,blueAlliance,Yes,,2,,,,,,,,2,1,6,4,,,,2,1,,No,Deep climb,Yes,9104.09999999404,Both,Source,4,4,No,,No,They barely do l4 and they only do l2 and l3. Their algae net scoring thing doesn't work and failed twice. The algae removal mechanism also doesn't work as well because it loses grip sometimes and takes a while to remove algae,Henry_Y,henry.yang.xz@gmail.com
+68012f2de6c5999cfeaa8da1,10157,Qualification,23,redAlliance,Yes,1,,,,,,,,,,,,,,,,,,,No,Shallow climb,No,,Coral,Source,2,3,Yes,4,Yes,,J.Reyhart,rodanthefiretitan@gmail.com
+68012f33e6c5999cfeaa8da2,6621,Qualification,23,redAlliance,Yes,1,2,0,0,0,0,0,0,0,0,8,4,2,0,0,0,2,0,0,Yes,Deep climb,Yes,3317,Both,Source,4,3,No,,Yes,,344882@stu.wvusd.org,344882@stu.wvusd.org
+68012f37e6c5999cfeaa8da3,3970,Qualification,23,blueAlliance,Yes,1,,,,,,,,,1,3,3,3,0,1,,,1,,Yes,Deep climb,Yes,8642,Both,Both,3,3,No,,No,,Terrance,323728@stu.wvusd.org
+68012f48e6c5999cfeaa8da4,5736,Qualification,23,blueAlliance,Yes,,2,,,,,,,,,1,1,1,,,,,,,Yes,Did not climb,No,,Coral,Source,2,2,No,2,No,,Bmannveer@gmail.com,bmannveer@gmail.com
+68012f50e6c5999cfeaa8da5,3794,Qualification,23,redAlliance,Yes,,,,,,,,,,,,1,,,,,1,1,,Yes,Shallow climb,No,3418,Coral,Source,2,3,No,,No,Stopped working for a while midway through,James Shu,jamesshu57@gmail.com
+68012f9be6c5999cfeaa8da6,5985,Qualification,23,blueAlliance,Yes,1,,,,,,,,,,,,,,0,,2,,,Yes,Did not climb,No,,Algae,Floor,2,2,No,,No,"Can only do algae but they do it really slowly and that their world is really trash as they cannot intake the coral it's a pretty tall boi too. Can't climb. When trying to score processer, it rolled back out 💀💀. Their elevator and arm is a bit wonky ",Henry_Y,henry.yang.xz@gmail.com
+680131129408531f8ac99e2c,2485,Qualification,24,redAlliance,Yes,1,1,,,,,,,,3,3,4,3,,,1,,,,Yes,Did not climb,No,,Both,Both,3,3,No,,Yes,,J.Reyhart,rodanthefiretitan@gmail.com
+680131179408531f8ac99e2d,7632,Qualification,24,blueAlliance,Yes,1,3,,,,,,,,2,2,3,4,,,,,,,Yes,Deep climb,No,9713,Coral,Source,4,3,No,,No,,Terrance,323728@stu.wvusd.org
+680131239408531f8ac99e2e,1700,Qualification,24,redAlliance,Yes,,,,,,,,,,4,4,,,,,,,,,Yes,Shallow climb,Yes,2856,Coral,Source,5,4,No,,No,,James Shu,jamesshu57@gmail.com
+680131279408531f8ac99e2f,9635,Qualification,24,redAlliance,Yes,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,5,2,0,1,Yes,Deep climb,Yes,3188.2999999970198,Algae,Source,4,3,Yes,,Yes,,344882@stu.wvusd.org,344882@stu.wvusd.org
+6801312d9408531f8ac99e30,70,Qualification,24,blueAlliance,Yes,,1,,,,,,1,,,,,2,,,3,3,0,,Yes,Deep climb,Yes,2442,Both,Both,4,3,No,,No,,Bmannveer@gmail.com,bmannveer@gmail.com
+680131899408531f8ac99e31,2960,Qualification,24,blueAlliance,Yes,,2,,,,,,,,3,2,3,3,,,,,1,,Yes,Deep climb,Yes,10147.299999982119,Both,Source,3,4,No,,No,Their accuracy is not the best,Henry_Y,henry.yang.xz@gmail.com
+68013310e4d8402410d3570a,2522,Qualification,25,blueAlliance,Yes,1,1,,,,,,,,2,8,,,,,,,,,Yes,Deep climb,No,7983.5,Coral,Both,4,4,No,,No,got stuck with an algae under the bot at some point,james,jamwan985@gmail.com
+68013311e4d8402410d3570b,1153,Qualification,25,blueAlliance,Yes,,,2,1,,,,,,,,4,1,,2,2,2,1,,Yes,Deep climb,Yes,7747,Both,Source,4,4,No,1,No,,jeremiah,jeremiahtung2020@gmail.com
+6801338ae4d8402410d3570d,9545,Qualification,25,redAlliance,Yes,1,,,,,,,,,,,,,,,,,,,Yes,Did not climb,No,,None,None,2,3,Yes,3,Yes,,Poguino,bbrandonn.llee@gmail.com
+68029189686c53f302a8df1c,9245,Qualification,25,blueAlliance,Yes,,,,,,,,,,,1,1,3,,,,,,,Yes,Did not climb,No,,Coral,Source,3,3,No,,No,,kylefeng,kfeng.209@gmail.com
+68029cbe38e90da8dbade81d,2470,Qualification,25,blueAlliance,Yes,,1,,,,,,,,1,1,,,,,,1,2,,Yes,Did not climb,No,,Both,Both,3,1,No,,No,,astro648,astronautayaan@gmail.com
+68029cbf38e90da8dbade81e,2470,Qualification,25,blueAlliance,Yes,,1,,,,,,,,1,1,,,,,,1,2,,Yes,Did not climb,No,,Both,Both,3,1,No,,No,,astro648,astronautayaan@gmail.com
+6802c8dd7c950c002f2a078c,888,Qualification,25,redAlliance,Yes,2,0,0,0,0,0,0,0,0,1,10,2,0,0,0,0,0,0,0,No,Did not climb,No,0,Coral,Source,3,2,No,0,No,0,astro648,astronautayaan@gmail.com
+68013497e4d8402410d3570e,9450,Qualification,26,blueAlliance,Yes,,2,,,,,,,,,7,3,,,,5,2,3,,Yes,Deep climb,Yes,7580,Both,Floor,5,5,No,,No,,jeremiah,jeremiahtung2020@gmail.com
+680134a7e4d8402410d3570f,6873,Qualification,26,blueAlliance,Yes,,,,,,,,,,1,,6,2,0,,,,,,Yes,Did not climb,No,0,Coral,Source,2,3,No,,No,"no vision, all manual align for coral",james,jamwan985@gmail.com
+680134afb36f4ebd7b677dc7,2080,Qualification,26,redAlliance,Yes,,1,,,,,,,,2,3,2,,1,,,,,,No,Deep climb,Yes,7147,Coral,Source,3,3,Yes,4,No,,Poguino,bbrandonn.llee@gmail.com
+680134c8b36f4ebd7b677dc8,3814,Qualification,26,blueAlliance,Yes,,,,,,,,,,,1,,,,,,,,,Yes,Shallow climb,Yes,1704,None,Source,3,3,Yes,3,No,,kylefeng,kfeng.209@gmail.com
+6801db2aefacf406291f63cc,2767,Qualification,26,redAlliance,Yes,,1,,,,,2,1,1,1,1,3,3,,3,,,,1,Yes,Deep climb,No,,Both,Both,4,4,No,,No,"This bot pretty fire at algae, their Coral also all right. Their processor scoring power is not the greatest as it missed twice in a row. Really nice auton",astro648,astronautayaan@gmail.com
+6801365bae1793a91d1f0b80,781,Qualification,27,blueAlliance,Yes,2,1,,,,,,,,1,6,1,,,,4,1,0,,Yes,Did not climb,No,,Both,Source,4,4,No,,No,,jeremiah,jeremiahtung2020@gmail.com
+6801365cae1793a91d1f0b81,4907,Practice,27,redAlliance,Yes,,1,,,,,,,,,3,5,2,1,0,3,,,,No,Deep climb,Yes,6962.999999999942,Both,Source,3,4,No,,No,,Poguino,bbrandonn.llee@gmail.com
+6801365cae1793a91d1f0b82,3882,Qualification,27,blueAlliance,Yes,1,,,,,,,,,2,1,1,1,,,,,,,Yes,Deep climb,Yes,5886,Coral,Source,3,2,No,,No,,kylefeng,kfeng.209@gmail.com
+68013663ae1793a91d1f0b83,3656,Qualification,27,redAlliance,Yes,,1,,,,,,,,,2,2,,2,2,,2,1,,No,Deep climb,Yes,5432,Both,Source,2,2,No,,No,,god.,pock3tp1ant@gmail.com
+68013692b034dd8ced5962e2,2877,Qualification,27,blueAlliance,Yes,1,2,,,,,,,,2,2,4,2,2,1,,1,,1,No,Deep climb,Yes,6182,Both,Both,3,3,No,1,No,"seems like a very heavy robot, almost tipped at one point
+
+drivers or human players not experienced getting source coral. they missed like 3",james,jamwan985@gmail.com
+6801dcacc6da9bd806ecba1e,1768,Qualification,27,redAlliance,Yes,1,3,,,,,,,,1,2,5,9,1,1,,,1,1,No,Deep climb,Yes,,Coral,Source,5,4,No,,No,Pretty good Coral bot. Nice Three or four piece auton. Extraordinarily speedy in terms of scoring coral. Can't do algae,astro648,astronautayaan@gmail.com
+680139b6914f47b01d98bf23,5193,Qualification,28,redAlliance,Yes,,,,2,,,,0,1,,,2,1,,,,2,1,,No,Deep climb,Yes,8804,Coral,Source,2,3,No,,No,,Poguino,bbrandonn.llee@gmail.com
+680139b6aaabf8ce6204cabc,2539,Qualification,28,redAlliance,No,0,2,1,,,,,,,2,7,6,,,,,,,,No,Deep climb,Yes,910,Coral,Source,4,3,No,,No,,god.,pock3tp1ant@gmail.com
+680139b8aaabf8ce6204cabd,86,Qualification,28,blueAlliance,Yes,,2,,,,,,,,1,3,4,3,,,,,,,Yes,Deep climb,Yes,7429.000000000116,Coral,Source,3,2,No,,No,,kylefeng,kfeng.209@gmail.com
+680139c8aaabf8ce6204cabe,6324,Qualification,28,blueAlliance,Yes,2,1,,,,,,,,3,4,3,4,,,,2,,,No,Deep climb,Yes,12382.300000011921,Coral,Source,4,4,No,1,No,human players selling,james,jamwan985@gmail.com
+680139e8aaabf8ce6204cabf,4728,Qualification,28,blueAlliance,Yes,,1,,,,,,,,2,1,2,5,,,,,1,,Yes,Deep climb,Yes,6903,Coral,Source,4,4,No,1,No,,jeremiah,jeremiahtung2020@gmail.com
+6801ddb6c6da9bd806ecba1f,7902,Qualification,28,redAlliance,Yes,,,,,,1,,,1,,,,2,,,1,,,,No,Did not climb,No,0,Coral,Source,2,3,No,,No,Bro disassembled for half the match. Couldn't do anything for the rest of the half match. They have algae auton so that's pretty unique,astro648,astronautayaan@gmail.com
+68014a13d4b26d41bf2830d2,540,Qualification,29,blueAlliance,Yes,,1,,,,,,,,3,3,6,5,,,,,,,No,Did not climb,No,0,Coral,Source,4,3,No,,No,,kylefeng,kfeng.209@gmail.com
+68014a35d4b26d41bf2830d3,467,Qualification,29,blueAlliance,Yes,1,2,0,,,,,,,2,2,3,3,,,,2,,,Yes,Deep climb,Yes,10841.000000000233,Coral,Source,4,5,No,1,No,,jeremiah,jeremiahtung2020@gmail.com
+6801df2bbe2b2f1be9fdf2d1,3928,Qualification,29,redAlliance,Yes,,,,,,,,,,1,6,,,,,,,2,,No,Deep climb,Yes,5463.699999988079,Both,Source,3,3,No,,No,Pretty doo doo auton. They only scored l4 for this game. Minimum algae function,astro648,astronautayaan@gmail.com
+68029dd938e90da8dbade81f,4009,Qualification,29,blueAlliance,Yes,1,2,0,0,0,0,0,0,0,0,3,4,3,0,0,0,2,0,0,No,Deep climb,No,0,Coral,Source,4,4,No,0,No,none,james,jamwan985@gmail.com
+68014c39c0f2c0b460e8ef39,801,Qualification,30,blueAlliance,Yes,0,2,0,,,,,,,3,5,3,,,,,,,,Yes,Did not climb,No,,Both,Source,3,3,No,,No,,kylefeng,kfeng.209@gmail.com
+68014c70c0f2c0b460e8ef3a,195,Qualification,30,blueAlliance,Yes,,2,,,,,,,,2,4,6,,1,,,1,1,,Yes,Deep climb,Yes,3866,Coral,Source,5,5,No,,No,,jeremiah,jeremiahtung2020@gmail.com
+6801dff0be2b2f1be9fdf2d2,9134,Qualification,30,redAlliance,No,1,1,,,,,,,,3,3,5,,,,,,,,Yes,Did not climb,No,,Coral,Source,4,4,No,,No,N/a,astro648,astronautayaan@gmail.com
+68029f1d38e90da8dbade825,8595,Qualification,30,blueAlliance,Yes,0,0,1,0,0,0,1,2,0,0,0,0,0,0,2,4,1,0,1,Yes,Deep climb,No,0,Both,Source,2,3,No,0,No,"driver lacks practice, keeps hitting random movements",james,jamwan985@gmail.com
+68014ddbc68c8abb79addb60,3197,Qualification,31,redAlliance,Yes,1,2,,,,,,1,,,3,2,4,,,4,,1,,Yes,Deep climb,No,14438,Both,Both,3,3,No,1,No,,god.,pock3tp1ant@gmail.com
+68014ddcc68c8abb79addb61,51,Qualification,31,blueAlliance,Yes,,1,,,,,,,,,,,,,,,,,2,Yes,Deep climb,Yes,5356,Algae,Source,3,4,Yes,3,No,,kylefeng,kfeng.209@gmail.com
+68014dfec68c8abb79addb62,10157,Qualification,31,redAlliance,Yes,,,,,,,,,,,,,,,,,,,,No,Shallow climb,Yes,3816,None,None,4,3,Yes,4,No,,Poguino,bbrandonn.llee@gmail.com
+68014e11c68c8abb79addb63,973,Qualification,31,blueAlliance,Yes,1,2,,,,,,,,,3,4,,,,2,,1,,Yes,Deep climb,Yes,9672,Both,Source,5,5,No,,No,,jeremiah,jeremiahtung2020@gmail.com
+68014e13c68c8abb79addb64,973,Qualification,31,blueAlliance,Yes,1,2,,,,,,,,,3,4,,,,2,,1,,Yes,Deep climb,Yes,9672,Both,Source,5,5,No,,No,,jeremiah,jeremiahtung2020@gmail.com
+6801e0f9be2b2f1be9fdf2d3,1241,Qualification,31,redAlliance,Yes,,4,,,,,,,,1,4,6,3,,2,,2,1,2,Yes,Did not climb,No,,Both,Source,4,5,No,,No,Has a pretty nice balance between allergy scoring and Coral scoring,astro648,astronautayaan@gmail.com
+68015003974c4a5716d30385,5013,Qualification,32,blueAlliance,No,,,,,,,,,,,,,,,,,,,,No,Did not climb,No,,None,None,1,1,No,1,No,bot broken and did not participate,james,jamwan985@gmail.com
+6801508d974c4a5716d30386,3130,Qualification,32,redAlliance,Yes,1,,,,,,,,,,4,5,4,,,,,,,No,Deep climb,Yes,3750,Coral,Source,4,4,No,,No,,Poguino,bbrandonn.llee@gmail.com
+68015098974c4a5716d30387,70,Practice,32,blueAlliance,Yes,,1,,,,,,,1,1,3,2,1,,1,2,,1,,Yes,Deep climb,Yes,3047,Both,Source,5,4,No,,No,,jeremiah,jeremiahtung2020@gmail.com
+680150a2974c4a5716d30388,9496,Qualification,32,redAlliance,Yes,,3,,,,,,,,,3,3,5,1,2,1,3,1,,No,Deep climb,Yes,2648,Both,Both,4,4,No,,No,,god.,pock3tp1ant@gmail.com
+680150b3974c4a5716d30389,3970,Qualification,32,blueAlliance,Yes,2,2,0,0,,,3,,,,5,8,6,,,,,,,Yes,Deep climb,Yes,3846,Both,Both,5,5,No,,No,,kylefeng,kfeng.209@gmail.com
+6801e251be2b2f1be9fdf2d4,2075,Qualification,32,redAlliance,Yes,,2,,,,,,,,,,4,4,0,,2,,2,,Yes,Deep climb,No,,Both,Source,4,4,No,,No,Pretty nice algae manipulator. I don't think they can score l4. Their processor scoring capabilities are not that good but they're net one is really good. They really only aim for l2 and l3.,astro648,astronautayaan@gmail.com
+680152652d9f76ea93ecbdd4,2080,Qualification,33,redAlliance,Yes,,,,,,,,,,1,1,2,,,,,1,1,,No,Did not climb,No,,Coral,Source,1,1,No,,No,,cind,cinlin480@gmail.com
+680152782d9f76ea93ecbdd5,2080,Qualification,33,redAlliance,No,,,,,,,,,,1,1,2,,,,,1,,,No,Did not climb,No,,Both,Source,2,2,No,,No,,Zihanli,zihanli.purifiedwater@gmail.com
+6801527c2d9f76ea93ecbdd6,3045,Qualification,33,blueAlliance,Yes,1,2,,,,,2,,,,1,,,,,,1,1,,Yes,Did not climb,No,,Both,Source,3,3,No,,No,Robot stop mid match,041b04,041b04@gmail.com
+680152ac2d9f76ea93ecbdd7,2383,Qualification,33,redAlliance,Yes,,2,,,,,,,,1,4,2,3,,2,,,1,,No,Deep climb,Yes,5242,Both,Floor,3,2,No,,No,good but was really slow,ashlyn,ashlynmlai@gmail.com
+680152b02d9f76ea93ecbdd8,9245,Qualification,33,blueAlliance,Yes,,,,,,,,,,,,,6,2,,,,,,Yes,Shallow climb,Yes,3232,Coral,Both,5,4,No,,No,,heeeeepoopp,1@gmail.com
+68029b3838e90da8dbade817,1700,Qualification,33,redAlliance,Yes,0,0,0,0,0,0,0,0,0,3,1,0,0,1,0,0,0,0,0,No,Did not climb,No,0,Coral,Source,3,3,Yes,3,No,0,ashlyn,ashlynmlai@gmail.com
+6801542fb04c5e3242099203,5181,Qualification,34,redAlliance,Yes,,,,,,,,,,,,,,,,2,1,3,,Yes,Did not climb,No,,None,None,3,1,Yes,3,No,,cind,cinlin480@gmail.com
+68015433b04c5e3242099204,5987,Qualification,34,blueAlliance,Yes,1,1,,,,,,,,3,5,3,,,,,2,1,,Yes,Did not climb,No,,Both,Source,4,3,No,,No,,041b04,041b04@gmail.com
+68015452b04c5e3242099205,2470,Qualification,34,blueAlliance,Yes,,,,,,,,,,1,,,,,,,,,,No,Did not climb,No,,None,None,3,4,Yes,4,No,,heeeeepoopp,1@gmail.com
+68015460b04c5e3242099206,5181,Qualification,34,redAlliance,Yes,,1,,,,,,,,,,,2,,,2,,,,Yes,Did not climb,No,,Both,None,3,3,Yes,2,No,,Zihanli,zihanli.purifiedwater@gmail.com
+68015460b04c5e3242099207,888,Qualification,34,redAlliance,Yes,,3,0,0,,,,,,,1,4,,1,,,1,,,Yes,Did not climb,No,5377,Both,Source,3,3,No,,Yes,they scored more coral than what i have marked down cause i couldn’t see some times. ,ashlyn,ashlynmlai@gmail.com
+68015474b04c5e3242099208,7632,Qualification,34,redAlliance,Yes,,4,,,,,,,,3,3,7,,,,,,,,Yes,Did not climb,No,15013.999999999942,Both,Source,4,4,No,,No,missed a lot of L3. kept bouncing off,ashlyn,ashlynmlai@gmail.com
+6801560a52befe962f8276fb,2200,Qualification,35,redAlliance,Yes,,3,,,,,,,,,4,6,6,,,,,1,,No,Deep climb,Yes,13098.999999999942,Both,Source,5,5,No,,No,really good 🔥,ashlyn,ashlynmlai@gmail.com
+6801560c2a66f2d63962c9ae,1902,Qualification,35,blueAlliance,Yes,,,,,,,,,,,,3,5,3,1,,,,,Yes,Did not climb,No,,Both,Source,2,3,No,,Yes,May have recorded the wrong robot,041b04,041b04@gmail.com
+680156352a66f2d63962c9af,2706,Qualification,35,blueAlliance,Yes,1,,,,,,,,,2,5,1,2,0,,,,,,Yes,Did not climb,No,,Coral,Both,1,3,No,1,No,,heeeeepoopp,1@gmail.com
+680156462a66f2d63962c9b0,3473,Qualification,35,redAlliance,Yes,,1,,,,,,,,2,1,3,1,1,,,,1,,Yes,Did not climb,No,,Both,Source,3,3,No,,No,,Zihanli,zihanli.purifiedwater@gmail.com
+6801566c13b99147d3e72ab2,2960,Qualification,35,redAlliance,Yes,1,,,,,,,,,,3,1,2,,7,,,,,Yes,Deep climb,Yes,16177,Both,Source,3,3,No,1,No,not bad,ashlyn,ashlynmlai@gmail.com
+680157a413b99147d3e72ab3,9635,Qualification,36,redAlliance,Yes,,,,,,,1,,,,,,,,,,,,,No,Did not climb,No,,Algae,None,3,3,Yes,2,No,got stuck on something while playing defense so it was useless for the rest of the game,ashlyn,ashlynmlai@gmail.com
+680157b313b99147d3e72ab4,2522,Qualification,36,blueAlliance,Yes,,3,,,,,,,,3,3,5,3,,,,,,,Yes,Did not climb,No,,Coral,Both,3,4,No,1,No,,heeeeepoopp,1@gmail.com
+680157bd13b99147d3e72ab5,5817,Qualification,36,redAlliance,Yes,,1,,,,,,,,2,5,5,1,1,1,,,1,,No,Did not climb,No,,Both,Floor,4,3,No,,No,,Zihanli,zihanli.purifiedwater@gmail.com
+680157c52a66f2d63962c9b2,33,Qualification,36,blueAlliance,Yes,,1,,,,,,,,,3,,,,,,2,,,Yes,Deep climb,Yes,1410,Both,Source,4,3,No,,No,Coral intake easily jammed ,041b04,041b04@gmail.com
+680157d92a66f2d63962c9b3,5817,Qualification,36,redAlliance,Yes,,1,,,,,,,,3,5,5,1,1,2,,1,1,,No,Did not climb,No,,Both,Floor,3,2,No,,No,L2 misses,cind,cinlin480@gmail.com
+680157e52a66f2d63962c9b4,3339,Qualification,36,redAlliance,Yes,3,,,,,,,,,,6,7,4,1,,4,2,,,No,Deep climb,Yes,4593,Both,Source,5,5,No,,No,really good team. auton kept missing tho,ashlyn,ashlynmlai@gmail.com
+680159565fcd1eeb4af7f5a7,2485,Qualification,37,blueAlliance,Yes,1,,,,,,,,,4,6,1,,,,,,,,Yes,Did not climb,No,,Coral,Source,2,3,No,,No,,041b04,041b04@gmail.com
+680159595fcd1eeb4af7f5a8,6652,Qualification,37,blueAlliance,Yes,,,,,,,,,,2,2,,,2,,,,,,Yes,Did not climb,Yes,,Coral,Source,3,1,No,1,No,,heeeeepoopp,1@gmail.com
+6801597a5fcd1eeb4af7f5a9,5736,Qualification,37,redAlliance,Yes,2,1,,,,,,,,3,5,2,3,0,,,,,,Yes,Did not climb,No,0,Coral,Source,3,3,No,,No,,cind,cinlin480@gmail.com
+6801597a5fcd1eeb4af7f5aa,5736,Qualification,37,redAlliance,Yes,,3,,,,,,,,3,3,3,2,,,,2,,,Yes,Shallow climb,No,,Both,Source,4,3,No,,No,,Zihanli,zihanli.purifiedwater@gmail.com
+680159875fcd1eeb4af7f5ab,3970,Qualification,37,redAlliance,Yes,,,,,,,,,1,,,,,,,,,,,Yes,Did not climb,No,12191,Both,Source,2,2,No,,No,they just sat at their own processor.,ashlyn,ashlynmlai@gmail.com
+68015a1a5fcd1eeb4af7f5ad,1506,Qualification,37,redAlliance,Yes,,3,,,,,,,,1,4,3,1,,,4,3,1,,No,Deep climb,Yes,8160.000000000058,Both,Source,5,5,No,,Yes,i couldn’t see some of it,ashlyn,ashlynmlai@gmail.com
+68015af75fcd1eeb4af7f5ae,9134,Qualification,38,blueAlliance,Yes,,1,,,,,,,,,3,3,,,1,,,,,Yes,Did not climb,No,,Coral,Source,3,3,No,1,No,,041b04,041b04@gmail.com
+68015b065fcd1eeb4af7f5af,8177,Qualification,38,redAlliance,Yes,1,1,,,,,,,,,2,3,1,1,,,,,,Yes,Shallow climb,Yes,4433,Coral,Source,3,3,No,,No,,Zihanli,zihanli.purifiedwater@gmail.com
+68015b095fcd1eeb4af7f5b0,10224,Qualification,38,redAlliance,Yes,1,,,,,,,,,,1,2,1,,2,,2,2,,Yes,Did not climb,No,21257,Both,Source,3,3,No,,No,,ashlyn,ashlynmlai@gmail.com
+68015b6c5fcd1eeb4af7f5b1,467,Qualification,38,redAlliance,Yes,,2,1,,,,,,,9,3,1,3,,,,,,,Yes,Deep climb,Yes,6994.000000000058,Coral,Source,3,3,No,,No,not accurate at all ,ashlyn,ashlynmlai@gmail.com
+68015d2c5fcd1eeb4af7f5b4,195,Qualification,39,redAlliance,Yes,,3,,,,,,,,,2,,,,,,,,,No,Did not climb,No,0,None,None,3,2,No,,No,Coral got stuck halfway and they raised their elevator and it hit the coral and then they broke,cind,cinlin480@gmail.com
+68015d485fcd1eeb4af7f5b5,9450,Qualification,39,blueAlliance,Yes,,1,,,,,,,,,8,2,,,,,3,,,Yes,Shallow climb,Yes,3911,Both,Floor,4,4,No,,No,,041b04,041b04@gmail.com
+68015d4a5fcd1eeb4af7f5b6,5193,Qualification,39,redAlliance,Yes,1,,,,,,,,,1,,1,,,,,,,,No,Shallow climb,No,,Coral,Source,2,3,Yes,2,No,,exie1,emilyxie666@gmail.com
+68015d545fcd1eeb4af7f5b7,8570,Qualification,39,redAlliance,Yes,,,2,,,,,2,,,,6,3,1,,,1,1,,Yes,Deep climb,Yes,5771,Both,Source,3,3,No,,No,really strong in L3 and L2. they specialize in those 2.,ashlyn,ashlynmlai@gmail.com
+68015d585fcd1eeb4af7f5b8,195,Qualification,39,redAlliance,Yes,,3,,,,,,,,,3,,,,,,,,,No,Did not climb,No,,Coral,Source,3,4,No,,No,Moving coral made the whole robot get stuck. Stayed still for most of the game. ,Zihanli,zihanli.purifiedwater@gmail.com
+68015f255fcd1eeb4af7f5bb,2877,Qualification,40,blueAlliance,Yes,,3,,,,,,,,1,7,6,,,,,1,,,Yes,Shallow climb,Yes,2344,Algae,Source,5,4,No,,No,,041b04,041b04@gmail.com
+68015f375fcd1eeb4af7f5bc,70,Qualification,40,redAlliance,Yes,,2,,,,,,,,1,4,2,1,,,,1,,,Yes,Deep climb,Yes,3034,Both,Source,3,2,No,,No,,exie1,emilyxie666@gmail.com
+68015f385fcd1eeb4af7f5bd,7902,Qualification,40,redAlliance,Yes,,,2,,,,,,,,1,4,4,2,,,1,,,Yes,Shallow climb,No,0,Both,Source,4,3,No,,No,,Zihanli,zihanli.purifiedwater@gmail.com
+68015f3e5fcd1eeb4af7f5be,7902,Qualification,40,redAlliance,Yes,,,2,,,,,,1,1,0,5,4,,1,,1,1,,Yes,Deep climb,No,15852.000000000058,Both,Source,3,3,No,,Yes,Couldn’t see,cind,cinlin480@gmail.com
+68015f585fcd1eeb4af7f5bf,3814,Qualification,40,redAlliance,Yes,,,,,,,,,,1,3,,2,,,,,,,Yes,Deep climb,Yes,10502.000000000058,Coral,Source,3,4,No,,No,the elevator and aligning is extremely slower than almost every other bot.,ashlyn,ashlynmlai@gmail.com
+680161675fcd1eeb4af7f5c4,2767,Qualification,41,blueAlliance,Yes,,3,,,,,,,,,1,5,4,,2,6,1,2,,Yes,Deep climb,Yes,9633.699999988079,Both,Source,5,4,No,,No,,delia,lilahhoan@gmail.com
+680161765fcd1eeb4af7f5c5,2075,Qualification,41,redAlliance,Yes,,3,,,,,,,,,1,4,6,,,1,1,1,,Yes,Deep climb,Yes,6225,Both,Source,5,4,No,,No,,CCandace,323535@stu.wvusd.org
+680161815fcd1eeb4af7f5c6,4009,Qualification,41,redAlliance,Yes,,,,,,,,,,,2,3,5,,,,,,,Yes,Deep climb,Yes,,Coral,Both,4,3,No,,No,,ZZoe,zzhaoozoe@gmail.com
+680161af5fcd1eeb4af7f5c7,4907,Qualification,41,redAlliance,Yes,,3,,,,,,,,,1,5,,,2,2,2,1,,Yes,Deep climb,No,23725,Both,Source,4,3,No,,No,Robot seems to uh climb but like it still touches the ground and attempted climb way 5 secs before end game started,mayukaan,emilyluo0127@gmail.com
+680161b05fcd1eeb4af7f5c8,973,Qualification,41,blueAlliance,Yes,1,3,0,0,1,,0,0,0,,2,6,3,0,,3,2,1,,Yes,Deep climb,Yes,2771,Both,Source,4,4,No,1,No,,exie1,emilyxie666@gmail.com
+6801630e5fcd1eeb4af7f5cb,4728,Qualification,42,blueAlliance,Yes,1,,,,,,,,1,,3,4,2,,1,,1,,,Yes,Deep climb,Yes,5323.699999988079,Both,Source,4,3,No,,No,,delia,lilahhoan@gmail.com
+6801631b5fcd1eeb4af7f5cc,1768,Qualification,42,blueAlliance,Yes,,2,,,,,,,,3,3,6,4,,,1,1,1,,Yes,Deep climb,Yes,2478,Both,Both,4,4,No,,No,,exie1,emilyxie666@gmail.com
+680163285fcd1eeb4af7f5cd,51,Qualification,42,redAlliance,Yes,,1,,,,,1,,1,1,1,2,4,,,,1,,1,Yes,Deep climb,Yes,3359.000000000058,Both,Both,5,4,No,,No,,CCandace,323535@stu.wvusd.org
+680163475fcd1eeb4af7f5ce,3045,Qualification,42,redAlliance,Yes,2,,0,,,,,,,,5,4,5,,,,1,1,,Yes,Deep climb,Yes,,Both,Source,4,3,No,,No,,ZZoe,zzhaoozoe@gmail.com
+6801637b5fcd1eeb4af7f5cf,230,Qualification,42,redAlliance,Yes,,1,,,,,,,,,1,5,2,,2,,,1,,Yes,Deep climb,No,,Both,Source,3,2,No,,No,"So uh in auton they scored in two l2 s but I think they can do three cuz like they did not have a preloaded coral but still went on the reef and at the end they like almost made it. Also for algae they did the processor, but for the first one they like couldn’t aim or smth and took like 5-7 seconds to score in the proccessor",mayukaan,emilyluo0127@gmail.com
+6802d8d85e763f333e4c5848,3130,Qualification,42,blueAlliance,Yes,1,2,0,0,0,0,0,0,1,1,2,1,3,0,0,0,0,0,0,No,Shallow climb,Yes,2484.5999999940395,Coral,Source,4,4,No,0,No,0,Lyn,allynsong08@gmail.com
+6802d9c5d2fa7024eb4922e1,9545,Qualification,42,blueAlliance,Yes,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,Yes,Did not climb,No,0,None,None,2,3,Yes,2,No,0,Lyn,allynsong08@gmail.com
+6801650d5fcd1eeb4af7f5d1,1902,Qualification,43,redAlliance,Yes,3,,,,,,,0,1,,,5,4,,1,,3,0,,Yes,Did not climb,No,,Both,Both,4,4,No,,No,,ZZoe,zzhaoozoe@gmail.com
+680165155fcd1eeb4af7f5d2,2960,Qualification,43,redAlliance,Yes,,2,,,,,,,,3,2,,,,,,,,,Yes,Deep climb,Yes,13230,Coral,Source,4,4,No,,No,Coral got stuck under the robot mid way,CCandace,323535@stu.wvusd.org
+680165175fcd1eeb4af7f5d3,8595,Qualification,43,blueAlliance,Yes,1,,,,,,1,,1,,,,,,2,2,1,,,Yes,Deep climb,No,16153.899999976158,Algae,None,2,3,No,,No,,delia,lilahhoan@gmail.com
+680165235fcd1eeb4af7f5d4,3928,Qualification,43,redAlliance,Yes,,,,,,,,1,,,3,2,1,,1,,,,,Yes,Deep climb,Yes,,Both,Source,2,2,No,1,No,Kinda gives off no offense but like the dumbified version of orbits not. Also like idk what happened but it was like playing defense with its own alliance for a good 6 seconds.,mayukaan,emilyluo0127@gmail.com
+680165355fcd1eeb4af7f5d5,1241,Qualification,43,blueAlliance,Yes,1,1,,,,,,,,5,6,6,5,2,,,2,,,Yes,Did not climb,No,,Both,Source,4,5,No,,No,Ran 24 cycles (actually amazing),exie1,emilyxie666@gmail.com
+6802dbfad2fa7024eb4922e6,5736,Qualification,43,blueAlliance,Yes,1,2,0,0,0,0,0,0,0,0,4,3,3,1,0,0,0,1,0,No,Shallow climb,Yes,0,Coral,Source,4,3,No,0,No,0,Lyn,allynsong08@gmail.com
+680166d419ffe569f37ef2df,3970,Qualification,44,blueAlliance,Yes,,3,,,,,,,,,5,5,6,1,2,,1,1,,Yes,Deep climb,Yes,4103.300000011921,Both,Floor,5,5,No,,No,,delia,lilahhoan@gmail.com
+680166dc19ffe569f37ef2e0,801,Qualification,44,blueAlliance,Yes,,2,,,,,,,,2,4,2,2,1,,,,,,Yes,Deep climb,Yes,6542,Coral,Source,3,3,No,,No,,exie1,emilyxie666@gmail.com
+680166ed19ffe569f37ef2e1,3656,Qualification,44,redAlliance,Yes,,2,,,,0,,,,,,,,,3,2,,,,Yes,Deep climb,Yes,,Both,Both,3,3,Yes,3,No,,ZZoe,zzhaoozoe@gmail.com
+6801670b19ffe569f37ef2e2,5987,Qualification,44,redAlliance,Yes,,2,,,,,,,,,4,2,,,,3,4,,,Yes,Shallow climb,Yes,,Both,Source,3,3,No,1,No,So uh the algae when tryna score in the net missed twice and the first time like it was kinda sad like they kinda got it and then they just gave up on it kinda,mayukaan,emilyluo0127@gmail.com
+6801672719ffe569f37ef2e3,540,Qualification,44,redAlliance,Yes,0,1,,,0,,,,,1,3,4,7,1,,,,,,No,Did not climb,No,0,Coral,Source,5,4,No,1,No,,CCandace,323535@stu.wvusd.org
+6802da96d2fa7024eb4922e2,9635,Qualification,44,blueAlliance,Yes,0,0,0,0,0,1,6,1,1,0,0,0,0,0,0,0,0,0,0,Yes,Did not climb,No,0,Algae,Floor,3,3,No,0,No,0,Lyn,allynsong08@gmail.com
+680168c4a8114ef10c680c99,6873,Qualification,45,blueAlliance,No,,,,,,,,,,,,,,,,,,,,Yes,Did not climb,No,,None,None,2,1,Yes,2,No,,exie1,emilyxie666@gmail.com
+680168c8a8114ef10c680c9a,9245,Qualification,45,redAlliance,Yes,,,2,2,,,,,,1,,8,7,,,,,,,Yes,Deep climb,Yes,6300.999999999942,Coral,Source,5,4,No,,No,,CCandace,323535@stu.wvusd.org
+680168e0a8114ef10c680c9b,9496,Qualification,45,redAlliance,Yes,,3,,,,,,,,,3,,3,4,2,2,,,2,Yes,Deep climb,Yes,,Both,Both,4,4,No,,No,,ZZoe,zzhaoozoe@gmail.com
+680168eaa8114ef10c680c9c,2539,Qualification,45,blueAlliance,Yes,,3,,,,,,,,1,4,6,5,,,,3,,,Yes,Deep climb,Yes,1857.800000011921,Coral,Source,5,5,No,,No,The climb may be a bit inaccurate. ,delia,lilahhoan@gmail.com
+680168ffa8114ef10c680c9d,5181,Qualification,45,redAlliance,Yes,,1,,,,,1,,1,2,5,2,1,,2,,2,,,Yes,Did not climb,No,,Both,Source,3,3,No,1,No,Imo can’t do l1 cuz they kept missing and didn’t make a single one also parked rly last second,mayukaan,emilyluo0127@gmail.com
+68016a620976960ff5878969,888,Qualification,46,redAlliance,Yes,2,1,,,,,,,,3,3,2,3,1,,,,,,Yes,Did not climb,No,0,Coral,Source,5,3,No,,No,,CCandace,323535@stu.wvusd.org
+68016a670976960ff587896a,781,Qualification,46,blueAlliance,Yes,,1,,,,,,,,,3,3,1,,,5,,1,,Yes,Did not climb,No,,Both,Source,4,3,No,1,No,,exie1,emilyxie666@gmail.com
+68016a6e0976960ff587896b,5985,Qualification,46,blueAlliance,Yes,1,,,,,,,,,,,,,,,,,,,Yes,Deep climb,Yes,10045.700000047684,None,None,3,4,Yes,3,No,,delia,lilahhoan@gmail.com
+68016a720976960ff587896c,4145,Qualification,46,redAlliance,Yes,,3,,,,,,0,,,2,,1,1,2,1,3,,1,Yes,Deep climb,Yes,,Both,Source,3,3,No,2,No,,mayukaan,emilyluo0127@gmail.com
+68016ab40976960ff587896d,2706,Qualification,46,redAlliance,Yes,,1,,,,,,,,1,,5,1,1,,,,,,Yes,Did not climb,No,,Coral,Source,4,3,No,,No,,ZZoe,zzhaoozoe@gmail.com
+68016cc297961801a20cb08e,5817,Qualification,47,blueAlliance,Yes,,1,,,,,,,,1,3,5,,,,4,2,2,,Yes,Did not climb,No,,Both,Both,3,3,No,,No,,exie1,emilyxie666@gmail.com
+68016cd297961801a20cb08f,1506,Qualification,47,redAlliance,Yes,,3,,,,,,,,2,,5,4,3,,1,1,,,Yes,Deep climb,Yes,8004,Both,Source,5,4,No,,No,,CCandace,323535@stu.wvusd.org
+68016ce897961801a20cb090,5013,Qualification,47,redAlliance,Yes,,1,,,,,1,,,3,1,1,3,,,,,,,Yes,Did not climb,No,,Both,Source,3,4,No,,No,,ZZoe,zzhaoozoe@gmail.com
+68016cef97961801a20cb091,10224,Qualification,47,blueAlliance,Yes,1,,,,,,,,,3,4,3,,,,,1,,,Yes,Deep climb,No,14308.899999976158,Coral,Source,2,1,No,,No,,delia,lilahhoan@gmail.com
+68016d0c97961801a20cb092,3197,Qualification,47,redAlliance,Yes,,3,,,,,,1,,,4,3,2,,,4,2,,,Yes,Deep climb,No,,Both,Both,3,3,No,,No,So uh during climb right like it took multiple times to get the thing into position but then like I don’t think they got it when they tried again and then like they fell on top of an algae. Also idk if this was intentional but a lot of times they like outtakes with elevator they would also like remove algae.,mayukaan,emilyluo0127@gmail.com
+68016e9b933158aa30114563,2383,Qualification,48,blueAlliance,Yes,,1,,,,1,,0,1,,2,1,,6,2,0,1,1,,Yes,Deep climb,Yes,2040.0000000000582,Both,Both,3,3,No,,No,,exie1,emilyxie666@gmail.com
+68016e9d1f0940594a9336b3,7421,Qualification,48,blueAlliance,Yes,2,,,,,,,,,5,2,2,,,,2,2,1,,Yes,Deep climb,Yes,3138.5,Both,Both,3,3,No,,No,,delia,lilahhoan@gmail.com
+68016ea61f0940594a9336b4,2470,Qualification,48,redAlliance,Yes,,,,,,,,,,,,,,,,,,,,Yes,Deep climb,Yes,,None,None,4,4,Yes,4,No,,ZZoe,zzhaoozoe@gmail.com
+68016ed31f0940594a9336b5,3339,Qualification,48,redAlliance,Yes,,2,,,,,,,,3,5,1,,,,5,1,,,Yes,Deep climb,Yes,,Both,Both,4,3,No,,No,Idk what happened but second half like they kept missing l4s also like the driver is really efficient and had a lot of cycles,mayukaan,emilyluo0127@gmail.com
+68016ed61f0940594a9336b6,6652,Qualification,48,redAlliance,Yes,1,,,,,,,,,1,,1,,1,,,,,,No,Did not climb,No,,Coral,Source,2,3,No,,No,,CCandace,323535@stu.wvusd.org
+680170b04601ed98c85d0289,3473,Qualification,49,blueAlliance,Yes,,0,,,,,,,,,2,3,2,,,,,,,Yes,Did not climb,No,,Coral,Source,2,2,No,1,No,"Oh boy we suck, randomly disabling",Mark,mark.wu123454@gmail.com
+680170bb4601ed98c85d028a,2080,Qualification,49,blueAlliance,Yes,,0,,,,,,,,,1,,,,,,,,,No,Did not climb,No,,None,None,1,1,No,1,No,Stopped after 30 seconds,Terrance,323728@stu.wvusd.org
+680170bc4601ed98c85d028b,1153,Qualification,49,redAlliance,Yes,,,1,1,,,,1,,,1,6,,,,3,1,,,No,Deep climb,Yes,3527,Both,Both,3,3,No,,Yes,,J.Reyhart,rodanthefiretitan@gmail.com
+680170d54601ed98c85d028c,7632,Qualification,49,blueAlliance,Yes,,2,,,,,,,,,1,2,1,,,1,,,,Yes,Deep climb,Yes,3081.0000000009313,Coral,Source,3,3,No,1,Yes,,aash,ashleycbb123@gmail.com
+680170e94601ed98c85d028d,6621,Qualification,49,blueAlliance,Yes,1,2,,,,,,,,1,1,1,3,6,,,1,2,,No,Deep climb,Yes,5389.9000000059605,Both,Source,4,4,No,1,Yes,N/a,Henry_Y,henry.yang.xz@gmail.com
+680171334601ed98c85d028e,33,Qualification,49,redAlliance,Yes,0,2,,,,,,,,2,3,3,1,,,1,,,,Yes,Deep climb,Yes,2414.999999999942,Both,Both,4,3,No,3,No,,Bmannveer@gmail.com,bmannveer@gmail.com
+6801727fc84c1df6d7a930c7,2485,Qualification,50,redAlliance,Yes,,3,,,,,,,,2,3,,,,1,,1,1,,Yes,Deep climb,Yes,12268,Both,Source,4,2,No,1,No,0,Terrance,323728@stu.wvusd.org
+68017280bfafaf9ba3a1fcb4,2200,Qualification,50,blueAlliance,Yes,,3,,,,,,,,1,1,5,3,2,2,,1,1,,Yes,Did not climb,No,0,Both,Source,3,3,No,,No,,Mark,mark.wu123454@gmail.com
+68017286bfafaf9ba3a1fcb5,2522,Qualification,50,redAlliance,Yes,0,3,,,,,,,,,2,5,4,,,,,1,,No,Deep climb,Yes,7493,Algae,Both,4,3,No,,Yes,,J.Reyhart,rodanthefiretitan@gmail.com
+68017286bfafaf9ba3a1fcb6,2491,Qualification,50,blueAlliance,Yes,1,2,,,,,,,,3,2,2,1,1,2,,1,2,,Yes,Did not climb,No,,Both,Both,5,5,No,,No,,heeeeepoopp,1@gmail.com
+680172cabfafaf9ba3a1fcb7,8177,Qualification,50,blueAlliance,Yes,,1,,,,,,,,1,1,1,2,1,,,,,,No,Deep climb,Yes,8206.199999988079,Coral,Source,5,3,Yes,5,No,"Their defence is absolutely goated, 🔥🔥🔥. In the first few secs of auton, their bot didn't move. ",Henry_Y,henry.yang.xz@gmail.com
+68017452c84c1df6d7a930c8,3882,Qualification,51,redAlliance,Yes,1,0,1,1,,,,,,,2,4,3,1,,,,,,No,Deep climb,Yes,2862,Coral,Source,4,2,No,,Yes,,J.Reyhart,rodanthefiretitan@gmail.com
+68017455c84c1df6d7a930c9,3928,Qualification,51,redAlliance,Yes,2,,,,,,,,,,4,4,4,,,,,1,,Yes,Deep climb,Yes,4477.999999999942,Both,Source,5,3,No,1,No,,Terrance,323728@stu.wvusd.org
+6801745bc84c1df6d7a930ca,3814,Qualification,51,blueAlliance,Yes,,,,,,,,,,1,1,,4,,,,,,,Yes,Did not climb,No,,Coral,Source,2,1,No,,No,,Mark,mark.wu123454@gmail.com
+68017477c84c1df6d7a930cb,3130,Qualification,51,blueAlliance,Yes,,2,,,,,,,,1,5,4,3,,,,,,,No,Did not climb,No,0,Coral,Source,3,3,No,,Yes,N/a,Henry_Y,henry.yang.xz@gmail.com
+6801747fc84c1df6d7a930cc,973,Qualification,51,redAlliance,Yes,1,2,,,,,,,,,3,,1,1,,4,,0,,Yes,Deep climb,Yes,2098,Both,Both,5,4,No,4,No,,Bmannveer@gmail.com,bmannveer@gmail.com
+680176026f53a81fbbafb845,5987,Qualification,52,redAlliance,Yes,0,1,,,,,,,,,3,3,2,,,3,1,2,,Yes,Deep climb,Yes,7438,Both,Source,4,4,No,1,No,,Terrance,323728@stu.wvusd.org
+6801760d6f53a81fbbafb846,6647,Qualification,52,blueAlliance,Yes,1,1,,,,,,,,1,1,4,3,3,1,,1,1,,Yes,Deep climb,Yes,12494,Both,Source,2,2,No,,No,,Mark,mark.wu123454@gmail.com
+680176136f53a81fbbafb847,195,Qualification,52,redAlliance,Yes,,1,,,,,,,,1,2,3,3,,2,,,,,No,Deep climb,Yes,2993.000000000058,Both,Source,4,2,No,,Yes,,J.Reyhart,rodanthefiretitan@gmail.com
+6801765e6f53a81fbbafb848,9545,Qualification,52,blueAlliance,Yes,1,0,,,,,,,,,,,,,,,,,,Yes,Did not climb,No,0,None,None,4,4,Yes,3,No,They were just playing defense this game . Their d wasn't that good cuz they still lost 💀💀,Henry_Y,henry.yang.xz@gmail.com
+68017867aec6ef1ce98bbd28,1768,Qualification,53,redAlliance,Yes,1,3,,,,,,,,4,2,2,3,,1,2,2,1,1,Yes,Deep climb,Yes,6384,Both,Source,4,4,No,1,No,,Terrance,323728@stu.wvusd.org
+6801786ccb507548822d8b6d,5181,Qualification,53,redAlliance,Yes,,,,,,,,,1,,3,4,4,,,,1,,,Yes,Did not climb,No,,Both,Both,3,2,No,,Yes,,J.Reyhart,rodanthefiretitan@gmail.com
+6801786fcb507548822d8b6e,467,Qualification,53,blueAlliance,Yes,,2,1,,,,,,,3,4,3,5,,,,,,,Yes,Did not climb,No,0,Coral,Source,3,3,No,,No,,Mark,mark.wu123454@gmail.com
+6801787ecb507548822d8b6f,801,Qualification,53,redAlliance,Yes,,2,,,,,,,,,,5,1,1,,3,,,,Yes,Deep climb,Yes,1760,Both,Both,4,4,No,,No,,Bmannveer@gmail.com,bmannveer@gmail.com
+680178adcb507548822d8b70,1241,Qualification,53,blueAlliance,Yes,,4,,,0,,,,,,2,8,6,,1,2,2,1,1,Yes,Did not climb,No,0,Both,Both,4,4,No,,No,Pretty fast,Henry_Y,henry.yang.xz@gmail.com
+68017a42cb507548822d8b71,4728,Qualification,54,redAlliance,Yes,1,1,,,,,,,,1,3,3,7,,,,1,2,,Yes,Deep climb,Yes,4795,Coral,Source,4,5,No,1,No,,Terrance,323728@stu.wvusd.org
+68017a4bcb507548822d8b72,2706,Qualification,54,redAlliance,Yes,,1,,,,,,,,2,2,2,,1,,,,,,Yes,Did not climb,No,,Coral,Source,1,2,Yes,2,No,"driver crashed multiple times
+",J.Reyhart,rodanthefiretitan@gmail.com
+68017a51cb507548822d8b73,1700,Qualification,54,blueAlliance,Yes,1,,,,,,,,,2,3,,,,,,,,,Yes,Deep climb,Yes,15947,Coral,Source,2,2,Yes,2,No,helped teammate off algae,Mark,mark.wu123454@gmail.com
+68017a61cb507548822d8b74,8570,Qualification,54,blueAlliance,Yes,,,0,,,,,,,2,,6,4,,,,1,,,Yes,Deep climb,Yes,3410,Both,Source,4,4,No,,No,,aash,ashleycbb123@gmail.com
+68017a80cb507548822d8b75,5736,Qualification,54,blueAlliance,Yes,,3,,,,,,,,,6,,,,,,,,,No,Deep climb,Yes,6158.700000017881,Coral,Source,3,3,No,,No,"Bro got stuck on an algae 💀💀. But other than that, it was alright, tad bit slow tho in terms of speed and scoring. ",Henry_Y,henry.yang.xz@gmail.com
+68017a9bcb507548822d8b76,9134,Qualification,54,redAlliance,Yes,,2,,,,,,,,,3,2,1,,,,,,,Yes,Deep climb,Yes,1350.9999999999418,Coral,Source,4,3,Yes,3,No,,Bmannveer@gmail.com,bmannveer@gmail.com
+68017c3964fd9a4f055350ad,888,Qualification,55,redAlliance,Yes,2,5,4,3,,,,,1,,,,,,,,,,,Yes,Did not climb,No,0,Coral,Source,3,4,No,1,No,,Terrance,323728@stu.wvusd.org
+68017c3a64fd9a4f055350ae,5985,Qualification,55,redAlliance,Yes,1,1,,,,,,,,,,,,,,,,,,No,Did not climb,No,,Coral,Source,1,1,Yes,2,No,driver ran into algae and got stuck,J.Reyhart,rodanthefiretitan@gmail.com
+68017c3d64fd9a4f055350af,1506,Qualification,55,blueAlliance,Yes,,1,,,,,1,,,1,3,3,3,,,1,1,,,Yes,Deep climb,Yes,2602.000000000029,Both,Source,4,4,No,1,No,,aash,ashleycbb123@gmail.com
+68017c5064fd9a4f055350b0,4009,Qualification,55,blueAlliance,Yes,,3,,,,,,,,1,3,,,,,,,,,Yes,Did not climb,No,,Coral,Source,2,3,No,,No,Elevator was broken and then it stopped at its most extended positions and restricted point scoring for their team. ,Henry_Y,henry.yang.xz@gmail.com
+68017c5464fd9a4f055350b1,9496,Qualification,55,blueAlliance,Yes,,3,,,,,,,,,2,4,4,1,0,3,1,1,,Yes,Did not climb,No,,Both,Source,3,3,No,,No,1,Mark,mark.wu123454@gmail.com
+68017c5a64fd9a4f055350b2,9450,Qualification,55,redAlliance,Yes,,,,,,,,,,,4,2,,,,,,,,No,Did not climb,No,,Coral,Both,4,4,No,,No,,Bmannveer@gmail.com,bmannveer@gmail.com
+68017e31a62af0ee4d45460c,10157,Qualification,56,redAlliance,Yes,,,,,,,,,,,,,,,,,,,,No,Shallow climb,Yes,13372,Coral,Source,1,2,Yes,1,No,"immediately had robot issue and switched to defense, auton didn’t work",J.Reyhart,rodanthefiretitan@gmail.com
+68017e37a62af0ee4d45460d,6652,Qualification,56,redAlliance,Yes,2,,1,2,,,,,,,,,,,,,,,,Yes,Did not climb,No,0,Coral,Source,2,3,No,1,No,,Terrance,323728@stu.wvusd.org
+68017e3da62af0ee4d45460e,1902,Qualification,56,redAlliance,Yes,1,,,,1,,,,,,,3,1,1,,1,0,1,,Yes,Did not climb,No,,Both,Source,4,4,No,,No,,Bmannveer@gmail.com,bmannveer@gmail.com
+68017e41a62af0ee4d45460f,7902,Qualification,56,blueAlliance,Yes,,0,1,,,1,0,1,0,2,5,4,2,1,1,2,2,1,,No,Did not climb,No,,Both,Floor,3,3,No,,No,,Mark,mark.wu123454@gmail.com
+68017e44a62af0ee4d454610,5817,Qualification,56,blueAlliance,Yes,1,1,,,,,,,,1,4,,3,,,2,2,,0,No,Did not climb,No,,Both,Source,4,3,No,1,No,,aash,ashleycbb123@gmail.com
+68017e81a62af0ee4d454611,2783,Qualification,56,blueAlliance,Yes,1,1,,,,,,,,,4,,3,,,,,,,Yes,Did not climb,Yes,21690.79999998212,Coral,Source,4,4,Yes,3,No,N/a,Henry_Y,henry.yang.xz@gmail.com
+68017fd675e74eebbfe8f6db,7421,Qualification,57,blueAlliance,Yes,0,1,0,,0,0,0,0,0,2,0,3,0,0,0,5,3,2,0,Yes,Deep climb,Yes,3700.5,Both,Source,5,4,No,1,Yes,,344882@stu.wvusd.org,344882@stu.wvusd.org
+68017fea75e74eebbfe8f6dc,3970,Qualification,57,blueAlliance,Yes,1,2,,,,,,,,2,4,5,1,0,,2,,,,Yes,Shallow climb,Yes,1722.000000000029,Both,Both,4,4,No,,Yes,Constantly dropped coral from intake,James Shu,jamesshu57@gmail.com
+68017fec75e74eebbfe8f6dd,7632,Qualification,57,redAlliance,Yes,1,3,,,,,,,,1,6,6,3,,,,,,,Yes,Deep climb,Yes,4221,Coral,Source,4,4,No,,No,,kylefeng,kfeng.209@gmail.com
+68017ffc75e74eebbfe8f6de,4145,Qualification,57,blueAlliance,Yes,,2,,1,,,,,,,,,,,,,,,,No,Did not climb,No,,Coral,Source,1,5,No,,No,their bot stopped working after auton.,jeremiah,jeremiahtung2020@gmail.com
+6801804475e74eebbfe8f6df,5193,Qualification,57,redAlliance,Yes,,,,,,,,,,1,,4,,,,,,1,,No,Deep climb,Yes,17077.5,Coral,Source,3,4,No,,Yes,,Henry_Y,henry.yang.xz@gmail.com
+6802a0a438e90da8dbade82b,3045,Qualification,57,redAlliance,Yes,0,0,0,0,0,0,0,0,0,5,0,2,3,0,2,1,1,0,0,No,Deep climb,Yes,9071.299999982119,Both,Source,3,3,No,0,No,"auton e stop
+had major issues with alignment for coral",james,jamwan985@gmail.com
+6801823f4d4450cc52f3c7e0,5013,Qualification,58,blueAlliance,Yes,1,1,0,0,0,0,0,0,0,4,1,4,2,0,0,0,1,0,,Yes,Did not climb,No,0,Both,Source,4,3,No,1,Yes,,344882@stu.wvusd.org,344882@stu.wvusd.org
+6801826b4d4450cc52f3c7e1,2075,Qualification,58,blueAlliance,Yes,,2,,,,,,,,1,3,,4,,2,0,,,,Yes,Shallow climb,Yes,,Both,Both,4,3,No,,Yes,,James Shu,jamesshu57@gmail.com
+680182704d4450cc52f3c7e2,2539,Qualification,58,redAlliance,Yes,,2,0,,,,,,,,6,,1,1,,,,,,Yes,Did not climb,No,418,Coral,Source,4,4,No,3,No,,kylefeng,kfeng.209@gmail.com
+6801828b4d4450cc52f3c7e3,8177,Qualification,58,blueAlliance,Yes,0,1,0,,,,,,,1,,8,1,1,,,,,,Yes,Did not climb,No,0,Coral,Source,3,1,No,,No,,jeremiah,jeremiahtung2020@gmail.com
+680182974d4450cc52f3c7e4,9245,Qualification,58,redAlliance,Yes,,,2,2,,0,0,0,0,,,4,4,,2,,1,1,,No,Deep climb,Yes,7052.200000017881,Both,Source,4,4,No,1,Yes,N/a,Henry_Y,henry.yang.xz@gmail.com
+6802a198761ab823ff7bdf88,3473,Qualification,58,redAlliance,Yes,1,0,0,0,0,0,0,0,0,3,1,3,2,1,0,0,0,1,0,Yes,Deep climb,No,0,Coral,Source,3,3,No,0,No,got stuck on algae at one point in the game,james,jamwan985@gmail.com
+680183e093897ec6bcf1cca5,10224,Qualification,59,blueAlliance,Yes,1,0,0,0,0,0,0,0,,1,2,3,2,1,0,0,0,0,0,Yes,Deep climb,Yes,5137.200000017881,Both,Source,4,3,No,1,Yes,,344882@stu.wvusd.org,344882@stu.wvusd.org
+680183e793897ec6bcf1cca6,2485,Qualification,59,blueAlliance,Yes,1,1,,,,,,,,1,4,3,1,,,1,1,,,Yes,Shallow climb,Yes,4776,Both,Both,4,3,No,,No,,James Shu,jamesshu57@gmail.com
+680183e893897ec6bcf1cca7,781,Qualification,59,redAlliance,Yes,,1,,,,,,,,1,1,,,,,5,1,1,2,Yes,Did not climb,Yes,,Both,Both,4,4,No,,No,,kylefeng,kfeng.209@gmail.com
+680183fa93897ec6bcf1cca8,2522,Qualification,59,redAlliance,Yes,,2,,,,,,,,2,1,6,3,,,,1,,,No,Deep climb,Yes,8146,Coral,Both,4,4,No,,No,N/A,james,jamwan985@gmail.com
+6801844b93897ec6bcf1cca9,2767,Qualification,59,blueAlliance,Yes,1,1,,,,,,,,1,4,5,,,,5,2,,,Yes,Did not climb,No,0,Coral,Source,4,5,No,,No,,jeremiah,jeremiahtung2020@gmail.com
+6801845893897ec6bcf1ccaa,10479,Qualification,59,redAlliance,Yes,,2,,,,,,,,,4,2,2,,,,,0,,No,Deep climb,Yes,5509.999999970198,Coral,Source,4,3,No,1,Yes,"I actually can't focus, some of it is correct.    mb about marking for review",Henry_Y,henry.yang.xz@gmail.com
+68018604e2ea33b738de9806,2491,Qualification,60,redAlliance,Yes,2,1,,,,,,,,2,3,4,5,,,1,1,,,Yes,Deep climb,Yes,3466.000000000058,Both,Both,4,4,No,,No,,kylefeng,kfeng.209@gmail.com
+6801860ee2ea33b738de9807,4907,Qualification,60,blueAlliance,Yes,1,0,0,0,0,0,0,0,0,0,3,4,0,0,0,3,1,2,0,Yes,Deep climb,Yes,3137.6000000089407,Both,Source,4,3,No,,Yes,,344882@stu.wvusd.org,344882@stu.wvusd.org
+6801861de2ea33b738de9808,86,Qualification,60,blueAlliance,Yes,,1,,,,,,,,1,5,3,,,,,,,,Yes,Shallow climb,Yes,3880,Coral,Source,4,4,No,,No,,James Shu,jamesshu57@gmail.com
+68018626e2ea33b738de9809,8595,Qualification,60,redAlliance,Yes,1,,,,,,,,,,,1,1,,2,1,,,,No,Deep climb,No,4903.200000017881,Both,Both,3,4,No,1,No,,james,jamwan985@gmail.com
+6801865ae2ea33b738de980a,2080,Qualification,60,blueAlliance,Yes,,,,,,,,,,,4,1,,,,,,,,Yes,Did not climb,No,,Coral,Source,2,1,No,,No,,jeremiah,jeremiahtung2020@gmail.com
+68018662e2ea33b738de980b,70,Qualification,60,redAlliance,Yes,,2,,,,,,,,,3,3,3,,,1,,1,,Yes,Deep climb,Yes,17184.80000001192,Both,Source,4,3,No,,No,"Pretty ight, but their algae scoring is pretty not good, as their accuracy is 50% and missed half of the algae. Elevator is kinda slow. Climbs slow too. ",Henry_Y,henry.yang.xz@gmail.com
+680187e08065ae7105a5ba54,3339,Qualification,61,blueAlliance,Yes,2,2,0,0,1,0,0,0,0,2,4,0,0,2,0,2,,0,0,No,Did not climb,No,0,Both,Source,4,3,No,1,Yes,stopped moving after about 1 minute ,344882@stu.wvusd.org,344882@stu.wvusd.org
+680187e28065ae7105a5ba55,1038,Qualification,61,redAlliance,Yes,,,,,,,1,,,,,,,,,6,,,,Yes,Shallow climb,Yes,2515,Algae,Both,4,4,No,1,No,,kylefeng,kfeng.209@gmail.com
+680187e38065ae7105a5ba56,1153,Qualification,61,blueAlliance,Yes,,,,,,,,,,,,3,3,,,2,,1,,Yes,Shallow climb,Yes,2455,Both,Both,4,3,No,,Yes,,James Shu,jamesshu57@gmail.com
+680187ff8065ae7105a5ba57,6324,Qualification,61,redAlliance,Yes,,1,,,,,,,,3,5,4,,1,,1,,,,No,Deep climb,Yes,8140.300000011921,Both,Source,4,4,No,1,No,very talented drivers,james,jamwan985@gmail.com
+680188398065ae7105a5ba59,3197,Qualification,61,redAlliance,Yes,1,2,,,,0,0,0,,,2,,,,,1,2,1,,No,Deep climb,Yes,7187.300000011921,Both,Both,4,3,No,,Yes,"Both red and blue Allience cleared the algae and put it in the net, do red team and blue Allience both have fire algae bots. ",Henry_Y,henry.yang.xz@gmail.com
+6801883f8065ae7105a5ba5a,540,Qualification,61,blueAlliance,Yes,,1,,,,,,,,2,4,4,1,,,,,,,Yes,Did not climb,No,,Coral,Source,4,5,Yes,4,No,their outtake probably broke with 30 seconds left so they switched to defense.,jeremiah,jeremiahtung2020@gmail.com
+680189ac28d214a86701269b,3794,Qualification,62,blueAlliance,Yes,0,0,0,0,0,0,0,0,0,3,0,2,0,1,0,0,0,0,0,Yes,Did not climb,No,0,Both,Source,3,4,No,1,Yes,,344882@stu.wvusd.org,344882@stu.wvusd.org
+680189b06fb980257c789e6d,2960,Qualification,62,blueAlliance,Yes,,1,,,,0,,,,,5,3,,,1,,1,,,Yes,Shallow climb,Yes,2755,Coral,Both,4,3,No,,No,,James Shu,jamesshu57@gmail.com
+680189bbeb362c3e392a38f9,33,Qualification,62,redAlliance,Yes,,4,,,,,,,,,3,6,3,,,3,1,,,No,Deep climb,Yes,4828.5,Both,Both,5,5,No,,No,"nice, clean cycles",james,jamwan985@gmail.com
+680189bf6fb980257c789e6e,6873,Qualification,62,redAlliance,Yes,,,,,,,,,,1,,3,1,,,,1,,,No,Did not climb,No,,Both,Source,2,4,No,,No,,kylefeng,kfeng.209@gmail.com
+68018a036fb980257c789e6f,2383,Qualification,62,blueAlliance,Yes,,2,,,,,,,,1,2,4,6,1,1,,1,1,,Yes,Deep climb,Yes,3752.000000000058,Coral,Floor,5,5,No,,No,,jeremiah,jeremiahtung2020@gmail.com
+68018a846fb980257c789e70,3656,Qualification,62,redAlliance,Yes,,2,,,,,,,,,2,4,4,3,1,,1,1,,No,Deep climb,Yes,11990.5,Both,Source,4,3,No,,No,The coral is kinda fast but not as fast as other bots. It's fastness is like a 7 to 6 from a 1 to 10 scale,Henry_Y,henry.yang.xz@gmail.com
+68024d6f74598e924292cff8,2470,Qualification,63,blueAlliance,Yes,,,,,,,,,,,1,,,,2,3,2,2,,No,Shallow climb,Yes,4562.89999999851,Both,Source,1,3,No,,No,,Lyn,allynsong08@gmail.com
+68024d7274598e924292cff9,2200,Qualification,63,redAlliance,Yes,,3,,,,,,,,1,3,6,4,,,1,1,1,,Yes,Deep climb,No,,Both,Source,4,4,No,,No,,exie1,emilyxie666@gmail.com
+68024da074598e924292cffa,6647,Qualification,63,blueAlliance,Yes,,1,,,,,,,,,,1,,,6,,,1,,Yes,Did not climb,No,0,Both,Source,3,4,Yes,4,No,,delia,lilahhoan@gmail.com
+68024da474598e924292cffb,467,Qualification,63,redAlliance,Yes,1,1,,1,,,,,,2,4,8,3,,,,,,,Yes,Deep climb,Yes,,Coral,Source,5,4,No,,Yes,,CCandace,323535@stu.wvusd.org
+68024db974598e924292cffc,6621,Qualification,63,blueAlliance,Yes,,1,,,,,,,,,4,6,5,,,,1,1,10,Yes,Shallow climb,Yes,6113,Both,Source,5,4,No,,No,,Zihanli,zihanli.purifiedwater@gmail.com
+68024db973a7397b25a2a101,6621,Qualification,63,blueAlliance,Yes,,1,,,,,,,,,4,6,5,,,,1,1,10,Yes,Shallow climb,Yes,6113,Both,Source,5,4,No,,No,,Zihanli,zihanli.purifiedwater@gmail.com
+68024db9eb1eb0013cf63d82,6621,Qualification,63,blueAlliance,Yes,,1,,,,,,,,,4,6,5,,,,1,1,10,Yes,Shallow climb,Yes,6113,Both,Source,5,4,No,,No,,Zihanli,zihanli.purifiedwater@gmail.com
+68024f24eb1eb0013cf63d83,10157,Qualification,64,redAlliance,Yes,,1,,,,,,,,,,,,,,,,,,Yes,Shallow climb,Yes,3032.000000000058,None,Source,3,3,Yes,3,No,NA,exie1,emilyxie666@gmail.com
+68024f29530f7406cc10638c,973,Qualification,64,blueAlliance,Yes,1,1,,,,,,,,1,6,3,,,,5,2,2,,Yes,Deep climb,Yes,10442.599999964237,Both,Source,4,5,No,,No,,delia,lilahhoan@gmail.com
+68024f2aeb1eb0013cf63d84,1902,Qualification,64,blueAlliance,Yes,,,1,1,,,,,1,,2,3,3,1,,,1,,,No,Shallow climb,Yes,4209.5,Both,Both,4,3,No,,No,,Lyn,allynsong08@gmail.com
+68024f2feb1eb0013cf63d85,195,Qualification,64,redAlliance,Yes,,1,,,,,,,,,4,9,2,,,,1,1,,Yes,Deep climb,Yes,3946,Both,Source,5,4,No,,No,,CCandace,323535@stu.wvusd.org
+68024f37530f7406cc10638d,9496,Qualification,64,blueAlliance,Yes,2,2,,,,,,,,,3,,1,5,,,1,1,4,Yes,Shallow climb,Yes,3987,Both,Source,4,5,No,,No,,Zihanli,zihanli.purifiedwater@gmail.com
+680250da396e45b121965078,4009,Qualification,65,redAlliance,Yes,1,,,,,,,,,,2,5,2,,,,,,,No,Deep climb,Yes,2165.0000000001164,Coral,Source,4,3,No,,Yes,,J.Reyhart,rodanthefiretitan@gmail.com
+680250df396e45b121965079,2706,Qualification,65,blueAlliance,Yes,1,,,,,,,,,,,,,,,,,,,Yes,Did not climb,No,0,None,None,4,4,Yes,4,No,,Terrance,323728@stu.wvusd.org
+680250ee396e45b12196507a,5817,Qualification,65,blueAlliance,Yes,,3,,,,,,,,3,4,4,5,,2,,2,,,Yes,Did not climb,No,,Both,Both,3,4,No,1,No,Missed a few l2s in the beginning of the match,mayukaan,emilyluo0127@gmail.com
+680250f8396e45b12196507b,1241,Qualification,65,blueAlliance,Yes,2,2,,,,,,,,2,3,6,7,,,1,2,,,No,Did not climb,No,,Both,Source,5,4,No,,No,,ZZoe,zzhaoozoe@gmail.com
+680250f9396e45b12196507c,230,Qualification,65,redAlliance,Yes,,1,,,,,,,,,2,4,,,,,,,,Yes,Shallow climb,Yes,3114,Coral,Source,3,2,No,,No,,Bmannveer@gmail.com,bmannveer@gmail.com
+680250fd396e45b12196507d,7632,Qualification,65,redAlliance,Yes,2,2,,,,,,,,1,4,3,2,,,,,,,Yes,Deep climb,Yes,6411,Coral,Source,4,4,No,,No,0,Henry_Y,henry.yang.xz@gmail.com
+680252d97ff24a1ab92d7a4a,5013,Qualification,66,blueAlliance,Yes,,,,,,,,,,,6,,,,,,,,,Yes,Did not climb,No,,Coral,Source,3,2,No,,No,Slow elevator,aash,ashleycbb123@gmail.com
+680252dd7ff24a1ab92d7a4b,3130,Qualification,66,redAlliance,Yes,1,2,,,,,,,,,5,2,,,,,,,,Yes,Deep climb,Yes,,Coral,Source,4,3,No,,No,,ZZoe,zzhaoozoe@gmail.com
+680252eb7ff24a1ab92d7a4c,9635,Qualification,66,blueAlliance,Yes,,,,,,,2,1,2,,,,,,2,3,3,,1,Yes,Deep climb,No,,Algae,Both,4,4,No,,No,Took a pretty long time tryna score algae into the processor,mayukaan,emilyluo0127@gmail.com
+680252ed7ff24a1ab92d7a4d,4145,Qualification,66,redAlliance,Yes,,2,,,,,,,,,,8,2,,2,2,2,2,2,No,Deep climb,Yes,11400.600000023842,Both,Source,4,4,No,,No,The bot is a really good hybrid. Bro good on algae manipulator. ,Henry_Y,henry.yang.xz@gmail.com
+680253247ff24a1ab92d7a4e,4145,Qualification,66,redAlliance,No,,,,,,,,,,2,,,,,,,,,,Yes,Did not climb,No,,Coral,Source,2,4,Yes,5,Yes,,mayukaan,emilyluo0127@gmail.com
+6802532a7ff24a1ab92d7a4f,2783,Qualification,66,redAlliance,Yes,,3,,,,,,,,1,3,,,,,,,,,Yes,Deep climb,Yes,1500,Coral,Source,3,3,No,,No,,Bmannveer@gmail.com,bmannveer@gmail.com
+68025490e1df876ad4f1acc3,10479,Qualification,67,blueAlliance,Yes,0,3,,,,,,,,1,3,4,1,,,,,,,Yes,Deep climb,No,,Coral,Source,4,4,No,,No,,mayukaan,emilyluo0127@gmail.com
+68025498e1df876ad4f1acc4,5985,Qualification,67,redAlliance,Yes,1,1,,,,,,,,,1,,,,,,2,,1,Yes,Did not climb,No,,Both,Source,2,2,No,,Yes,,astro648,astronautayaan@gmail.com
+68025499e1df876ad4f1acc5,801,Qualification,67,blueAlliance,Yes,,1,,,,,,,1,1,1,3,3,,2,,1,1,,Yes,Deep climb,Yes,4348,Both,Source,4,3,No,,No,,aash,ashleycbb123@gmail.com
+6802549fe1df876ad4f1acc6,3928,Qualification,67,blueAlliance,Yes,,,,,,,,,,,4,2,2,0,,,2,,,No,Did not climb,No,,Both,Source,4,4,No,,No,Robot got stuck with ball under,ZZoe,zzhaoozoe@gmail.com
+680254ace1df876ad4f1acc7,8177,Qualification,67,redAlliance,Yes,,1,,,,,,,,,4,4,,1,,,,1,,No,Deep climb,Yes,10031.600000023842,Both,Source,3,3,No,,No,"They scored pretty slowly, that's really odd it. And their auton steaks for the first few seconds but only scores an l4 ",Henry_Y,henry.yang.xz@gmail.com
+680254d1e1df876ad4f1acc8,5193,Qualification,67,redAlliance,Yes,1,,,,,,,,,,1,3,2,,,,1,,,Yes,Did not climb,No,,Coral,Source,2,3,No,,No,,Bmannveer@gmail.com,bmannveer@gmail.com
+6802566de1df876ad4f1acca,781,Qualification,68,redAlliance,Yes,,2,,,,,,,,2,3,3,,,,4,1,,,Yes,Did not climb,No,0,Both,Source,4,4,No,1,No,,Terrance,323728@stu.wvusd.org
+68025670e1df876ad4f1accb,6652,Qualification,68,blueAlliance,Yes,1,,,,,,,,,1,,1,1,,,,,,,Yes,Did not climb,No,,Coral,Source,3,2,Yes,3,No,,aash,ashleycbb123@gmail.com
+68025671e1df876ad4f1accc,9450,Qualification,68,blueAlliance,Yes,,2,1,,,,,1,,2,4,5,1,,1,3,,,,Yes,Did not climb,No,,Both,Both,4,3,No,,No,,ZZoe,zzhaoozoe@gmail.com
+68025682e1df876ad4f1accd,1700,Qualification,68,redAlliance,Yes,,1,,,,,,,,,,,,,,,,,,No,Deep climb,Yes,20502.099999964237,None,None,3,4,Yes,2,No,It's the coral launching bot. Only made 1 l4 in addition and proceeded to do defence,Henry_Y,henry.yang.xz@gmail.com
+68025697e1df876ad4f1acce,2485,Qualification,68,redAlliance,Yes,,1,,,,,,,,,,0,,,,3,2,,,Yes,Did not climb,No,,Both,Source,4,3,No,,No,,Bmannveer@gmail.com,bmannveer@gmail.com
+6802569ae1df876ad4f1accf,51,Qualification,68,blueAlliance,Yes,,2,,,,,,,,,2,2,,,,1,2,,,Yes,Deep climb,Yes,,Both,Floor,2,2,No,1,No,Takes a fat minute to aim for corals.,mayukaan,emilyluo0127@gmail.com
+6802569be1df876ad4f1acd0,51,Qualification,68,blueAlliance,Yes,,2,,,,,,,,,2,2,,,,1,2,,,Yes,Deep climb,Yes,,Both,Floor,2,2,No,1,No,Takes a fat minute to aim for corals.,mayukaan,emilyluo0127@gmail.com
+68027eda04708f7a428adb28,2383,Qualification,68,blueAlliance,Yes,1,,,,,,,,,,6,2,3,,,,,,,Yes,Deep climb,No,0,Coral,Floor,3,3,No,,No,,delia,lilahhoan@gmail.com
+680258b2e1df876ad4f1acd3,1506,Qualification,69,redAlliance,Yes,1,2,,,,,,,,,1,3,4,4,,1,1,,,No,Deep climb,Yes,4564,Both,Source,4,3,No,1,No,,Terrance,323728@stu.wvusd.org
+680258b9e1df876ad4f1acd4,3473,Qualification,69,blueAlliance,Yes,,,,,,,,,,6,1,2,2,,,,2,,,Yes,Did not climb,No,,Both,Source,4,3,No,,No,,aash,ashleycbb123@gmail.com
+680258c3e1df876ad4f1acd5,9134,Qualification,69,redAlliance,Yes,1,1,,,,,,,,1,1,3,3,1,,,,,,No,Did not climb,No,,Coral,Source,4,4,No,,No,,Henry_Y,henry.yang.xz@gmail.com
+680258dbe1df876ad4f1acd6,7421,Qualification,69,redAlliance,Yes,,1,,,,,,,,,,,,,,3,1,,,Yes,Did not climb,No,,Coral,Source,3,3,No,1,No,,Bmannveer@gmail.com,bmannveer@gmail.com
+680258e8e1df876ad4f1acd7,540,Qualification,69,blueAlliance,Yes,2,,,,,,,,,2,2,4,4,,,,,,,Yes,Did not climb,No,,Coral,Source,3,3,No,,No,,ZZoe,zzhaoozoe@gmail.com
+68025958e1df876ad4f1acd8,4907,Qualification,69,blueAlliance,Yes,1,2,4,,,1,,,,,,,,,,,,,,Yes,Deep climb,Yes,,Coral,Source,2,4,No,,No,,mayukaan,emilyluo0127@gmail.com
+68025b05e1df876ad4f1acdb,888,Qualification,70,blueAlliance,Yes,,3,,,,,,,,1,2,3,4,,,,1,,,Yes,Did not climb,No,,Both,Source,4,4,No,,No,,aash,ashleycbb123@gmail.com
+68025b09e1df876ad4f1acdc,3814,Qualification,70,redAlliance,Yes,,,,,,,,,,,2,2,2,,,,,,,Yes,Deep climb,Yes,5852,Coral,Source,2,3,No,1,No,,Terrance,323728@stu.wvusd.org
+68025b1de1df876ad4f1acdd,6324,Qualification,70,redAlliance,Yes,,,,,,,,0,,,1,0,,,,2,2,,,Yes,Deep climb,No,,Both,Source,4,3,No,1,No,,Bmannveer@gmail.com,bmannveer@gmail.com
+68025b2ae1df876ad4f1acde,1768,Qualification,70,blueAlliance,Yes,,2,,,2,,,,,,2,5,,2,1,1,1,1,,Yes,Deep climb,No,,Coral,Source,4,4,No,,No,0eveeytime they uh ‘missed’ it ended up being an l1,mayukaan,emilyluo0127@gmail.com
+68025b42e1df876ad4f1acdf,2080,Qualification,70,redAlliance,Yes,,0,,,,,,,,3,3,1,,,,,,1,,No,Did not climb,No,,Both,Source,2,2,No,,No,"The elevator was very slow and very wobbly. When the elevator is fully extended, the vote moves very slow too prevent them from topplibg over ",Henry_Y,henry.yang.xz@gmail.com
+68025b59e1df876ad4f1ace0,3794,Qualification,70,blueAlliance,Yes,,,,,,,,,,1,,,,,,,,,,Yes,Did not climb,No,,Coral,Source,3,2,Yes,2,No,"Instability, glitchy/ pauses a lot",ZZoe,zzhaoozoe@gmail.com
+68025dffef27b35781349e13,6873,Qualification,71,redAlliance,Yes,,,,,,,,,,2,,3,2,,,,1,,,No,Did not climb,No,,Coral,Source,2,1,No,1,No,,Terrance,323728@stu.wvusd.org
+68025e06ef27b35781349e14,2470,Qualification,71,redAlliance,Yes,,,,,,,,,,,,,,,,,,,,Yes,Did not climb,No,,None,None,3,5,Yes,4,No,,Bmannveer@gmail.com,bmannveer@gmail.com
+68025e0aef27b35781349e15,70,Qualification,71,blueAlliance,No,,,,,,,,,,,3,2,1,,3,1,0,2,,Yes,Deep climb,Yes,,Both,Source,4,3,No,,No,,ZZoe,zzhaoozoe@gmail.com
+68025e0eef27b35781349e16,3656,Qualification,71,blueAlliance,Yes,,2,,,,,,,,,2,3,2,,,0,2,1,1,No,Deep climb,Yes,2589,Both,Both,4,4,No,,No,,aash,ashleycbb123@gmail.com
+68025e10ef27b35781349e17,2539,Qualification,71,blueAlliance,Yes,1,2,,,,,,,,1,5,2,3,,,,,,,Yes,Deep climb,Yes,2926,Coral,Source,4,4,No,,No,,astro648,astronautayaan@gmail.com
+68025e49c5468d6fb23472ef,1153,Qualification,71,redAlliance,Yes,,,1,,,1,,0,1,,,3,5,2,1,1,2,,1,No,Deep climb,Yes,11997.100000023842,Both,Source,4,3,No,,No,,Henry_Y,henry.yang.xz@gmail.com
+68025fc07f0191fa31e03381,86,Qualification,72,blueAlliance,Yes,,2,,,,,,,,1,4,5,1,,,,,,,Yes,Deep climb,Yes,2189,Coral,Source,4,3,No,,Yes,,ZZoe,zzhaoozoe@gmail.com
+68025fcc7f0191fa31e03382,5987,Qualification,72,redAlliance,Yes,,,,,,,1,1,,,1,,,,,1,,,,Yes,Deep climb,Yes,1659,Both,Both,4,4,No,1,No,,Bmannveer@gmail.com,bmannveer@gmail.com
+68025fd97f0191fa31e03383,6621,Qualification,72,redAlliance,Yes,,3,0,0,0,,,,,,1,6,3,2,,,,,,No,Deep climb,Yes,5589,Coral,Source,4,3,No,1,No,,Terrance,323728@stu.wvusd.org
+68025fdb7f0191fa31e03384,1038,Qualification,72,blueAlliance,Yes,,,,,,0,2,1,1,,,,,,1,5,2,2,,No,Deep climb,Yes,2747,Algae,Both,3,3,No,,No,,aash,ashleycbb123@gmail.com
+68025fdd7f0191fa31e03385,2383,Qualification,72,blueAlliance,Yes,0,1,0,,,,,,,2,4,3,,,,,,,,Yes,Deep climb,Yes,2583,Coral,Source,3,4,No,,No,,astro648,astronautayaan@gmail.com
+68025fdf7f0191fa31e03386,8570,Qualification,72,redAlliance,Yes,,,1,,,,,2,,1,,6,6,,,,,,,No,Deep climb,Yes,8556.899999976158,Both,Source,4,4,No,,No,Only did l2 and l3 in this game and is pretty efficiently do it. ,Henry_Y,henry.yang.xz@gmail.com
+6802619c7f0191fa31e0338a,9245,Qualification,73,blueAlliance,Yes,0,0,2,2,0,0,0,1,0,2,0,6,7,0,0,0,1,1,2,Yes,Deep climb,Yes,4388.700000017881,Both,Source,5,5,No,1,Yes,,344882@stu.wvusd.org,344882@stu.wvusd.org
+680261a57f0191fa31e0338b,2485,Qualification,73,redAlliance,Yes,,1,,,,,1,,1,,5,3,2,,,1,,,,Yes,Shallow climb,Yes,2586,Both,Both,5,4,No,,No,,James Shu,jamesshu57@gmail.com
+680261a77f0191fa31e0338c,33,Qualification,73,blueAlliance,Yes,1,1,,,,,,,,,9,3,3,,,,,,,No,Deep climb,Yes,2232,Both,Both,5,5,No,,Yes,,astro648,astronautayaan@gmail.com
+680261ca7f0191fa31e0338d,2767,Qualification,73,blueAlliance,Yes,,,,,,,1,2,1,,1,1,,,1,6,1,,1,Yes,Deep climb,No,,Both,Source,5,5,Yes,4,No,"🔥
+Really good in algae and auton ",Henry_Y,henry.yang.xz@gmail.com
+680261cd7f0191fa31e0338e,2877,Qualification,73,redAlliance,Yes,,3,,,,,,,,,2,5,1,,,,,0,,No,Deep climb,Yes,13723,Coral,Source,4,4,No,,No,looks like they’re manually aligning might not have vision.,jeremiah,jeremiahtung2020@gmail.com
+680261d67f0191fa31e0338f,3970,Qualification,73,redAlliance,Yes,,3,0,,,,,,,,1,6,4,,,1,,,,No,Shallow climb,Yes,5649,Both,Both,3,4,Yes,2,No,,kylefeng,kfeng.209@gmail.com
+68026393f16f75470c30192c,2075,Qualification,74,redAlliance,Yes,,3,0,,,,0,,,1,2,2,3,,,3,1,,,Yes,Shallow climb,Yes,3174,Both,Source,4,3,No,,No,,James Shu,jamesshu57@gmail.com
+680263a2f16f75470c30192d,5181,Qualification,74,blueAlliance,Yes,1,0,0,0,0,0,0,1,0,3,4,3,4,0,0,0,1,0,0,Yes,Did not climb,No,0,Both,Source,4,4,No,,Yes,,344882@stu.wvusd.org,344882@stu.wvusd.org
+680263aef16f75470c30192e,7902,Qualification,74,redAlliance,Yes,,,1,,,,,,,,,2,5,1,,,,1,,No,Shallow climb,Yes,6753,Both,Source,3,3,No,,No,,kylefeng,kfeng.209@gmail.com
+680263b1f16f75470c30192f,3197,Qualification,74,blueAlliance,Yes,0,1,,,,,,,,3,3,4,,,,,0,0,,No,Deep climb,Yes,2283,Both,Both,3,4,No,,No,,astro648,astronautayaan@gmail.com
+680263cdf16f75470c301930,2522,Qualification,74,redAlliance,Yes,,3,,,,,,,,,5,5,3,0,,,,1,,No,Deep climb,Yes,12381,Coral,Source,4,5,No,,No,pretty fast aligning and outtake.,jeremiah,jeremiahtung2020@gmail.com
+680263daf16f75470c301931,2960,Qualification,74,blueAlliance,Yes,1,,,,1,,,,,2,2,1,,,2,,1,,1,No,Deep climb,Yes,16005.899999916553,None,Source,3,3,No,,No,"Their Coral scoring capabilities ain't the greatest, very inaccurate. The coral will fall out if bot shook to hard. ",Henry_Y,henry.yang.xz@gmail.com
+680265946402b9b45a2f9fd0,8595,Qualification,75,blueAlliance,Yes,1,0,0,0,0,0,1,1,1,2,0,0,0,0,0,0,1,1,2,Yes,Did not climb,No,0,Both,Source,3,4,Yes,5,Yes,,344882@stu.wvusd.org,344882@stu.wvusd.org
+680265aa6402b9b45a2f9fd1,10224,Qualification,75,redAlliance,Yes,,,,,,,,,,,2,1,,,,,,,1,Yes,Shallow climb,No,,Both,Source,3,4,No,,No,,kylefeng,kfeng.209@gmail.com
+680265ac6402b9b45a2f9fd2,3339,Qualification,75,blueAlliance,Yes,,2,,,,,,,,2,6,7,1,,,2,1,1,,Yes,Deep climb,Yes,6921.400000035763,Both,Source,5,5,No,,No,Pretty fast scoring mechanism for coral and algae. ,Henry_Y,henry.yang.xz@gmail.com
+680265af6402b9b45a2f9fd3,2200,Qualification,75,blueAlliance,Yes,,3,,,,,,,,,2,5,10,0,,,,1,,No,Deep climb,Yes,3107,Both,Source,5,5,No,1,Yes,,astro648,astronautayaan@gmail.com
+680265b26402b9b45a2f9fd4,3045,Qualification,75,redAlliance,Yes,1,2,,,,,,0,,,3,2,5,,,2,1,1,,Yes,Shallow climb,No,0,Both,Both,5,4,No,,Yes,Climb was not successful due to running out of time,James Shu,jamesshu57@gmail.com
+680265d16402b9b45a2f9fd5,3882,Qualification,75,redAlliance,Yes,,,,,,,,,,,1,3,2,,,,1,,,No,Deep climb,Yes,9140,Coral,Source,4,3,No,,Yes,i missed the first 30 seconds sorry.,jeremiah,jeremiahtung2020@gmail.com
+680267c56402b9b45a2f9fd6,5013,Qualification,76,blueAlliance,Yes,0,2,0,0,,0,0,0,0,0,0,0,0,0,0,0,0,0,0,No,Did not climb,No,0,Coral,Source,3,5,Yes,3,Yes,got stuck on algae when they played defense.,344882@stu.wvusd.org,344882@stu.wvusd.org
+680267e16402b9b45a2f9fd7,1241,Qualification,76,redAlliance,Yes,3,1,,,,,,,,,2,4,3,3,,1,1,,,Yes,Did not climb,No,,Both,Source,4,4,No,,No,,James Shu,jamesshu57@gmail.com
+680267e66402b9b45a2f9fd8,230,Qualification,76,redAlliance,Yes,,3,,,,,,,,,1,3,3,,,2,,2,,Yes,Did not climb,No,0,Both,Source,4,4,No,,No,,jeremiah,jeremiahtung2020@gmail.com
+680267f66402b9b45a2f9fd9,10479,Qualification,76,redAlliance,Yes,,1,,,,,,,,1,3,5,3,,,,,,,No,Shallow climb,Yes,7929,Coral,Source,3,4,No,,No,,kylefeng,kfeng.209@gmail.com
+680267fe6402b9b45a2f9fda,9450,Qualification,76,blueAlliance,Yes,,2,,,,,,,,,4,1,1,,,8,2,2,,No,Deep climb,Yes,7028.599999964237,Both,Both,5,5,No,,No,Very good algae and coral scoring. They also score very fast too,Henry_Y,henry.yang.xz@gmail.com
+6802680a6402b9b45a2f9fdb,467,Qualification,76,blueAlliance,Yes,,2,,,,,,,,,5,8,6,1,,,,,,No,Deep climb,Yes,2440,Coral,Both,5,5,No,,Yes,,astro648,astronautayaan@gmail.com
+68026a04c6a50283f22bc377,9545,Qualification,77,blueAlliance,Yes,0,,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,Yes,Did not climb,No,0,Both,Source,5,4,No,4,Yes,,344882@stu.wvusd.org,344882@stu.wvusd.org
+68026a1a96e682fb6ebf676b,7632,Qualification,77,redAlliance,Yes,1,3,,,,,,,,1,6,3,2,,,,,,,No,Deep climb,Yes,8069,Coral,Source,4,5,No,,No,,jeremiah,jeremiahtung2020@gmail.com
+68026a1bc6a50283f22bc378,51,Qualification,77,redAlliance,Yes,,1,,,,,,,,,,,1,,,2,,,1,No,Shallow climb,Yes,9818.000000000058,Both,Both,3,3,No,,No,,kylefeng,kfeng.209@gmail.com
+68026a1d96e682fb6ebf676c,5736,Qualification,77,blueAlliance,Yes,,,,,,,,,,,,4,3,,,,,,,No,Deep climb,Yes,3106,Coral,Source,3,1,No,,No,,astro648,astronautayaan@gmail.com
+68026a2296e682fb6ebf676d,8177,Qualification,77,redAlliance,Yes,0,1,,,,,,,,1,1,6,1,,,,1,,,Yes,Shallow climb,Yes,3177.000000000058,Coral,Source,4,3,No,1,No,,James Shu,jamesshu57@gmail.com
+68026a4596e682fb6ebf676e,9496,Qualification,77,blueAlliance,Yes,1,2,,,,,,,,,9,2,,,2,3,2,3,2,No,Deep climb,Yes,6479.799999952316,Both,Both,5,4,No,,No,Very good Coral and algae scoring mechanism. Scoring very fast,Henry_Y,henry.yang.xz@gmail.com
+68026b9a48fcb838bd659342,973,Qualification,78,redAlliance,Yes,2,1,,,,,,,,,1,4,5,,2,2,,2,,No,Deep climb,Yes,6798,Coral,Source,5,5,No,,No,,jeremiah,jeremiahtung2020@gmail.com
+68026ba148fcb838bd659343,801,Qualification,78,redAlliance,Yes,,1,,,,,,,1,,2,3,2,,,2,1,,,Yes,Shallow climb,Yes,3690.999999999942,Both,Source,5,4,No,,No,,James Shu,jamesshu57@gmail.com
+68026bab48fcb838bd659344,3130,Qualification,78,redAlliance,Yes,,2,,,,,,,,,3,6,4,,,,,,2,No,Shallow climb,Yes,3816,Both,Source,4,3,No,,No,,kylefeng,kfeng.209@gmail.com
+68026bb048fcb838bd659345,781,Qualification,78,blueAlliance,Yes,1,1,,,,,,,,,5,1,,,2,5,3,1,2,Yes,Deep climb,No,,Both,Both,5,5,No,,No,,Henry_Y,henry.yang.xz@gmail.com
+68026bba48fcb838bd659346,2080,Qualification,78,blueAlliance,Yes,,,,,,,,,,1,,,,,,,,,,Yes,Did not climb,No,,Coral,Source,1,1,No,1,No,0,344882@stu.wvusd.org,344882@stu.wvusd.org
+68026bd548fcb838bd659347,2706,Qualification,78,blueAlliance,Yes,,,,,,,,,,,2,4,,,,,,,,No,Did not climb,No,,Coral,Source,1,1,No,,No,,astro648,astronautayaan@gmail.com
+68026db85d823aa9dddb5c2d,3928,Qualification,79,blueAlliance,Yes,,1,,,,,,,,1,1,4,2,,,,1,,,No,Deep climb,Yes,3570,Both,Both,4,3,No,1,No,,astro648,astronautayaan@gmail.com
+68026db838dfe165901e9cc3,3928,Qualification,79,blueAlliance,Yes,,1,,,,,,,,1,1,4,2,,,,1,,,No,Deep climb,Yes,3570,Both,Both,4,3,No,5,No,,astro648,astronautayaan@gmail.com
+68026db938dfe165901e9cc4,9635,Qualification,79,redAlliance,Yes,,,,,,,2,2,0,,,,,,,2,,1,1,Yes,Did not climb,No,,Algae,Both,3,4,Yes,2,No,,kylefeng,kfeng.209@gmail.com
+68026dba38dfe165901e9cc5,4907,Qualification,79,blueAlliance,Yes,0,3,0,0,0,,0,0,0,0,3,3,4,0,2,2,2,2,2,Yes,Did not climb,No,0,Both,Source,4,5,No,,Yes,,344882@stu.wvusd.org,344882@stu.wvusd.org
+68026dc038dfe165901e9cc6,6873,Qualification,79,redAlliance,Yes,,,0,0,,,,1,,2,,2,5,,,,,,,Yes,Did not climb,No,,Coral,Source,3,3,No,,No,,jeremiah,jeremiahtung2020@gmail.com
+68026dd838dfe165901e9cc8,888,Qualification,79,blueAlliance,Yes,1,2,,,,,,,,1,2,4,5,,,,,,,Yes,Did not climb,No,0,Both,Source,4,3,No,,No,Pretty slow,Henry_Y,henry.yang.xz@gmail.com
+68026f8f38dfe165901e9cc9,2783,Qualification,80,blueAlliance,Yes,,2,,,,,,,,2,2,3,1,2,,,,,,No,Deep climb,Yes,7000,Coral,Source,4,3,No,,No,,J.Reyhart,rodanthefiretitan@gmail.com
+68026fb338dfe165901e9cca,70,Qualification,80,blueAlliance,Yes,0,0,0,0,0,0,0,0,0,0,0,2,4,0,1,2,2,2,1,Yes,Did not climb,No,0,Both,Source,5,4,No,,Yes,,344882@stu.wvusd.org,344882@stu.wvusd.org
+68026fb338dfe165901e9ccb,195,Qualification,80,redAlliance,Yes,,1,,,,,,,,,2,3,4,1,,,1,1,,Yes,Shallow climb,Yes,1815,Coral,Source,4,4,No,1,No,,James Shu,jamesshu57@gmail.com
+68026fbc38dfe165901e9ccc,1768,Qualification,80,redAlliance,Yes,2,1,,,,,,,,,1,6,2,1,,,,,1,No,Shallow climb,Yes,3816,Coral,Source,4,4,No,1,No,,kylefeng,kfeng.209@gmail.com
+68026fc538dfe165901e9ccd,1506,Qualification,80,blueAlliance,Yes,2,1,,,,,,,,1,7,4,,1,,1,,1,,No,Deep climb,Yes,21284.399999976158,Both,Source,4,3,No,,No,,Henry_Y,henry.yang.xz@gmail.com
+68026fe138dfe165901e9cce,6621,Qualification,80,redAlliance,Yes,,2,,,,,,,,,5,2,5,,,,,,,Yes,Deep climb,No,,Coral,Source,4,5,No,,No,,jeremiah,jeremiahtung2020@gmail.com
+680271a438dfe165901e9ccf,2470,Qualification,81,redAlliance,Yes,,2,,,,,,,,,1,,,,1,1,1,1,,No,Shallow climb,No,14884.999999999942,Both,Source,3,3,No,,No,Their coral gets stuck inside bot sometimes,Lyn,allynsong08@gmail.com
+680271a738dfe165901e9cd0,4145,Qualification,81,blueAlliance,Yes,,3,,,,,,,,,,3,5,,,4,3,1,,Yes,Deep climb,No,0,Both,Source,4,4,No,,No,nice LED lights,james,jamwan985@gmail.com
+680271b038dfe165901e9cd1,540,Qualification,81,blueAlliance,Yes,,,,,,,,,,1,4,5,5,0,,,,,,Yes,Did not climb,No,,Coral,Source,4,5,No,1,No,Tyler Mong did this match :D,astro648,astronautayaan@gmail.com
+680271de38dfe165901e9cd2,3794,Qualification,81,redAlliance,Yes,,,,1,,,,,1,,,1,1,1,,,,,3,Yes,Did not climb,No,,Both,Source,1,2,No,,No,Physically unstable. ,Zihanli,zihanli.purifiedwater@gmail.com
+6802720d38dfe165901e9cd3,2877,Qualification,81,blueAlliance,Yes,,3,0,,,,,,,2,1,4,2,4,1,,1,,,No,Deep climb,Yes,6746,Both,Source,4,4,No,,No,,Poguino,bbrandonn.llee@gmail.com
+6802736ec72ee87b67ec2239,5817,Qualification,82,blueAlliance,Yes,,1,,,,,,,,1,5,4,2,,,,,,,No,Deep climb,No,,Coral,Source,3,3,No,,No,,Poguino,bbrandonn.llee@gmail.com
+6802737ac72ee87b67ec223a,1038,Qualification,82,blueAlliance,Yes,,,,,,,1,1,1,,,,,,2,6,3,3,,No,Deep climb,Yes,3024,Algae,Floor,3,2,No,1,No,Tyler Mong did this one :(,astro648,astronautayaan@gmail.com
+68027390c72ee87b67ec223b,2539,Qualification,82,redAlliance,Yes,,1,,,,,,,,0,1,2,,2,,,,,,Yes,Shallow climb,Yes,4904.999999999942,Coral,Source,3,3,No,1,No,,Zihanli,zihanli.purifiedwater@gmail.com
+68027401c72ee87b67ec223c,6647,Qualification,82,redAlliance,Yes,,1,0,2,,2,,1,,,,,,,,,,,,No,Shallow climb,Yes,9533,Both,Source,2,2,No,,No,,Lyn,allynsong08@gmail.com
+68027524c72ee87b67ec223d,4009,Qualification,83,blueAlliance,Yes,1,1,,,,,,,,2,5,4,1,,,,,,,Yes,Deep climb,No,10090.5,Coral,Source,4,5,No,,No,,delia,lilahhoan@gmail.com
+68027529c72ee87b67ec223e,9134,Qualification,83,blueAlliance,Yes,1,,,,,,,,,1,1,3,2,1,1,,1,1,,No,Did not climb,No,,Both,Source,3,2,No,,No,,Poguino,bbrandonn.llee@gmail.com
+68027531c72ee87b67ec223f,2522,Qualification,83,redAlliance,Yes,,2,0,0,,,,,,3,2,6,6,1,,,,,,No,Shallow climb,Yes,5768,Coral,Floor,4,3,No,,No,,Lyn,allynsong08@gmail.com
+68027540c72ee87b67ec2241,2960,Qualification,83,redAlliance,Yes,,1,,,,,,,,2,2,3,,,1,,0,,,No,Deep climb,Yes,5317,Coral,Source,4,3,No,1,No,,Luke ,lukeyu2020@gmail.com
+68027550c72ee87b67ec2242,3045,Qualification,83,blueAlliance,Yes,1,1,,,,,,,,1,3,3,3,0,,4,2,2,,No,Deep climb,Yes,1732,Both,Both,4,4,No,1,No,Tyler Mong did this one ,astro648,astronautayaan@gmail.com
+6802769a3899acab724b6226,7421,Qualification,84,redAlliance,Yes,1,,,,,,,,,,1,,,,,1,1,,,No,Did not climb,No,,Coral,Floor,1,1,No,1,No,Climb got caught on net early into the game and couldnt play,Lyn,allynsong08@gmail.com
+680276d1f1bbfab49e42e89e,33,Qualification,84,blueAlliance,Yes,1,2,,,,,,,,0,11,2,0,1,,4,1,0,,No,Deep climb,Yes,525,Both,Source,5,4,No,1,No,Tyler Mong did this one ,astro648,astronautayaan@gmail.com
+680276d23592a87c2dc4e1bd,1902,Qualification,84,blueAlliance,Yes,,,,1,0,,,1,,2,,6,7,5,,,2,2,,Yes,Did not climb,No,,Algae,Source,5,4,No,,No,,harryson,harrisonpjames2008@gmail.com
+680276d93592a87c2dc4e1be,5987,Qualification,84,redAlliance,Yes,1,1,,,,,,,,,2,,,,,3,,2,,Yes,Did not climb,No,,Both,Source,4,4,No,,No,Intake got stuck on net while shooting algae early on. Inactive for rest of game. ,Zihanli,zihanli.purifiedwater@gmail.com
+680276e83592a87c2dc4e1bf,1700,Qualification,84,blueAlliance,Yes,1,,,,,,,,,2,,,,,,,,,,Yes,Deep climb,No,,Coral,Source,4,5,Yes,4,No,,delia,lilahhoan@gmail.com
+68027535c72ee87b67ec2240,3882,Qualification,85,redAlliance,Yes,,1,,,,,,,,,5,5,1,1,,,,,2,Yes,Shallow climb,Yes,7075,Coral,Source,4,2,No,,No,,Zihanli,zihanli.purifiedwater@gmail.com
+6802794f3592a87c2dc4e1c0,5181,Qualification,85,redAlliance,Yes,,1,,,,,1,0,1,1,1,,1,,,,,,,Yes,Did not climb,No,0,Both,Source,4,4,Yes,4,No,,Zihanli,zihanli.purifiedwater@gmail.com
+6802794f3592a87c2dc4e1c1,5181,Qualification,85,redAlliance,Yes,,1,,,,,1,0,1,1,1,,1,,,,,,,Yes,Did not climb,No,0,Both,Source,4,4,Yes,4,No,,Zihanli,zihanli.purifiedwater@gmail.com
+68027952a260f1cc22d6ac7e,3970,Qualification,85,blueAlliance,Yes,1,1,,,,,,,,,8,4,4,,,2,1,2,,Yes,Deep climb,Yes,894.9999999999418,Both,Floor,3,4,No,,No,Tyler Mong did this match,astro648,astronautayaan@gmail.com
+680279653592a87c2dc4e1c2,8570,Qualification,85,blueAlliance,Yes,,,1,,1,,,1,,,,7,6,,,,1,,,No,Deep climb,Yes,7273.899999976158,Coral,Source,5,5,No,,No,,delia,lilahhoan@gmail.com
+680279733592a87c2dc4e1c3,3814,Qualification,85,blueAlliance,Yes,,,,,,,,,,,1,,,,,,,,,No,Did not climb,No,,None,None,3,3,Yes,2,No,bot got stuck on top of some algae for abt 32 seconds,harryson,harrisonpjames2008@gmail.com
+6802799b3592a87c2dc4e1c4,3339,Qualification,85,redAlliance,Yes,,2,,,,,,0,,2,3,3,2,0,,1,1,,,No,Shallow climb,Yes,7360,Both,Source,4,3,No,,No,,Lyn,allynsong08@gmail.com
+68027b2e4e7a1aa57c8ffaa2,3656,Qualification,86,redAlliance,Yes,,1,,,,,,,,,3,2,2,,1,,,,,No,Did not climb,No,,Both,Source,1,2,No,1,No,,Lyn,allynsong08@gmail.com
+68027b2f4e7a1aa57c8ffaa3,5985,Qualification,86,blueAlliance,Yes,,2,,,,,,,,1,5,,,,,,,,,Yes,Deep climb,No,0,Coral,Source,3,2,No,,No,,delia,lilahhoan@gmail.com
+68027b324e7a1aa57c8ffaa4,9245,Qualification,86,blueAlliance,Yes,,,1,1,,,,1,,,,9,4,,,,,3,,Yes,Did not climb,No,,Coral,Source,3,4,No,,No,Tyler Mong did this match,astro648,astronautayaan@gmail.com
+68027b444e7a1aa57c8ffaa5,3197,Qualification,86,redAlliance,Yes,1,1,1,,,,,1,,1,2,3,2,,,6,1,,,Yes,Shallow climb,No,10319,Both,Source,5,3,No,,No,,Zihanli,zihanli.purifiedwater@gmail.com
+68027b524e7a1aa57c8ffaa6,8595,Qualification,86,blueAlliance,Yes,1,,,,,,,,1,,,,,,,,,,,No,Deep climb,No,9861,None,None,4,3,Yes,4,No,,harryson,harrisonpjames2008@gmail.com
+68027d15176bfdfe58d262cd,86,Qualification,87,redAlliance,Yes,,2,,,,,,,,,4,4,,,,,,,,No,Shallow climb,Yes,6873,Coral,Source,4,3,No,,No,,Lyn,allynsong08@gmail.com
+68027d18176bfdfe58d262ce,5193,Qualification,87,redAlliance,Yes,,,,1,,,,,,2,,2,5,,,,,,,Yes,Shallow climb,Yes,3535,Coral,Source,3,2,No,,No,,Zihanli,zihanli.purifiedwater@gmail.com
+68027d23176bfdfe58d262cf,2075,Qualification,87,blueAlliance,Yes,,1,,,,0,1,1,,,2,5,5,1,,1,,2,,No,Deep climb,Yes,4446.400000035763,Both,Source,4,5,No,,No,,delia,lilahhoan@gmail.com
+68027d28176bfdfe58d262d0,2200,Qualification,87,blueAlliance,Yes,,,,,,,,,,,5,7,7,,,,1,,,No,Deep climb,No,12129,Coral,Source,3,4,No,,No,,harryson,harrisonpjames2008@gmail.com
+68027d3e176bfdfe58d262d1,1153,Qualification,87,redAlliance,Yes,1,0,1,,,,,1,,,,3,,3,2,2,,,0,No,Deep climb,Yes,7012,Both,Source,3,3,No,1,No,,Luke ,lukeyu2020@gmail.com
+68027d5a176bfdfe58d262d2,2767,Qualification,87,blueAlliance,Yes,1,2,,,,,,,,,,,,,2,11,1,0,,No,Deep climb,Yes,3369,Both,Both,4,4,No,,No,Tyler Mong did this one,astro648,astronautayaan@gmail.com
+68027edc04708f7a428adb29,10224,Qualification,88,redAlliance,Yes,,,,,,,,,,4,2,4,2,,,,,,,Yes,Did not climb,No,,Coral,Source,3,2,No,,No,,Luke ,lukeyu2020@gmail.com
+68027efb04708f7a428adb2a,7902,Qualification,88,blueAlliance,Yes,0,,1,0,,1,,,,1,,5,6,,,,1,0,,No,Deep climb,Yes,4219,Both,Source,3,3,No,,No,Tyler Mong did this one ,astro648,astronautayaan@gmail.com
+68027f0204708f7a428adb2b,4907,Qualification,88,blueAlliance,Yes,,1,,,,,,,,,5,4,1,,,,3,1,,No,Deep climb,Yes,6028.000000000058,Both,Source,4,4,No,1,No,,harryson,harrisonpjames2008@gmail.com
+68027f1904708f7a428adb2c,9450,Qualification,88,redAlliance,Yes,,2,,,,,1,,,1,1,5,,,,10,3,2,,Yes,Shallow climb,Yes,1987,Both,Source,5,3,No,,No,,Zihanli,zihanli.purifiedwater@gmail.com
+680280c9899bce59d3f11810,10157,Qualification,89,blueAlliance,Yes,,,,,,,,,,,,,,1,,,,,,No,Shallow climb,Yes,4528.000000000116,None,None,3,3,Yes,3,No,,exie1,emilyxie666@gmail.com
+680280d4899bce59d3f11811,2877,Qualification,89,redAlliance,Yes,,3,,,,,,,,,3,5,3,,,1,,,,No,Deep climb,Yes,4049.000000000058,Both,Both,5,4,No,,No,,CCandace,323535@stu.wvusd.org
+680280d8899bce59d3f11812,230,Qualification,89,blueAlliance,Yes,,2,,,,,,,,0,5,6,,,2,1,2,1,,No,Deep climb,Yes,6144.900000035763,Both,Source,5,5,No,,No,,delia,lilahhoan@gmail.com
+680280ee899bce59d3f11813,9635,Qualification,89,blueAlliance,Yes,,,,,,,1,2,,,,,,,2,4,,,2,No,Deep climb,Yes,12643,Algae,Both,4,4,No,1,No,,ZZoe,zzhaoozoe@gmail.com
+68028150899bce59d3f11814,2080,Qualification,89,redAlliance,Yes,,,,,,,,,,2,2,1,,,,,,,,No,Did not climb,No,,Coral,Source,3,2,No,1,No,super slow elevator. they turned the outtake the wrong way once shooting the coral outside.,jeremiah,jeremiahtung2020@gmail.com
+6802826a899bce59d3f11815,540,Qualification,90,blueAlliance,Yes,,1,,,,,,,,,,,,,,,,,,Yes,Did not climb,No,,None,None,4,5,Yes,4,No,,exie1,emilyxie666@gmail.com
+6802826c899bce59d3f11816,5817,Qualification,90,redAlliance,Yes,,1,,,,,,,,3,5,5,3,,,1,,1,,No,Did not climb,No,,Both,Both,5,4,No,,No,,CCandace,323535@stu.wvusd.org
+68028276899bce59d3f11817,51,Qualification,90,blueAlliance,Yes,,1,,,,,1,,,,,,,1,2,5,3,,2,No,Deep climb,Yes,17197,Both,Floor,4,3,No,,No,,ZZoe,zzhaoozoe@gmail.com
+68028291899bce59d3f11818,801,Qualification,90,blueAlliance,Yes,,2,,,,,,,,1,3,3,4,,3,,2,1,,No,Deep climb,Yes,13885,Both,Source,4,5,No,,No,,delia,lilahhoan@gmail.com
+680282a8899bce59d3f11819,10479,Qualification,90,redAlliance,Yes,0,2,0,0,0,0,0,0,0,4,0,2,4,1,0,0,0,0,0,No,Deep climb,Yes,8464.99999999997,Coral,Source,3,4,No,0,No,0,jeremiah,jeremiahtung2020@gmail.com
+6802989638e90da8dbade80c,6621,Qualification,91,blueAlliance,Yes,0,3,0,0,0,0,0,0,0,1,3,5,1,0,0,0,2,1,0,No,Deep climb,Yes,2796.400000035763,Coral,Source,4,5,No,0,No,0,delia,lilahhoan@gmail.com
+680298a038e90da8dbade80d,6873,Qualification,91,blueAlliance,Yes,0,0,0,0,0,0,0,0,0,0,1,2,4,1,0,0,0,0,0,No,Deep climb,Yes,2652,Coral,Source,4,3,No,1,No,0,exie1,emilyxie666@gmail.com
+680298a038e90da8dbade80e,6873,Qualification,91,blueAlliance,Yes,0,0,0,0,0,0,0,0,0,0,1,2,4,1,0,0,0,0,0,No,Deep climb,Yes,2652,Coral,Source,4,3,No,1,No,0,exie1,emilyxie666@gmail.com
+680298ba38e90da8dbade80f,9545,Qualification,91,redAlliance,Yes,,,,,,,,,,,,,,1,,,,,,No,Did not climb,No,,Coral,Source,4,4,Yes,4,No,Robot broke down near the end of the match,CCandace,323535@stu.wvusd.org
+680298bb38e90da8dbade810,2491,Qualification,91,blueAlliance,Yes,0,3,4,0,0,0,0,0,0,0,1,3,3,0,0,5,5,0,0,No,Deep climb,Yes,0,Both,Source,5,4,No,0,No,Can do algae and coral in one move,ZZoe,zzhaoozoe@gmail.com
+680298f138e90da8dbade811,2706,Qualification,91,redAlliance,Yes,0,1,0,0,0,0,0,0,0,0,5,6,0,1,0,0,0,0,0,Yes,Did not climb,No,0,Coral,Source,4,4,No,0,No,their elevator goes up kinda slow.,jeremiah,jeremiahtung2020@gmail.com
+68029a7138e90da8dbade812,467,Qualification,92,redAlliance,Yes,0,2,1,0,0,0,0,0,0,3,2,5,5,2,0,0,0,0,0,No,Deep climb,Yes,0,Coral,Source,4,4,No,1,No,0,ZZoe,zzhaoozoe@gmail.com
+68029a7538e90da8dbade813,5987,Qualification,92,blueAlliance,Yes,0,1,0,0,0,0,1,0,1,0,1,3,5,0,2,1,2,0,0,No,Deep climb,Yes,3152,Both,Source,4,4,No,0,No,0,exie1,emilyxie666@gmail.com
+68029a7a38e90da8dbade814,3045,Qualification,92,redAlliance,Yes,0,1,0,0,0,0,1,1,1,1,3,4,5,0,0,0,0,0,0,No,Deep climb,Yes,19523,Both,Source,5,4,No,0,No,0,CCandace,323535@stu.wvusd.org
+68029a7b38e90da8dbade815,1506,Qualification,92,blueAlliance,Yes,0,3,0,0,0,0,0,0,0,0,3,5,3,0,0,3,2,1,0,No,Deep climb,Yes,15592.600000023842,Both,Source,4,5,No,0,No,0,delia,lilahhoan@gmail.com
+68029a8938e90da8dbade816,973,Qualification,92,redAlliance,Yes,0,3,0,0,0,0,0,0,0,0,1,1,0,0,2,7,0,1,0,No,Deep climb,Yes,4084,Both,Source,5,5,No,0,No,0,jeremiah,jeremiahtung2020@gmail.com
+68029c2938e90da8dbade818,5013,Qualification,93,blueAlliance,Yes,1,0,0,0,0,0,0,0,0,1,0,8,1,0,0,0,2,1,0,Yes,Did not climb,No,0,Both,Source,3,4,No,0,No,0,exie1,emilyxie666@gmail.com
+68029c3138e90da8dbade819,8570,Qualification,93,redAlliance,Yes,0,0,1,0,0,0,0,0,1,2,0,3,2,5,0,0,0,0,0,No,Deep climb,Yes,3434,Coral,Both,4,4,No,0,No,0,CCandace,323535@stu.wvusd.org
+68029c3838e90da8dbade81a,2783,Qualification,93,blueAlliance,Yes,0,3,0,0,0,0,0,0,0,1,3,2,2,0,3,0,2,1,0,No,Deep climb,Yes,11746.599999964237,Both,Source,5,4,No,0,No,0,delia,lilahhoan@gmail.com
+68029c5438e90da8dbade81b,2522,Qualification,93,redAlliance,Yes,1,2,0,0,0,0,0,0,0,1,2,7,6,2,0,0,0,0,0,Yes,Did not climb,No,0,Coral,Both,4,3,No,0,No,0,ZZoe,zzhaoozoe@gmail.com
+68029ca238e90da8dbade81c,6324,Qualification,93,redAlliance,Yes,0,3,0,0,0,0,0,0,0,3,3,1,3,0,0,2,0,1,0,No,Deep climb,Yes,8375,Both,Source,4,5,No,0,No,0,jeremiah,jeremiahtung2020@gmail.com
+68029e0838e90da8dbade820,3928,Qualification,94,redAlliance,Yes,1,0,0,0,0,0,0,1,0,1,3,3,0,0,0,0,0,0,0,No,Deep climb,Yes,0,Coral,Source,4,3,No,0,No,0,ZZoe,zzhaoozoe@gmail.com
+68029e0d38e90da8dbade821,4728,Qualification,94,redAlliance,Yes,0,2,0,0,0,0,0,0,0,1,6,3,1,0,0,4,1,0,0,No,Deep climb,Yes,8294,Both,Both,5,4,No,0,No,0,CCandace,323535@stu.wvusd.org
+68029e0f38e90da8dbade822,781,Qualification,94,blueAlliance,Yes,0,2,0,0,0,0,0,0,0,3,5,2,0,0,0,3,0,0,0,Yes,Did not climb,No,0,Both,Source,4,4,No,0,No,0,delia,lilahhoan@gmail.com
+68029e1838e90da8dbade823,7421,Qualification,94,blueAlliance,Yes,0,2,0,0,0,0,0,0,0,1,3,6,2,1,0,1,0,1,0,Yes,Deep climb,No,0,Both,Both,4,4,No,0,No,0,exie1,emilyxie666@gmail.com
+68029e9838e90da8dbade824,781,Qualification,94,redAlliance,Yes,0,0,0,0,0,0,0,0,0,0,0,6,6,0,0,0,1,0,0,No,Deep climb,Yes,6790.999999999942,Coral,Source,4,4,No,0,Yes,missed the first half of the game,jeremiah,jeremiahtung2020@gmail.com
+6802a02638e90da8dbade826,1153,Qualification,95,blueAlliance,Yes,0,0,1,0,0,0,2,1,1,1,1,2,2,2,2,1,1,1,0,No,Deep climb,Yes,6660,Both,Source,4,4,No,0,No,0,exie1,emilyxie666@gmail.com
+6802a03238e90da8dbade827,5985,Qualification,95,redAlliance,Yes,1,2,0,0,0,0,0,0,0,0,0,3,0,1,2,0,3,0,1,No,Deep climb,Yes,0,Both,Source,4,3,No,0,No,0,ZZoe,zzhaoozoe@gmail.com
+6802a04238e90da8dbade828,1902,Qualification,95,blueAlliance,Yes,0,0,2,1,0,0,0,1,0,2,0,5,8,0,0,0,0,0,0,Yes,Deep climb,No,0,Coral,Floor,3,3,No,0,No,0,delia,lilahhoan@gmail.com
+6802a04838e90da8dbade829,6647,Qualification,95,redAlliance,Yes,0,1,0,0,0,0,0,0,0,1,3,1,4,1,0,0,1,0,0,No,Deep climb,Yes,10982.000000000058,Coral,Source,4,5,No,0,No,0,jeremiah,jeremiahtung2020@gmail.com
+6802a04f38e90da8dbade82a,5181,Qualification,95,redAlliance,Yes,0,1,0,0,0,0,0,0,1,1,0,6,5,0,0,0,1,0,0,No,Did not climb,No,0,Both,Source,5,3,No,0,No,0,CCandace,323535@stu.wvusd.org
+6802a21f38e90da8dbade82c,7902,Qualification,96,blueAlliance,Yes,0,0,1,0,0,0,1,0,1,0,0,2,0,2,0,0,1,2,0,No,Deep climb,Yes,5447,Both,Source,3,3,No,0,No,0,exie1,emilyxie666@gmail.com
+6802a23838e90da8dbade82d,4009,Qualification,96,redAlliance,Yes,1,1,0,0,1,0,0,0,0,0,1,2,0,2,0,1,1,0,0,Yes,Deep climb,No,0,Both,Source,4,4,No,0,No,0,jeremiah,jeremiahtung2020@gmail.com
+6802a24838e90da8dbade82e,8595,Qualification,96,redAlliance,Yes,2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,No,Deep climb,No,0,Coral,Source,4,3,Yes,4,No,0,ZZoe,zzhaoozoe@gmail.com
+6802a24938e90da8dbade82f,3970,Qualification,96,redAlliance,Yes,0,3,0,0,0,0,0,0,0,0,7,7,6,0,0,1,1,1,0,No,Deep climb,Yes,6755,Both,Both,5,4,No,0,No,0,CCandace,323535@stu.wvusd.org
+6802a24938e90da8dbade830,3970,Qualification,96,redAlliance,Yes,0,3,0,0,0,0,0,0,0,0,7,7,6,0,0,1,1,1,0,No,Deep climb,Yes,6755,Both,Both,5,4,No,0,No,0,CCandace,323535@stu.wvusd.org
+6802a25038e90da8dbade831,2485,Qualification,96,blueAlliance,Yes,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,Yes,Did not climb,No,0,None,None,5,5,Yes,4,No,I think their elevator broke. Couldn't score or go under barge so played defense against defense,delia,lilahhoan@gmail.com
+68026dc038dfe165901e9cc7,10157,Qualification,97,redAlliance,Yes,,,,,,,,,,3,,,,2,,,,,,Yes,Shallow climb,Yes,,Coral,Source,4,3,Yes,2,Yes,Can only do L1 coral and shallow climb. Not very good at L1 coral though,James Shu,jamesshu57@gmail.com
+6802a47d940037bf575c8157,3794,Qualification,97,redAlliance,No,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,No,Did not climb,No,0,None,None,1,1,No,1,No,didn’t even move the whole match,J.Reyhart,rodanthefiretitan@gmail.com
+6802a47e16c31066fb48d4fa,3794,Qualification,97,redAlliance,No,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,No,Did not climb,No,0,None,None,1,1,No,1,No,didn’t even move the whole match,J.Reyhart,rodanthefiretitan@gmail.com
+6802a48116c31066fb48d4fb,3473,Qualification,97,blueAlliance,Yes,,2,,,,,,,,4,0,3,1,0,,,,1,,Yes,Did not climb,No,,Both,Source,5,5,No,1,No,Pretty good,Henry_Y,henry.yang.xz@gmail.com
+6802a48516c31066fb48d4fc,5193,Qualification,97,blueAlliance,Yes,,,,1,,,,,,,,6,3,,,,1,,,No,Deep climb,Yes,2909.9999999995343,Both,Source,4,4,No,1,No,,aash,ashleycbb123@gmail.com
+6802a48716c31066fb48d4fd,5193,Qualification,97,blueAlliance,Yes,,,,1,,,,,,,,6,3,,,,1,,,No,Deep climb,Yes,2909.9999999995343,Both,Source,4,4,No,1,No,,aash,ashleycbb123@gmail.com
+6802a4d916c31066fb48d4fe,3130,Qualification,97,blueAlliance,Yes,1,2,,,,,,,,1,7,1,1,1,,,,,,Yes,Deep climb,Yes,10948,Coral,Source,3,3,No,,No,,Mark,mark.wu123454@gmail.com
+6802a4dc16c31066fb48d4ff,3197,Qualification,97,redAlliance,Yes,,2,,,,,,1,,,8,7,,,,,2,1,,Yes,Deep climb,Yes,5746,Coral,Source,3,3,No,,No,,Terrance,323728@stu.wvusd.org
+6802a7574de2d929444b62f8,3656,Qualification,98,blueAlliance,Yes,1,1,0,0,0,0,0,0,0,0,2,3,3,3,3,0,1,2,0,Yes,Deep climb,Yes,4712,Both,Source,3,3,No,1,No,0,Mark,mark.wu123454@gmail.com
+6802a7654de2d929444b62f9,86,Qualification,98,redAlliance,Yes,0,1,0,0,0,0,0,0,0,0,0,0,2,3,0,0,0,0,0,No,Deep climb,No,0,Coral,Source,1,1,No,0,No,"unstable elevator, only could score l1 and l2 consistently ",J.Reyhart,rodanthefiretitan@gmail.com
+6802a7694de2d929444b62fa,1700,Qualification,98,blueAlliance,Yes,1,2,0,0,0,0,0,0,0,0,2,5,3,0,0,0,2,0,0,Yes,Did not climb,No,0,Both,Source,4,2,No,0,No,0,aash,ashleycbb123@gmail.com
+6802a76a4de2d929444b62fb,888,Qualification,98,blueAlliance,Yes,1,2,0,0,0,0,0,0,0,0,4,5,4,0,0,0,1,1,0,Yes,Did not climb,No,0,Coral,Source,4,4,No,0,No,0,Henry_Y,henry.yang.xz@gmail.com
+6802a7757ba61269aa3ea83e,1241,Qualification,98,redAlliance,Yes,1,0,0,0,0,0,1,1,1,0,0,0,0,0,0,3,3,2,0,Yes,Did not climb,No,0,Algae,Both,4,3,Yes,3,No,0,Terrance,323728@stu.wvusd.org
+6802a92add09c75d1a15369c,4145,Qualification,99,blueAlliance,Yes,0,3,0,0,0,0,0,0,0,0,3,8,5,0,0,3,1,1,0,Yes,Deep climb,Yes,4987,Both,Source,4,4,No,0,No,0,Mark,mark.wu123454@gmail.com
+6802a932dd09c75d1a15369d,2960,Qualification,99,redAlliance,Yes,0,1,0,0,0,0,0,0,0,0,0,0,0,0,5,0,0,0,0,No,Deep climb,Yes,7922,Algae,Floor,4,4,No,1,No,0,Terrance,323728@stu.wvusd.org
+6802a932dd09c75d1a15369e,2960,Qualification,99,redAlliance,Yes,0,1,0,0,0,0,0,0,0,0,0,0,0,0,5,0,0,0,0,No,Deep climb,Yes,7922,Algae,Floor,4,4,No,1,No,0,Terrance,323728@stu.wvusd.org
+6802a93add09c75d1a15369f,9496,Qualification,99,redAlliance,Yes,1,2,0,0,0,0,0,0,0,0,3,3,0,0,0,0,2,0,0,Yes,Did not climb,No,0,Both,Source,4,3,No,0,No,0,J.Reyhart,rodanthefiretitan@gmail.com
+6802a941dd09c75d1a1536a0,2767,Qualification,99,blueAlliance,Yes,0,0,0,0,0,0,2,1,1,0,0,3,6,0,0,4,3,1,0,No,Deep climb,Yes,2409,Both,Source,5,4,Yes,4,No,0,aash,ashleycbb123@gmail.com
+6802a946dd09c75d1a1536a1,1768,Qualification,99,redAlliance,Yes,0,4,0,0,0,0,0,0,0,0,1,4,3,0,0,2,1,1,0,No,Deep climb,Yes,1952,Both,Source,5,5,No,0,No,0,Bmannveer@gmail.com,bmannveer@gmail.com
+6802a954dd09c75d1a1536a2,3339,Qualification,99,blueAlliance,Yes,0,3,0,0,0,0,0,0,0,0,5,7,5,0,1,3,1,0,0,No,Deep climb,Yes,12760,Both,Both,5,5,No,0,No,Extremely fast scoring,Henry_Y,henry.yang.xz@gmail.com
+6802ab19dd09c75d1a1536a3,2200,Qualification,100,blueAlliance,Yes,0,3,0,0,0,0,0,0,0,0,4,6,3,0,0,3,1,2,0,Yes,Deep climb,No,7149,Both,Source,4,4,No,0,No,0,Mark,mark.wu123454@gmail.com
+6802ab20dd09c75d1a1536a4,2075,Qualification,100,redAlliance,Yes,0,2,0,0,0,0,0,0,0,1,2,8,1,0,0,4,4,0,0,No,Deep climb,No,0,Both,Source,4,3,No,1,No,0,J.Reyhart,rodanthefiretitan@gmail.com
+6802ab20dd09c75d1a1536a5,195,Qualification,100,redAlliance,Yes,1,1,0,0,0,0,0,0,0,2,6,4,3,0,0,0,0,1,0,No,Deep climb,Yes,3681,Coral,Source,3,4,No,1,No,0,Terrance,323728@stu.wvusd.org
+6802ab23dd09c75d1a1536a6,6652,Qualification,100,blueAlliance,Yes,0,0,0,0,0,0,0,0,0,3,0,0,5,1,0,0,0,0,0,Yes,Did not climb,No,,Coral,Source,3,4,No,,Yes,,344882@stu.wvusd.org,344882@stu.wvusd.org
+6802ab25dd09c75d1a1536a7,3814,Qualification,100,redAlliance,Yes,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,No,Deep climb,Yes,3214,None,None,3,4,Yes,4,No,0,Bmannveer@gmail.com,bmannveer@gmail.com
+6802ab64dd09c75d1a1536a8,2383,Qualification,100,blueAlliance,Yes,0,1,0,0,0,0,0,0,0,1,3,6,0,0,0,0,1,1,0,No,Deep climb,Yes,6990.100000023842,Both,Source,4,2,No,0,No,"Their bot when scoring is pretty slow even when moving from place a to b, the bot is just slow. Their accuracy is also ight as they miss sometimes ",Henry_Y,henry.yang.xz@gmail.com
+6802ab65dd09c75d1a1536a9,2383,Qualification,100,blueAlliance,Yes,0,1,0,0,0,0,0,0,0,1,3,6,0,0,0,0,1,1,0,No,Deep climb,Yes,6990.100000023842,Both,Source,4,2,No,0,No,"Their bot when scoring is pretty slow even when moving from place a to b, the bot is just slow. Their accuracy is also ight as they miss sometimes ",Henry_Y,henry.yang.xz@gmail.com
+6802ad0505741edf0ebf930e,3045,Qualification,101,blueAlliance,Yes,1,1,0,0,0,0,0,0,0,0,3,5,1,0,0,0,2,0,0,Yes,Deep climb,Yes,8158.4000000059605,None,Source,4,4,No,0,Yes,0,344882@stu.wvusd.org,344882@stu.wvusd.org
+6802ad1205741edf0ebf930f,2877,Qualification,101,redAlliance,Yes,1,2,0,0,0,0,0,0,0,0,8,2,2,0,0,2,0,1,0,No,Deep climb,Yes,2389,Both,Both,4,2,No,1,No,0,J.Reyhart,rodanthefiretitan@gmail.com
+6802ad1b05741edf0ebf9310,801,Qualification,101,blueAlliance,Yes,0,1,0,0,0,0,0,0,1,0,2,3,1,0,1,1,1,1,0,No,Deep climb,Yes,5906,Both,Both,4,3,No,0,No,0,harryson,harrisonpjames2008@gmail.com
+6802ad2305741edf0ebf9311,8570,Qualification,101,redAlliance,Yes,0,0,2,0,0,0,0,1,0,1,0,1,0,0,0,0,1,0,0,No,Deep climb,Yes,9079,Coral,Source,4,4,No,4,No,0,Terrance,323728@stu.wvusd.org
+6802ad4b05741edf0ebf9313,1506,Qualification,101,blueAlliance,Yes,2,1,0,0,0,0,0,0,0,2,3,4,2,0,0,0,1,0,0,Yes,Did not climb,No,0,Both,Source,4,3,No,0,No,0,Henry_Y,henry.yang.xz@gmail.com
+6802b2c54a95124269d5e1ae,7632,Qualification,101,blueAlliance,Yes,0,4,0,0,1,0,0,0,0,2,9,2,2,0,0,0,1,1,0,No,Deep climb,Yes,5182.800000011921,Both,Source,4,3,No,1,No,N/a,Henry_Y,henry.yang.xz@gmail.com
+6802af0f0dee01dca48adbb2,3882,Qualification,102,blueAlliance,Yes,0,1,0,0,0,0,0,0,0,1,2,4,4,1,0,0,1,0,0,Yes,Deep climb,Yes,5948.5999999940395,Both,Source,5,4,No,0,Yes,0,344882@stu.wvusd.org,344882@stu.wvusd.org
+6802af1f0dee01dca48adbb3,5817,Qualification,102,redAlliance,Yes,0,1,2,0,0,0,2,0,0,0,7,4,0,3,0,1,0,0,0,Yes,Did not climb,No,0,Both,Both,4,2,No,1,No,0,J.Reyhart,rodanthefiretitan@gmail.com
+6802af2c0dee01dca48adbb4,9245,Qualification,102,redAlliance,Yes,0,0,1,0,0,0,0,0,0,0,2,5,5,0,0,0,0,0,0,No,Deep climb,Yes,3734,Coral,Source,4,4,No,1,No,0,Bmannveer@gmail.com,bmannveer@gmail.com
+6802af2d0dee01dca48adbb5,10479,Qualification,102,blueAlliance,Yes,0,0,0,0,0,0,0,0,0,2,3,4,5,4,0,0,0,0,0,No,Deep climb,Yes,10972,Coral,Source,3,3,No,0,No,0,harryson,harrisonpjames2008@gmail.com
+6802af2e0dee01dca48adbb6,10479,Qualification,102,blueAlliance,Yes,0,0,0,0,0,0,0,0,0,2,3,4,5,4,0,0,0,0,0,No,Deep climb,Yes,10972,Coral,Source,3,3,No,0,No,0,harryson,harrisonpjames2008@gmail.com
+6802af4b0dee01dca48adbb7,6324,Qualification,102,blueAlliance,Yes,2,1,0,0,0,0,0,0,0,1,3,4,0,0,0,2,3,2,0,No,Deep climb,Yes,11009.800000011921,Both,Source,4,4,No,0,No,Instability when the elevator is fully extended and when moving. Especially by the net as it might topple over. ,Henry_Y,henry.yang.xz@gmail.com
+6802af8e0dee01dca48adbb9,6621,Qualification,102,redAlliance,Yes,0,2,0,0,0,0,0,0,0,0,2,5,3,5,0,0,0,0,0,No,Deep climb,Yes,7009.000000000058,Coral,Source,3,3,No,1,No,0,Terrance,323728@stu.wvusd.org
+6802b0cf0dee01dca48adbbb,9450,Qualification,103,redAlliance,Yes,0,1,1,0,0,0,0,0,1,0,0,1,0,0,2,8,1,2,0,No,Deep climb,Yes,1691,Both,Both,4,3,No,1,Yes,0,J.Reyhart,rodanthefiretitan@gmail.com
+6802b0d50dee01dca48adbbc,540,Qualification,103,redAlliance,Yes,0,2,0,0,0,0,0,0,0,1,2,4,2,0,0,0,0,0,0,Yes,Did not climb,No,0,Coral,Source,4,5,No,4,No,0,Terrance,323728@stu.wvusd.org
+6802b0db0dee01dca48adbbd,2080,Qualification,103,blueAlliance,Yes,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,Yes,Did not climb,No,0,Coral,Source,4,3,Yes,4,Yes,0,344882@stu.wvusd.org,344882@stu.wvusd.org
+6802b0db0dee01dca48adbbe,2539,Qualification,103,redAlliance,Yes,0,2,0,0,0,0,0,0,0,0,1,0,0,0,0,6,2,0,0,No,Shallow climb,Yes,1466,Algae,Both,4,4,No,1,No,0,Bmannveer@gmail.com,bmannveer@gmail.com
+6802b0e00dee01dca48adbbf,2522,Qualification,103,blueAlliance,Yes,0,3,0,0,0,0,0,0,0,2,6,3,2,0,0,0,1,3,0,No,Deep climb,Yes,2419,Both,Floor,3,4,No,1,No,0,harryson,harrisonpjames2008@gmail.com
+6802b1010dee01dca48adbc0,1902,Qualification,103,blueAlliance,Yes,0,0,1,1,0,0,0,0,0,2,0,3,8,1,2,0,0,1,2,Yes,Deep climb,No,0,Both,Source,4,3,No,0,No,0,Henry_Y,henry.yang.xz@gmail.com
+6802b293d815342b22529e33,10157,Qualification,104,blueAlliance,Yes,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,No,Shallow climb,Yes,3835,None,None,3,3,Yes,3,No,0,harryson,harrisonpjames2008@gmail.com
+6802b298d815342b22529e34,8595,Qualification,104,blueAlliance,Yes,0,0,1,0,0,0,0,1,0,0,0,0,0,0,0,0,2,0,2,Yes,Deep climb,Yes,5511.800000011921,Algae,Source,5,4,No,0,Yes,0,344882@stu.wvusd.org,344882@stu.wvusd.org
+6802b29ed815342b22529e35,5181,Qualification,104,redAlliance,Yes,0,1,0,0,0,0,0,0,0,1,3,1,1,0,1,0,1,1,0,Yes,Did not climb,No,0,Coral,Source,3,3,No,1,No,0,Terrance,323728@stu.wvusd.org
+6802b2a9d815342b22529e36,4009,Qualification,104,redAlliance,Yes,1,2,0,0,0,0,0,0,0,1,4,2,0,0,0,0,0,0,0,No,Deep climb,Yes,5321.000000000058,Both,Source,5,4,No,0,No,0,Bmannveer@gmail.com,bmannveer@gmail.com
+6802b2aa4a95124269d5e1ad,5013,Qualification,104,redAlliance,Yes,1,1,0,0,0,0,0,0,0,3,0,5,2,0,0,0,0,1,0,Yes,Did not climb,No,0,Coral,Source,4,2,No,0,No,coral will occasionally fall out of outtake when elevator rises,J.Reyhart,rodanthefiretitan@gmail.com
+6802b481d815342b22529e37,2706,Qualification,105,blueAlliance,Yes,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,No,Did not climb,No,0,Coral,Source,1,3,No,0,No,they aligned to an L4 and just swerved for no reason causing the bot to fall over.,jeremiah,jeremiahtung2020@gmail.com
+6802b4a0d815342b22529e38,7902,Qualification,105,blueAlliance,Yes,,0,2,,,,,,,3,,7,1,,1,,1,,,Yes,Deep climb,No,,Coral,Source,3,3,No,,No,Missed most l4s,mayukaan,emilyluo0127@gmail.com
+6802b4aed815342b22529e39,9635,Qualification,105,blueAlliance,Yes,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,4,2,2,0,Yes,Did not climb,No,0,Algae,None,4,4,Yes,3,Yes,0,344882@stu.wvusd.org,344882@stu.wvusd.org
+6802b4aed815342b22529e3a,6647,Qualification,105,redAlliance,Yes,0,1,0,0,0,0,0,0,0,0,0,7,0,0,0,0,0,0,0,Yes,Did not climb,No,0,Coral,Source,3,3,No,0,No,0,kylefeng,kfeng.209@gmail.com
+6802b4d3d815342b22529e3b,7421,Qualification,105,redAlliance,Yes,1,0,0,0,0,0,0,0,0,1,1,1,0,0,0,4,1,1,1,No,Deep climb,No,0,Both,Both,4,4,No,0,No,"insane robot, with many degrees of freedom (highly complex, may be prone to failure)
+
+climb almost worked and then fell off",james,jamwan985@gmail.com
+6802b4e3d815342b22529e3c,3794,Qualification,105,blueAlliance,No,0,0,0,0,0,0,0,0,0,1,0,1,1,2,0,0,0,0,0,Yes,Did not climb,No,0,Coral,Source,3,2,No,0,No,Wobbly ahh outtake. (Some l1’s are from missing l2 or l3),James Shu,jamesshu57@gmail.com
+6802b64fad043d0545693694,9134,Qualification,106,redAlliance,Yes,0,1,0,0,0,0,0,0,0,0,0,4,5,0,0,0,0,0,0,Yes,Did not climb,No,0,Coral,Source,3,4,No,0,No,0,kylefeng,kfeng.209@gmail.com
+6802b65bad043d0545693695,51,Qualification,106,blueAlliance,Yes,0,1,0,0,0,0,1,1,0,0,0,2,2,0,2,2,2,3,2,Yes,Deep climb,Yes,8387.199999988079,Both,Source,4,5,No,0,Yes,0,344882@stu.wvusd.org,344882@stu.wvusd.org
+6802b667ad043d0545693696,888,Qualification,106,blueAlliance,Yes,0,2,0,0,0,0,0,0,0,0,6,5,6,0,0,0,0,0,0,Yes,Did not climb,No,0,Coral,Source,5,5,No,0,No,0,James Shu,jamesshu57@gmail.com
+6802b667ad043d0545693697,3656,Qualification,106,redAlliance,Yes,1,1,0,0,0,0,0,0,0,1,6,0,1,0,1,0,0,0,0,No,Deep climb,Yes,5849,Both,Source,4,5,No,0,No,have a pretty consistent and fast climb,james,jamwan985@gmail.com
+6802b683ad043d0545693698,5193,Qualification,106,redAlliance,Yes,1,0,0,0,0,0,0,1,0,0,1,4,2,2,0,0,1,0,0,No,Deep climb,Yes,0,Coral,Source,3,3,No,1,No,0,mayukaan,emilyluo0127@gmail.com
+6802b6a6ad043d0545693699,2485,Qualification,106,blueAlliance,Yes,1,1,0,0,0,0,0,0,0,1,2,5,4,1,0,1,1,1,0,Yes,Deep climb,No,0,Both,Source,5,5,No,0,No,very fast bot,jeremiah,jeremiahtung2020@gmail.com
+6802b7d4ad043d054569369a,1768,Qualification,107,blueAlliance,Yes,0,3,0,0,0,0,0,0,0,2,4,6,6,1,1,2,2,1,0,Yes,Deep climb,Yes,3437.0999999940395,Both,Source,4,4,No,0,Yes,0,344882@stu.wvusd.org,344882@stu.wvusd.org
+6802b7e9ad043d054569369b,2470,Qualification,107,blueAlliance,Yes,1,1,0,0,0,0,0,0,0,2,0,0,3,0,0,0,0,1,0,No,Shallow climb,Yes,1941.0000000000582,Coral,Source,4,3,No,0,No,0,James Shu,jamesshu57@gmail.com
+6802b7faad043d054569369c,4907,Qualification,107,redAlliance,Yes,0,3,0,0,0,0,0,0,0,0,2,7,3,0,0,3,0,0,0,No,Shallow climb,Yes,4854,Both,Source,4,4,Yes,2,No,0,kylefeng,kfeng.209@gmail.com
+6802b7fcad043d054569369d,3130,Qualification,107,redAlliance,Yes,0,1,0,0,0,0,0,0,0,1,2,5,4,0,0,0,0,0,0,No,Deep climb,Yes,6503.799999982119,Coral,Source,3,4,No,1,No,seems like they had some issues with alignment and out taking. could be mechanical or driver error,james,jamwan985@gmail.com
+6802b7fead043d054569369e,33,Qualification,107,redAlliance,Yes,0,2,0,0,0,0,0,0,0,0,0,2,0,0,2,4,2,0,0,No,Deep climb,Yes,0,Both,Both,4,4,No,1,No,0very versatile time very good time efficiency and good climb also can do a lot of net algae scoring at ease,mayukaan,emilyluo0127@gmail.com
+6802b80fad043d054569369f,8177,Qualification,107,blueAlliance,Yes,0,1,0,0,0,0,0,0,0,1,1,3,1,1,0,0,1,0,0,No,Deep climb,Yes,7049,Coral,Source,3,4,Yes,0,No,last 30 seconds switched to defense for some reason but instantly got stuck on algae on the red side before they did any defending.,jeremiah,jeremiahtung2020@gmail.com
+6802ba368d56434ad6bf9916,1241,Qualification,108,blueAlliance,Yes,2,2,0,0,0,0,0,0,0,2,3,4,4,5,0,2,1,1,0,Yes,Did not climb,No,0,Both,Source,4,3,No,1,Yes,0,344882@stu.wvusd.org,344882@stu.wvusd.org
+6802ba488d56434ad6bf9917,70,Qualification,108,redAlliance,No,0,0,0,0,0,0,0,0,0,0,1,0,3,0,0,3,0,1,0,Yes,Did not climb,No,0,Both,Source,4,2,No,0,No,0,mayukaan,emilyluo0127@gmail.com
+6802ba5c8d56434ad6bf9918,2383,Qualification,108,redAlliance,Yes,0,2,0,0,0,0,0,0,0,1,2,8,3,0,0,0,0,0,0,No,Deep climb,Yes,5444.399999976158,Coral,Both,5,5,No,0,No,"solid bot, can do L4 and adapted to L3 and lower levels",james,jamwan985@gmail.com
+6802ba998d56434ad6bf991a,2491,Qualification,108,blueAlliance,Yes,0,3,0,0,0,0,0,0,0,0,4,7,2,0,0,1,1,0,0,No,Deep climb,Yes,4095,Both,Source,5,5,No,0,No,very fast and very accurate. also they place L3 coral in the same time they pick up L3 algae.,jeremiah,jeremiahtung2020@gmail.com
+6802bae28d56434ad6bf991b,2767,Qualification,108,redAlliance,Yes,0,3,0,0,0,0,0,0,0,0,1,2,2,0,0,6,3,0,0,No,Did not climb,No,0,Algae,Both,5,5,Yes,4,No,0,kylefeng,kfeng.209@gmail.com
+6802ba818d56434ad6bf9919,4728,Qualification,109,blueAlliance,Yes,0,1,0,0,0,0,1,0,1,0,1,2,1,0,0,2,0,0,0,No,Did not climb,No,0,Both,Both,5,3,No,0,No,Did not climb/park because it was being harassed by some other robot,James Shu,jamesshu57@gmail.com
+6802bc559ed042ee12306d88,2200,Qualification,109,redAlliance,Yes,0,0,0,0,0,0,0,0,0,0,4,4,6,0,3,0,1,2,0,No,Deep climb,Yes,6182,Both,Source,5,4,No,0,No,0,J.Reyhart,rodanthefiretitan@gmail.com
+6802bc5bf593b8f14a8892f2,2783,Qualification,109,redAlliance,Yes,0,1,0,0,0,0,0,0,0,1,4,4,1,0,0,0,0,0,0,No,Shallow climb,Yes,5728,Coral,Source,4,4,No,1,No,0,kylefeng,kfeng.209@gmail.com
+6802bc5cf593b8f14a8892f3,5987,Qualification,109,blueAlliance,Yes,0,2,0,0,0,0,0,0,0,0,4,3,0,0,0,1,1,0,0,Yes,Deep climb,Yes,7735.5999999940395,Both,Source,4,3,No,0,Yes,0,344882@stu.wvusd.org,344882@stu.wvusd.org
+6802bc64f593b8f14a8892f4,9496,Qualification,109,blueAlliance,Yes,0,3,0,0,0,0,0,0,0,0,0,5,5,1,2,1,1,1,0,No,Deep climb,Yes,7137,Both,Source,5,5,No,1,No,they can do all levels of the reef well.,jeremiah,jeremiahtung2020@gmail.com
+6802bc75f593b8f14a8892f5,3928,Qualification,109,redAlliance,Yes,0,0,0,0,0,0,0,0,0,0,3,2,2,0,0,0,2,0,0,No,Deep climb,No,0,Coral,Source,4,4,Yes,2,No,bot got stuck on algae right  before climb,james,jamwan985@gmail.com
+6802bc78f593b8f14a8892f6,3197,Qualification,109,blueAlliance,Yes,0,1,0,0,0,0,0,1,1,1,1,4,3,0,0,1,0,1,0,No,Shallow climb,Yes,1487,Both,Both,4,4,No,0,No,0,James Shu,jamesshu57@gmail.com
+6802be1e25f0aead20b49a4c,973,Qualification,110,blueAlliance,Yes,0,3,0,0,0,0,0,0,0,0,7,2,0,0,0,5,3,2,0,Yes,Deep climb,Yes,4645.0999999940395,Both,Source,5,4,No,0,Yes,0,344882@stu.wvusd.org,344882@stu.wvusd.org
+6802be25f593b8f14a8892f7,10224,Qualification,110,blueAlliance,Yes,0,0,0,0,0,0,0,0,0,0,3,3,0,2,0,0,1,0,0,No,Shallow climb,Yes,3196,Coral,Source,4,3,No,0,No,0,James Shu,jamesshu57@gmail.com
+6802be2bf593b8f14a8892f8,1038,Qualification,110,redAlliance,Yes,0,0,0,0,0,0,2,1,1,0,0,0,0,0,0,8,1,1,0,No,Deep climb,Yes,10863,Algae,Both,4,3,Yes,3,No,0,J.Reyhart,rodanthefiretitan@gmail.com
+6802be30f593b8f14a8892f9,3970,Qualification,110,redAlliance,Yes,0,3,0,0,0,0,0,0,0,1,5,12,0,0,0,1,1,0,0,No,Shallow climb,Yes,3558,Both,Both,5,5,No,0,Yes,0,kylefeng,kfeng.209@gmail.com
+6802be5df593b8f14a8892fa,6652,Qualification,110,blueAlliance,Yes,1,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,No,Did not climb,No,0,Coral,Source,3,3,No,0,No,takes them a very long time to get coral in their outtake and it’s very inconsistent.,jeremiah,jeremiahtung2020@gmail.com
+6802be84f593b8f14a8892fb,9545,Qualification,110,redAlliance,Yes,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,Yes,Deep climb,No,0,Coral,Source,3,4,Yes,3,No,driver was low-key bugging out towards the end...they moved to from a strong defense position to the red side and did nothing,james,jamwan985@gmail.com
+6802c07e3e3436c58d520393,3339,Qualification,111,blueAlliance,Yes,0,3,0,0,0,0,0,0,0,0,3,6,3,0,0,4,1,3,0,Yes,Deep climb,Yes,4471.300000011921,Both,Source,4,4,No,0,Yes,0,344882@stu.wvusd.org,344882@stu.wvusd.org
+6802c0953e3436c58d520394,1700,Qualification,111,redAlliance,Yes,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,Yes,Did not climb,No,0,None,None,3,3,Yes,3,No,0,kylefeng,kfeng.209@gmail.com
+6802c0963e3436c58d520395,467,Qualification,111,redAlliance,Yes,0,2,1,0,0,0,0,0,0,1,5,2,1,0,0,0,2,0,0,No,Deep climb,Yes,2870,Coral,Source,3,3,No,0,Yes,0,J.Reyhart,rodanthefiretitan@gmail.com
+6802c0b03e3436c58d520396,195,Qualification,111,blueAlliance,Yes,0,3,0,0,0,0,0,0,0,0,2,2,2,4,0,0,0,0,0,No,Deep climb,Yes,4921,Coral,Source,4,5,No,1,No,0,jeremiah,jeremiahtung2020@gmail.com
+6802c0c93e3436c58d520397,5985,Qualification,111,blueAlliance,Yes,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,Yes,Did not climb,No,0,None,None,2,3,Yes,2,No,Didn’t even defend well 💔,James Shu,jamesshu57@gmail.com
+6802c0c93e3436c58d520398,5985,Qualification,111,blueAlliance,Yes,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,Yes,Did not climb,No,0,None,None,2,3,Yes,2,No,Didn’t even defend well 💔,James Shu,jamesshu57@gmail.com
+6802c0db3e3436c58d520399,3473,Qualification,111,redAlliance,Yes,0,1,0,0,0,0,0,0,0,0,2,4,4,0,0,0,1,0,0,Yes,Deep climb,No,0,Coral,Source,4,4,No,0,No,"takes too long to align the corals, where auto align?",james,jamwan985@gmail.com
+6802c27272bbb40d9de4f3a6,2960,Qualification,112,redAlliance,Yes,0,1,1,0,0,0,0,0,0,1,1,2,0,0,1,0,0,0,0,No,Deep climb,Yes,7280.000000000058,Coral,Source,3,2,No,0,Yes,0,J.Reyhart,rodanthefiretitan@gmail.com
+6802c28b72bbb40d9de4f3a7,230,Qualification,112,redAlliance,Yes,0,3,0,0,0,0,0,0,0,0,1,4,2,0,2,1,1,1,0,No,Deep climb,Yes,7377.9000000059605,Both,Both,5,5,No,0,No,"solid bot and nice LED strip
+got stuck on an algae at one point ",james,jamwan985@gmail.com
+6802c28c72bbb40d9de4f3a8,781,Qualification,112,blueAlliance,Yes,0,2,0,0,0,0,0,0,0,0,5,0,0,0,0,2,2,0,0,Yes,Deep climb,No,0,Both,Source,3,3,No,0,No,0took 24 secs to climb to only not climb cuz the aiming was bad,mayukaan,emilyluo0127@gmail.com
+6802c28e72bbb40d9de4f3a9,86,Qualification,112,redAlliance,Yes,0,2,0,0,0,0,0,0,0,1,3,5,4,0,0,0,0,0,0,No,Shallow climb,Yes,0,Coral,Source,4,3,No,0,No,0,kylefeng,kfeng.209@gmail.com
+6802c2b272bbb40d9de4f3aa,3814,Qualification,112,blueAlliance,Yes,0,0,0,0,0,0,0,0,0,2,0,0,0,0,0,0,0,0,0,No,Shallow climb,No,5729,Coral,Source,4,3,Yes,2,No,"Wobbled a bit, lost coms, decided to defend, then decided no (defended for about 30 seconds)",James Shu,jamesshu57@gmail.com
+6802c2b572bbb40d9de4f3ab,3814,Qualification,112,blueAlliance,Yes,0,0,0,0,0,0,0,0,0,2,0,0,0,0,0,0,0,0,0,No,Shallow climb,No,5729,Coral,Source,4,3,Yes,2,No,"Wobbled a bit, lost coms, decided to defend, then decided no (defended for about 30 seconds)",James Shu,jamesshu57@gmail.com
+6802c2d072bbb40d9de4f3ac,1153,Qualification,112,blueAlliance,Yes,0,0,2,1,0,0,0,0,1,0,0,5,3,0,2,3,3,0,0,Yes,Deep climb,No,11707,Both,Source,5,5,No,0,No,they hold algae while doing coral.,jeremiah,jeremiahtung2020@gmail.com
+6802c48fd497b14782a91a9e,1902,Qualification,113,blueAlliance,Yes,0,1,0,0,0,0,0,0,0,1,0,6,4,1,1,0,1,1,0,Yes,Deep climb,Yes,5831.999999999942,Both,Both,3,4,No,0,No,0,Poguino,bbrandonn.llee@gmail.com
+6802c494d497b14782a91a9f,2075,Qualification,113,blueAlliance,Yes,1,2,0,0,0,0,0,0,0,0,3,2,3,0,0,1,1,1,0,No,Deep climb,Yes,9502,Both,Source,3,3,No,0,No,0,god.,pock3tp1ant@gmail.com
+6802c49bd497b14782a91aa0,5736,Qualification,113,redAlliance,Yes,1,2,,,,,,,,1,7,3,2,,,,,,7,Yes,Shallow climb,Yes,15403,Coral,Source,5,3,No,,No,,ashlyn,ashlynmlai@gmail.com
+6802c49ed497b14782a91aa1,5736,Qualification,113,redAlliance,Yes,1,2,,,,,,,,1,7,3,2,,,,,,7,Yes,Shallow climb,Yes,15403,Coral,Source,5,3,No,,No,,ashlyn,ashlynmlai@gmail.com
+6802c567d497b14782a91aa2,9635,Qualification,113,redAlliance,Yes,0,0,0,0,0,0,1,1,0,0,0,0,0,0,2,5,2,2,0,Yes,Deep climb,No,0,Algae,Floor,3,3,No,1,No,0,exie1,emilyxie666@gmail.com
+6802c68cd497b14782a91aa3,7421,Qualification,114,blueAlliance,Yes,1,0,0,0,0,0,0,0,1,0,0,0,0,0,2,6,1,0,0,No,Deep climb,Yes,4587,Both,Source,4,3,No,0,No,0,Poguino,bbrandonn.llee@gmail.com
+6802c692d497b14782a91aa4,2539,Qualification,114,redAlliance,Yes,0,2,0,0,0,0,0,0,0,0,3,4,8,1,0,0,1,2,0,No,Deep climb,Yes,3384.999999999942,Both,Source,4,4,No,1,No,0,exie1,emilyxie666@gmail.com
+6802c698d497b14782a91aa5,6621,Qualification,114,blueAlliance,Yes,0,2,0,0,1,0,0,0,0,0,3,4,3,1,0,0,0,0,0,No,Deep climb,Yes,0,Coral,Source,3,3,No,0,No,solid coral bit,harryson,harrisonpjames2008@gmail.com
+6802c69ed497b14782a91aa6,2877,Qualification,114,blueAlliance,Yes,0,3,0,0,0,0,0,0,0,0,4,1,5,2,0,1,0,1,0,No,Deep climb,Yes,7091,Both,Source,4,3,No,0,No,0,god.,pock3tp1ant@gmail.com
+6802c6d6d497b14782a91aa7,8595,Qualification,114,redAlliance,Yes,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,0,0,0,1,Yes,Shallow climb,Yes,6414.000000000058,Algae,Floor,3,4,Yes,3,No,Seems to have difficultly/unable to score coral. ,Zihanli,zihanli.purifiedwater@gmail.com
+6802c6d6394ee02dd72826dd,8595,Qualification,114,redAlliance,Yes,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,0,0,0,1,Yes,Shallow climb,Yes,6414.000000000058,Algae,Floor,3,4,Yes,3,No,Seems to have difficultly/unable to score coral. ,Zihanli,zihanli.purifiedwater@gmail.com
+6802c8347c950c002f2a0786,7632,Qualification,115,redAlliance,Yes,0,1,0,0,0,0,0,0,0,0,6,5,3,2,0,0,0,0,0,No,Deep climb,Yes,2688,Coral,Source,4,4,No,0,No,0,exie1,emilyxie666@gmail.com
+6802c84c7c950c002f2a0787,9245,Qualification,115,redAlliance,Yes,0,2,1,0,0,0,0,0,0,0,0,7,10,0,0,0,0,0,0,Yes,Shallow climb,Yes,3797,Coral,Source,5,4,No,0,No,0,Zihanli,zihanli.purifiedwater@gmail.com
+6802c8537c950c002f2a0788,3794,Qualification,115,blueAlliance,Yes,0,0,0,0,1,0,0,0,0,0,0,0,0,0,1,0,0,0,0,Yes,Did not climb,No,0,Coral,Floor,2,1,No,0,No,Tried saving teammate for like 1 minute ,god.,pock3tp1ant@gmail.com
+6802c87b7c950c002f2a0789,9134,Qualification,115,blueAlliance,Yes,0,1,0,0,0,0,0,0,0,0,0,1,0,0,1,0,1,0,0,No,Deep climb,Yes,9015,Both,Source,4,3,No,0,No,"Fell over during auton, flipped back up mid match",Poguino,bbrandonn.llee@gmail.com
+6802c8977c950c002f2a078a,7632,Qualification,115,redAlliance,Yes,0,1,0,0,0,0,0,0,0,0,5,4,3,2,0,0,0,0,0,No,Deep climb,Yes,2382.9999999999854,Coral,Source,4,4,No,1,No,0,exie1,emilyxie666@gmail.com
+6802c8b47c950c002f2a078b,3130,Qualification,115,blueAlliance,Yes,1,2,0,0,0,0,0,0,0,0,3,0,0,0,0,0,0,0,0,No,Did not climb,No,0,Coral,Source,4,4,No,1,No,rhey got stuck on a coral half way theough that’s a good the match but was able to turn over a bot the was flipped on its side. ,harryson,harrisonpjames2008@gmail.com
+6802ca8e7c950c002f2a0791,10157,Qualification,115,redAlliance,Yes,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,Yes,Shallow climb,Yes,2531,None,None,4,3,Yes,4,No,0,exie1,emilyxie666@gmail.com
+6802c9fb7c950c002f2a078d,10157,Qualification,116,redAlliance,Yes,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,No,Shallow climb,Yes,3604.999999999942,None,None,4,3,Yes,4,No,0,exie1,emilyxie666@gmail.com
+6802ca0f7c950c002f2a078e,6647,Qualification,116,blueAlliance,Yes,1,0,0,0,0,0,0,0,0,1,0,1,4,0,3,0,0,0,0,No,Deep climb,Yes,12436,Both,Both,3,2,No,0,No,0,god.,pock3tp1ant@gmail.com
+6802ca297c950c002f2a078f,1768,Qualification,116,blueAlliance,Yes,0,4,0,0,0,0,0,0,0,0,4,7,0,1,0,3,2,1,0,No,Deep climb,Yes,5372,Both,Source,5,5,No,0,No,0,Poguino,bbrandonn.llee@gmail.com
+6802ca6d7c950c002f2a0790,2485,Qualification,116,blueAlliance,Yes,1,2,0,0,0,0,0,0,0,0,2,7,2,0,0,1,0,0,0,Yes,Did not climb,No,9463,Both,Source,3,3,No,0,No,pretty good,harryson,harrisonpjames2008@gmail.com
+6802cc0e5ad192e980a0fcb3,10479,Qualification,117,redAlliance,Yes,,2,,,,,,,,3,,2,2,,,,,,,No,Shallow climb,Yes,10410.79999999702,Coral,Source,2,2,No,,No,,Lyn,allynsong08@gmail.com
+6802cc135ad192e980a0fcb4,3656,Qualification,117,blueAlliance,Yes,0,1,0,0,0,0,0,0,0,1,3,3,5,0,0,0,1,0,0,Yes,Deep climb,Yes,6197,Both,Source,3,2,No,1,No,0,god.,pock3tp1ant@gmail.com
+6802cc165ad192e980a0fcb5,8570,Qualification,117,redAlliance,Yes,0,1,0,0,0,0,0,0,0,1,2,3,2,0,0,0,0,0,0,Yes,Deep climb,No,0,Coral,Source,3,3,No,0,No,0,exie1,emilyxie666@gmail.com
+6802cc285ad192e980a0fcb6,7902,Qualification,117,redAlliance,Yes,0,0,0,0,0,1,0,1,0,1,0,2,0,5,0,0,0,0,0,No,Deep climb,Yes,6194,Coral,Source,4,3,No,0,No,0,Poguino,bbrandonn.llee@gmail.com
+6802cc295ad192e980a0fcb7,9496,Qualification,117,redAlliance,Yes,0,3,0,0,0,0,0,1,0,0,2,5,3,0,1,4,2,1,0,Yes,Shallow climb,Yes,3613.000000000058,Both,Source,5,4,No,0,No,0,Zihanli,zihanli.purifiedwater@gmail.com
+6802cde8c826805ae6687544,2470,Qualification,118,redAlliance,Yes,0,2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,Yes,Did not climb,No,0,None,None,3,3,Yes,4,No,0,exie1,emilyxie666@gmail.com
+6802cdfac826805ae6687545,3928,Qualification,118,redAlliance,Yes,0,1,0,0,0,0,0,0,1,0,2,7,0,0,0,1,0,0,0,No,Shallow climb,Yes,9923,Both,Source,4,3,No,0,No,0,Lyn,allynsong08@gmail.com
+6802ce00c826805ae6687546,2706,Qualification,118,blueAlliance,Yes,0,0,0,0,0,0,0,0,0,1,0,3,2,0,0,0,0,0,0,No,Did not climb,No,0,Coral,Source,3,2,Yes,3,No,0,Poguino,bbrandonn.llee@gmail.com
+6802ce07c826805ae6687547,1506,Qualification,118,blueAlliance,Yes,0,3,0,0,0,0,0,0,0,1,4,4,0,0,0,0,0,0,0,No,Deep climb,Yes,15237,Both,Source,3,3,No,0,No,They e really fast and solid,julibee,julieshen19@gmail.com
+6802ce08c826805ae6687548,6324,Qualification,118,blueAlliance,Yes,0,1,1,1,0,0,2,0,0,0,4,5,1,0,0,2,1,1,0,No,Deep climb,No,11815,Both,Source,3,3,No,1,No,0,god.,pock3tp1ant@gmail.com
+6802ce10c826805ae6687549,2767,Qualification,118,redAlliance,Yes,0,3,0,0,0,0,0,0,0,0,4,7,0,0,0,6,3,0,0,Yes,Shallow climb,Yes,5236,Both,Source,5,4,No,0,No,0,Zihanli,zihanli.purifiedwater@gmail.com
+6802cfee4506b96286c6dbee,1038,Qualification,119,redAlliance,Yes,0,0,0,0,0,0,1,1,1,0,0,0,0,0,2,4,1,0,0,Yes,Deep climb,No,0,Algae,Floor,3,3,No,0,No,0,exie1,emilyxie666@gmail.com
+6802cffd4506b96286c6dbef,6873,Qualification,119,blueAlliance,Yes,0,0,0,0,0,0,0,0,0,0,0,4,4,0,0,0,2,1,0,No,Did not climb,No,0,Coral,Source,3,3,No,0,No,Solid team,julibee,julieshen19@gmail.com
+6802d0054506b96286c6dbf0,5193,Qualification,119,blueAlliance,Yes,0,0,0,2,0,0,0,0,0,0,0,6,3,0,0,0,1,0,0,Yes,Did not climb,No,0,Coral,Source,4,3,No,0,No,0,Poguino,bbrandonn.llee@gmail.com
+6802d0194506b96286c6dbf1,4009,Qualification,119,blueAlliance,Yes,1,2,0,0,0,0,0,0,0,2,8,0,1,0,0,0,0,0,0,No,Deep climb,Yes,5836,Coral,Source,4,3,No,0,No,0,god.,pock3tp1ant@gmail.com
+6802d1dd4506b96286c6dbf3,4907,Qualification,120,redAlliance,Yes,0,2,0,0,0,0,0,0,0,1,4,7,4,1,0,1,2,0,0,Yes,Shallow climb,Yes,6426,Both,Source,5,4,No,0,No,0,Zihanli,zihanli.purifiedwater@gmail.com
+6802d1df4506b96286c6dbf4,4728,Qualification,120,redAlliance,Yes,0,1,0,0,0,0,1,0,1,0,1,4,3,2,0,4,2,0,0,No,Deep climb,Yes,4171.000000000058,Both,Source,5,4,No,0,No,0,exie1,emilyxie666@gmail.com
+6802d1e24506b96286c6dbf5,9545,Qualification,120,blueAlliance,No,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,Yes,Did not climb,No,0,None,None,2,2,Yes,3,No,Defended one source ,god.,pock3tp1ant@gmail.com
+6802d1fa4506b96286c6dbf6,5181,Qualification,120,blueAlliance,Yes,0,0,0,0,0,0,0,0,0,2,1,5,7,0,0,0,0,1,0,Yes,Did not climb,No,0,Both,Source,4,3,No,0,No,0,Poguino,bbrandonn.llee@gmail.com
+6802d2064506b96286c6dbf7,5817,Qualification,120,blueAlliance,Yes,0,1,0,0,0,0,2,0,0,4,6,2,1,1,2,0,0,0,0,Yes,Did not climb,No,0,Both,Floor,4,3,No,0,No,Good auton,julibee,julieshen19@gmail.com
+6802d3854506b96286c6dbf9,467,Qualification,121,redAlliance,Yes,0,1,0,0,0,0,0,0,0,0,3,4,3,0,0,0,0,0,0,No,Deep climb,Yes,3964,Coral,Source,3,3,No,0,No,0,Terrance,323728@stu.wvusd.org
+6802d38c4506b96286c6dbfa,2522,Qualification,121,blueAlliance,Yes,0,3,0,0,0,0,0,0,0,0,3,6,5,0,0,0,1,0,0,No,Deep climb,Yes,5055.700000047684,Coral,Floor,5,5,No,0,No,0,delia,lilahhoan@gmail.com
+6802d3914506b96286c6dbfb,3814,Qualification,121,blueAlliance,Yes,,,,,,,,,,2,,,4,,,,,,,No,Deep climb,Yes,10883,Coral,Source,4,4,No,,No,,CCandace,323535@stu.wvusd.org
+6802d3944506b96286c6dbfc,51,Qualification,121,blueAlliance,Yes,0,1,0,0,0,0,0,1,0,0,3,3,2,0,2,1,2,1,2,No,Deep climb,Yes,0,Both,Both,5,3,No,0,No,0,ZZoe,zzhaoozoe@gmail.com
+6802d3a24506b96286c6dbfd,33,Qualification,121,redAlliance,Yes,0,3,0,0,0,0,0,0,0,1,2,3,1,0,1,3,1,1,0,Yes,Deep climb,Yes,3177.9999999999854,Both,Source,3,3,No,0,No,Had Coral stuck in drivebase,Mark,mark.wu123454@gmail.com
+6802d3be4506b96286c6dbfe,2075,Qualification,121,redAlliance,Yes,0,2,0,0,0,0,0,0,0,0,3,3,4,0,0,0,1,0,0,No,Deep climb,Yes,4348.000000000931,Both,Source,4,4,No,0,Yes,"Missed a bit of auton, may need to fact check ",aash,ashleycbb123@gmail.com
+6802d540b65e53a4683ce82d,1700,Qualification,122,redAlliance,Yes,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,1,0,0,Yes,Did not climb,No,0,Algae,Source,4,4,Yes,4,No,0,aash,ashleycbb123@gmail.com
+6802d540b65e53a4683ce82e,2783,Qualification,122,blueAlliance,Yes,0,3,0,0,0,0,0,0,0,1,4,2,2,0,0,0,0,0,0,No,Deep climb,Yes,11479.800000011921,Coral,Source,5,3,No,0,No,0,delia,lilahhoan@gmail.com
+6802d554b65e53a4683ce82f,801,Qualification,122,blueAlliance,Yes,0,2,0,0,0,0,0,0,0,1,2,4,0,0,0,0,2,0,0,No,Deep climb,Yes,11678,Both,Source,4,4,No,0,No,0,ZZoe,zzhaoozoe@gmail.com
+6802d557b65e53a4683ce830,10224,Qualification,122,blueAlliance,Yes,1,0,0,0,0,0,0,0,0,1,0,1,5,0,2,0,1,1,2,No,Deep climb,Yes,14770.000000000058,Both,Source,5,4,No,0,No,0,CCandace,323535@stu.wvusd.org
+6802d557b65e53a4683ce831,2960,Qualification,122,redAlliance,Yes,1,0,0,0,0,0,0,0,0,2,2,0,0,0,0,0,1,0,0,Yes,Deep climb,No,18303.99999999994,Both,Source,2,2,No,0,No,0,Mark,mark.wu123454@gmail.com
+6802d575b65e53a4683ce832,1153,Qualification,122,redAlliance,Yes,0,0,0,2,0,0,0,0,1,0,0,7,0,0,1,2,1,1,0,No,Deep climb,No,0,Both,Source,3,4,No,1,No,0 got stuck on an algae and also tried climbing but part of the robot was touching the uh floor,mayukaan,emilyluo0127@gmail.com
+6802d6fea862006d4ce39fb7,70,Qualification,123,blueAlliance,Yes,0,1,0,0,0,0,0,0,0,0,1,4,1,0,0,0,0,0,0,No,Deep climb,Yes,0,Both,Source,3,3,No,0,No,0,ZZoe,zzhaoozoe@gmail.com
+6802d72da862006d4ce39fb8,5987,Playoff,123,blueAlliance,Yes,0,1,0,0,0,0,1,0,1,0,6,3,4,0,0,2,2,0,0,No,Deep climb,Yes,4285.800000011921,Both,Source,4,4,No,0,No,0,delia,lilahhoan@gmail.com
+6802d74ca862006d4ce39fb9,6652,Qualification,123,redAlliance,Yes,1,0,0,0,0,0,0,0,0,2,0,1,1,0,0,0,0,0,0,Yes,Did not climb,No,0,Coral,Source,3,3,No,0,No,0,aash,ashleycbb123@gmail.com
+6802d755a862006d4ce39fba,3473,Qualification,123,redAlliance,Yes,0,2,0,0,0,0,0,0,0,2,0,3,2,0,0,0,0,1,0,Yes,Deep climb,Yes,18810,Both,Source,3,2,No,0,No,CLIMBBBBBB,Mark,mark.wu123454@gmail.com
+6802d780a862006d4ce39fbb,230,Qualification,123,blueAlliance,Yes,0,2,0,0,0,0,0,0,0,1,1,7,3,1,0,0,1,0,0,Yes,Deep climb,No,0,Coral,Both,4,4,No,0,No,0,CCandace,323535@stu.wvusd.org
+6802d8d85e763f333e4c5847,86,Qualification,124,blueAlliance,Yes,0,2,0,0,0,0,0,0,0,4,2,2,3,0,0,0,1,0,0,No,Deep climb,Yes,5166,Coral,Source,4,4,No,0,No,0,CCandace,323535@stu.wvusd.org
+6802d8e75e763f333e4c5849,973,Qualification,124,blueAlliance,Yes,0,1,0,0,0,0,1,2,0,0,2,3,0,2,0,3,4,1,0,No,Deep climb,Yes,7858,Both,Source,5,4,No,0,No,0,ZZoe,zzhaoozoe@gmail.com
+6802d8fb5e763f333e4c584a,5736,Qualification,124,blueAlliance,Yes,0,2,0,0,0,0,0,0,0,1,3,5,4,0,0,0,0,0,0,No,Deep climb,Yes,5208.899999976158,Coral,Source,3,4,No,0,No,0,delia,lilahhoan@gmail.com
+6802daadd2fa7024eb4922e3,195,Qualification,125,blueAlliance,Yes,0,3,0,0,0,0,0,0,0,2,2,5,2,0,0,0,1,2,0,No,Deep climb,Yes,3113.600000023842,Coral,Source,3,4,No,0,No,0,delia,lilahhoan@gmail.com
+6802dac3d2fa7024eb4922e4,3197,Qualification,125,blueAlliance,Yes,1,1,0,0,0,0,0,1,0,0,4,3,0,0,4,1,2,0,0,No,Deep climb,Yes,0,Both,Source,4,4,No,1,No,0,ZZoe,zzhaoozoe@gmail.com
+6802dae4d2fa7024eb4922e5,8177,Qualification,125,blueAlliance,Yes,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,No,Deep climb,Yes,4651,Coral,Source,4,4,Yes,4,No,0,CCandace,323535@stu.wvusd.org

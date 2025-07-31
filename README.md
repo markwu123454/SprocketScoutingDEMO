@@ -27,7 +27,7 @@ interactive match input, and TBA integration.
 
 ### Frontend
 * React + Vite(TypeScript)
-* Tailwind + shad/cn
+* Tailwind + shad/utils
 * Stateless 
 
 ### Backend
@@ -68,7 +68,7 @@ DEMOFRONTEND/
 │  ├─ types/
 │  │  ├─ index.ts                 # Types for global use
 │  ├─ utils/
-│  │  └─ cn.ts                    # Tailwind class merging (clsx + twMerge)
+│  │  └─ utils.ts                    # Tailwind class merging (clsx + twMerge)
 │  ├─ pages/
 │  │  ├─ Home.tsx
 │  │  ├─ MatchScouting.tsx

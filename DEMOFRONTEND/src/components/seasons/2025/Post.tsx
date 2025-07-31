@@ -1,5 +1,5 @@
 import React from "react"
-import type {ScoutingData} from "@/types"
+import type {MatchScoutingData} from "@/types"
 import RatingSlider from "@/components/ui/ratingSlider.tsx"
 import InfoToggle from "@/components/ui/infoToggle.tsx" // adjust path if needed
 
@@ -7,11 +7,11 @@ export default function PostMatch({
     data,
     setData,
 }: {
-    data: ScoutingData
-    setData: React.Dispatch<React.SetStateAction<ScoutingData>>
+    data: MatchScoutingData
+    setData: React.Dispatch<React.SetStateAction<MatchScoutingData>>
 }) {
 
-    const handleChange = (field: keyof ScoutingData["postmatch"]) => (val: number) => {
+    const handleChange = (field: keyof MatchScoutingData["postmatch"]) => (val: number) => {
         const updated = {
             ...data.postmatch,
             [field]: val
@@ -19,7 +19,7 @@ export default function PostMatch({
         setData(prev => ({...prev, postmatch: updated}))
     }
 
-    const toggleFault = (key: keyof ScoutingData["postmatch"]["faults"]) => () => {
+    const toggleFault = (key: keyof MatchScoutingData["postmatch"]["faults"]) => () => {
         const updated = {
             ...data.postmatch.faults,
             [key]: !data.postmatch.faults[key]

@@ -1,6 +1,7 @@
-import type { AllianceType, MatchType } from "@/types"
+import type {AllianceType, MatchType} from "@/types"
+import type {Branches} from "@/types/data.ts";
 
-export type ScoutingData = {
+export type MatchScoutingData = {
     match: number | null
     match_type: MatchType
     alliance: AllianceType
@@ -8,8 +9,15 @@ export type ScoutingData = {
     scouter: string | null
 
     auto: {
-        branchPlacement: Record<string, { l2: boolean; l3: boolean; l4: boolean }>
-        algaePlacement: Record<string, boolean>
+        branchPlacement: Record<Branches, { l2: boolean; l3: boolean; l4: boolean }>
+        algaePlacement: {
+            AB: boolean
+            CD: boolean
+            EF: boolean
+            GH: boolean
+            IJ: boolean
+            KL: boolean
+        }
         missed: { l2: number; l3: number; l4: number; l1: number }
         l1: number
         processor: number
@@ -19,8 +27,15 @@ export type ScoutingData = {
     }
 
     teleop: {
-        branchPlacement: Record<string, { l2: boolean; l3: boolean; l4: boolean }>
-        algaePlacement: Record<string, boolean>
+        branchPlacement: Record<Branches, { l2: boolean; l3: boolean; l4: boolean }>
+        algaePlacement: {
+            AB: boolean
+            CD: boolean
+            EF: boolean
+            GH: boolean
+            IJ: boolean
+            KL: boolean
+        }
         missed: { l2: number; l3: number; l4: number; l1: number }
         l1: number
         processor: number
@@ -43,6 +58,30 @@ export type ScoutingData = {
     }
 }
 
+export type PitScoutingData = {
+    team: number;
+
+    // Robot Specs
+    widthInches: number;
+    lengthInches: number;
+    heightExtendedInches: number;
+    heightCollapsedInches: number;
+    weightPounds: number;
+
+    drivebaseType: string;
+    hoursOfDrivePractice: number;
+    intakeDescription: string;
+
+    climbLevel: "shallow" | "deep"; // was: cageSetting
+    role: "Defense" | "Offense" | "Both";
+
+    autonStartPosition: ("Center" | "Left Wing" | "Right Wing" | "Stage Edge" | "Far Side")[];
+    teleopPlayArea: ("AB Zone" | "CD Zone" | "EF Zone" | "GH Zone" | "IJ Zone" | "KL Zone")[];
+
+    additionalComments?: string;
+};
+
+
 export type UIInfo = {
     red: {
         score: number
@@ -56,15 +95,20 @@ export type UIInfo = {
     }
 }
 
-export const defaultScoutingData: Omit<ScoutingData, 'scouter'> = {
+export const defaultScoutingData: Omit<MatchScoutingData, 'scouter'> = {
     match: null,
     match_type: null,
     alliance: null,
     teamNumber: null,
     auto: {
         branchPlacement: Object.fromEntries(
-            "ABCDEFGHIJKL".split("").map((id) => [id, { l2: false, l3: false, l4: false }])
-        ),
+            (["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L"] as const).map((id) => [
+                id, {l2: false, l3: false, l4: false},
+            ])) as Record<"A" | "B" | "C" | "D" | "E" | "F" | "G" | "H" | "I" | "J" | "K" | "L", {
+            l2: boolean;
+            l3: boolean;
+            l4: boolean
+        }>,
         algaePlacement: {
             AB: true,
             CD: true,
@@ -73,7 +117,7 @@ export const defaultScoutingData: Omit<ScoutingData, 'scouter'> = {
             IJ: true,
             KL: true
         },
-        missed: { l1: 0, l2: 0, l3: 0, l4: 0 },
+        missed: {l1: 0, l2: 0, l3: 0, l4: 0},
         l1: 0,
         processor: 0,
         barge: 0,
@@ -82,8 +126,13 @@ export const defaultScoutingData: Omit<ScoutingData, 'scouter'> = {
     },
     teleop: {
         branchPlacement: Object.fromEntries(
-            "ABCDEFGHIJKL".split("").map((id) => [id, { l2: false, l3: false, l4: false }])
-        ),
+            (["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L"] as const).map((id) => [
+                id, {l2: false, l3: false, l4: false},
+            ])) as Record<"A" | "B" | "C" | "D" | "E" | "F" | "G" | "H" | "I" | "J" | "K" | "L", {
+            l2: boolean;
+            l3: boolean;
+            l4: boolean
+        }>,
         algaePlacement: {
             AB: true,
             CD: true,
@@ -92,7 +141,7 @@ export const defaultScoutingData: Omit<ScoutingData, 'scouter'> = {
             IJ: true,
             KL: true
         },
-        missed: { l1: 0, l2: 0, l3: 0, l4: 0 },
+        missed: {l1: 0, l2: 0, l3: 0, l4: 0},
         l1: 0,
         processor: 0,
         barge: 0,

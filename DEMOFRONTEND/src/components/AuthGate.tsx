@@ -11,9 +11,9 @@ const PERMISSION_LABELS: Record<string, string> = {
 }
 
 export default function AuthGate({
-    permission,
-    children,
-}: {
+                                     permission,
+                                     children,
+                                 }: {
     permission: "dev" | "admin" | "match_scouting" | "pit_scouting"
     children: React.ReactNode
 }) {
@@ -54,7 +54,8 @@ export default function AuthGate({
                 <div className="bg-zinc-800 rounded-xl p-8 text-center max-w-sm shadow-xl border border-zinc-700">
                     <h2 className="text-2xl font-bold mb-4">Access Denied</h2>
                     <p className="mb-6">
-                        You lack <span className="font-semibold text-red-400">{PERMISSION_LABELS[permission]}</span> permission or your
+                        You lack <span
+                        className="font-semibold text-red-400">{PERMISSION_LABELS[permission]}</span> permission or your
                         session expired.
                     </p>
                     <button
@@ -68,5 +69,8 @@ export default function AuthGate({
         )
     }
 
-    return <div>{children}</div>
+    return <div className="min-h-screen w-screen">
+        {children}
+    </div>
+
 }

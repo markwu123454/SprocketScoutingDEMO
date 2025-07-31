@@ -1,5 +1,5 @@
 import {useState} from "react"
-import type {ScoutingData} from "@/types"
+import type {MatchScoutingData} from "@/types"
 import ScoreBox from "@/components/ui/scoreBox.tsx"
 import fieldImage from "@/assets/2025_Reef_Transparent_No-Tape_Blue.png"
 import * as React from "react";
@@ -8,8 +8,8 @@ import regions from "@/assets/reef_button_regions.json"
 const coralLevels = ['l2', 'l3', 'l4'] as const
 
 export default function AutoPhase({data, setData}: {
-    data: ScoutingData,
-    setData: React.Dispatch<React.SetStateAction<ScoutingData>>
+    data: MatchScoutingData,
+    setData: React.Dispatch<React.SetStateAction<MatchScoutingData>>
 }) {
     const [selectedBranch, setSelectedBranch] = useState<string | null>(null)
 
@@ -56,6 +56,32 @@ export default function AutoPhase({data, setData}: {
         const imageWidth = 567;
         const imageHeight = 655;
 
+        const levelOffsets: Record<string, Record<"l2" | "l3" | "l4", { x: number; y: number }>> = {
+            A: {l2: {x: -35, y: 30}, l3: {x: -35, y: 0}, l4: {x: -35, y: -30}},
+            B: {l2: {x: -35, y: 30}, l3: {x: -35, y: 0}, l4: {x: -35, y: -30}},
+            C: {l2: {x: 10, y: 50}, l3: {x: -20, y: 32}, l4: {x: -50, y: 14}},
+            D: {l2: {x: 10, y: 50}, l3: {x: -20, y: 32}, l4: {x: -50, y: 14}},
+            E: {l2: {x: -10, y: 50} , l3: {x: 20, y: 32}, l4: {x: 50, y: 14}},
+            F: {l2: {x: -10, y: 50} , l3: {x: 20, y: 32}, l4: {x: 50, y: 14}},
+            G: {l2: {x: 35, y: 30}, l3: {x: 35, y: 0}, l4: {x: 35, y: -30}},
+            H: {l2: {x: 35, y: 30}, l3: {x: 35, y: 0}, l4: {x: 35, y: -30}},
+            I: {l2: {x: 50, y: -14}, l3: {x: 20, y: -32}, l4: {x: -10, y: -50}},
+            J: {l2: {x: 50, y: -14}, l3: {x: 20, y: -32}, l4: {x: -10, y: -50}},
+            K: {l2: {x: -50, y: -14}, l3: {x: -20, y: -32}, l4: {x: 10, y: -50}},
+            L: {l2: {x: -50, y: -14}, l3: {x: -20, y: -32}, l4: {x: 10, y: -50}},
+        }
+
+
+        function getCentroid(points: { x: number; y: number }[]) {
+            const n = points.length
+            const {x, y} = points.reduce(
+                (acc, p) => ({x: acc.x + p.x, y: acc.y + p.y}),
+                {x: 0, y: 0}
+            )
+            return {x: x / n, y: y / n}
+        }
+
+
         return (
             <div className="relative w-full aspect-[567/655]">
                 <img
@@ -65,22 +91,56 @@ export default function AutoPhase({data, setData}: {
                 />
                 <svg
                     viewBox={`0 0 ${imageWidth} ${imageHeight}`}
-                    className="absolute inset-0 w-full h-full"
+                    className="absolute inset-0 w-full h-full text-md"
                 >
-                    {regions.map(({label, points}) => (
-                        <polygon
-                            key={label}
-                            points={points.map(p => `${p.x},${p.y}`).join(" ")}
-                            onClick={() => setSelectedBranch(label)}
-                            className={`cursor-pointer ${
-                                selectedBranch === label ? "fill-white/30" : "fill-transparent"
-                            } stroke-white stroke-[0.5]`}
-                        />
-                    ))}
+                    {regions.map(({label, points}) => {
+                        const centroid = getCentroid(points)
+                        return (
+                            <>
+                                <polygon
+                                    key={label}
+                                    points={points.map(p => `${p.x},${p.y}`).join(" ")}
+                                    onClick={() => setSelectedBranch(label)}
+                                    className={`cursor-pointer ${
+                                        selectedBranch === label ? "fill-white/30" : "fill-transparent"
+                                    } stroke-white stroke-[0.5]`}
+                                />
+                                <text
+                                    x={centroid.x}
+                                    y={centroid.y}
+                                    textAnchor="middle"
+                                    dominantBaseline="middle"
+                                    className="fill-white pointer-events-none select-none"
+                                >
+                                    {label}
+                                </text>
+                                {(["l2", "l3", "l4"] as const).map((level) => {
+                                    const active = data.auto.branchPlacement?.[label]?.[level]
+                                    const offset = levelOffsets[label]?.[level] ?? {x: 0, y: 0}
+                                    return (
+                                        active && (
+                                            <text
+                                                key={level}
+                                                x={centroid.x + offset.x}
+                                                y={centroid.y + offset.y}
+                                                textAnchor="middle"
+                                                dominantBaseline="middle"
+                                                className="fill-white text-md pointer-events-none select-none"
+                                            >
+                                                {level}
+                                            </text>
+                                        )
+                                    )
+                                })}
+
+
+                            </>
+                        )
+                    })}
                     <circle
                         cx={imageWidth / 2}
                         cy={imageHeight / 2}
-                        r={70}
+                        r={100}
                         onClick={() => {
                             setSelectedBranch("missed")
                             setMissedMode("inc")
@@ -90,7 +150,24 @@ export default function AutoPhase({data, setData}: {
                             selectedBranch === "missed" ? "fill-white/30" : "fill-transparent"
                         } stroke-white stroke-[0.5]`}
                     />
-
+                    <text
+                        x={imageWidth / 2}
+                        y={imageHeight / 2 * 0.9}
+                        textAnchor="middle"
+                        dominantBaseline="middle"
+                        className="fill-white pointer-events-none select-none"
+                    >
+                        Miss
+                    </text>
+                    <text
+                        x={imageWidth / 2}
+                        y={imageHeight / 2 * 1.1}
+                        textAnchor="middle"
+                        dominantBaseline="middle"
+                        className="fill-white pointer-events-none select-none text-lg"
+                    >
+                        {`l2:${data.auto.missed.l2}, l3:${data.auto.missed.l3}, l4:${data.auto.missed.l4}`}
+                    </text>
                 </svg>
             </div>
         );
@@ -191,7 +268,7 @@ export default function AutoPhase({data, setData}: {
                 />
                 <ScoreBox
                     id="auto-missAlgae"
-                    label="Algae miss"
+                    label="Barge miss"
                     value={data.auto.missAlgae}
                     onChange={(v) => {
                         const updated = {
