@@ -58,43 +58,6 @@ export type MatchScoutingData = {
     }
 }
 
-export type PitScoutingData = {
-    team: number;
-
-    // Robot Specs
-    widthInches: number;
-    lengthInches: number;
-    heightExtendedInches: number;
-    heightCollapsedInches: number;
-    weightPounds: number;
-
-    drivebaseType: string;
-    hoursOfDrivePractice: number;
-    intakeDescription: string;
-
-    climbLevel: "shallow" | "deep"; // was: cageSetting
-    role: "Defense" | "Offense" | "Both";
-
-    autonStartPosition: ("Center" | "Left Wing" | "Right Wing" | "Stage Edge" | "Far Side")[];
-    teleopPlayArea: ("AB Zone" | "CD Zone" | "EF Zone" | "GH Zone" | "IJ Zone" | "KL Zone")[];
-
-    additionalComments?: string;
-};
-
-
-export type UIInfo = {
-    red: {
-        score: number
-        coral: number
-        algae: number
-    }
-    blue: {
-        score: number
-        coral: number
-        algae: number
-    }
-}
-
 export const defaultScoutingData: Omit<MatchScoutingData, 'scouter'> = {
     match: null,
     match_type: null,
@@ -162,6 +125,42 @@ export const defaultScoutingData: Omit<MatchScoutingData, 'scouter'> = {
     },
 }
 
+export type PitScoutingData = {
+    team: number;
+
+    // Robot Specs
+    widthInches: number;
+    lengthInches: number;
+    heightExtendedInches: number;
+    heightCollapsedInches: number;
+    weightPounds: number;
+
+    drivebaseType: string;
+    hoursOfDrivePractice: number;
+    intakeDescription: string;
+
+    climbLevel: "shallow" | "deep"; // was: cageSetting
+    role: "Defense" | "Offense" | "Both";
+
+    autonStartPosition: ("Center" | "Left Wing" | "Right Wing" | "Stage Edge" | "Far Side")[];
+    teleopPlayArea: ("AB Zone" | "CD Zone" | "EF Zone" | "GH Zone" | "IJ Zone" | "KL Zone")[];
+
+    additionalComments?: string;
+};
+
+export type UIInfo = {
+    red: {
+        score: number
+        coral: number
+        algae: number
+    }
+    blue: {
+        score: number
+        coral: number
+        algae: number
+    }
+}
+
 export const defaultUIINFO = {
     red: {
         score: 0,
@@ -174,3 +173,5 @@ export const defaultUIINFO = {
         algae: 0
     }
 }
+
+

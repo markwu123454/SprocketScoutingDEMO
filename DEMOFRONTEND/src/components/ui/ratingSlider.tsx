@@ -1,26 +1,15 @@
-import React, { useState } from "react"
+import React, {useState, useRef, useEffect} from "react"
 import * as Slider from "@radix-ui/react-slider"
-import { HelpCircle } from "lucide-react"
+import {HelpCircle} from "lucide-react"
 
-/**
- * RatingSlider – Gradient slider for qualitative rating input
- *
- * Props:
- * @param value - Current value (0 to 1)
- * @param onChange - Callback when value changes
- * @param title - Optional text shown above the slider
- * @param leftLabel - Label shown under the minimum value (default: "Low")
- * @param rightLabel - Label shown under the maximum value (default: "High")
- * @param infoBox - Optional custom ReactNode to show in a floating popup
- */
 export default function RatingSlider({
-    value,
-    onChange,
-    title,
-    leftLabel = "Low",
-    rightLabel = "High",
-    infoBox
-}: {
+                                         value,
+                                         onChange,
+                                         title,
+                                         leftLabel = "Low",
+                                         rightLabel = "High",
+                                         infoBox
+                                     }: {
     value: number
     onChange: (val: number) => void
     title?: string
@@ -29,6 +18,30 @@ export default function RatingSlider({
     infoBox?: React.ReactNode
 }) {
     const [showInfo, setShowInfo] = useState(false)
+    const infoRef = useRef<HTMLDivElement | null>(null)
+    const toggleRef = useRef<HTMLButtonElement | null>(null)
+
+
+    // Outside click handler
+    useEffect(() => {
+        if (!showInfo) return
+
+        const handlePointerDown = (event: PointerEvent) => {
+            const target = event.target as Node
+            if (
+                infoRef.current &&
+                !infoRef.current.contains(target) &&
+                toggleRef.current &&
+                !toggleRef.current.contains(target)
+            ) {
+                setShowInfo(false)
+            }
+        }
+
+        document.addEventListener("pointerdown", handlePointerDown)
+        return () => document.removeEventListener("pointerdown", handlePointerDown)
+    }, [showInfo])
+
 
     const getColor = (v: number) => {
         const ratio = Math.max(0, Math.min(1, v))
@@ -52,19 +65,19 @@ export default function RatingSlider({
             <div className="flex items-center justify-between">
                 {title && <div className="text-sm font-medium text-zinc-200">{title}</div>}
                 {infoBox && (
-                    <button onClick={() => setShowInfo(prev => !prev)}>
-                        <HelpCircle className="w-4 h-4 text-zinc-400 hover:text-white" />
+                    <button ref={toggleRef} onClick={() => setShowInfo(prev => !prev)}>
+                        <HelpCircle className="w-4 h-4 text-zinc-400 hover:text-white"/>
                     </button>
                 )}
             </div>
 
             {showInfo && (
-                <button
-                    onClick={() => setShowInfo(false)}
+                <div
+                    ref={infoRef}
                     className="absolute top-0 right-0 z-10 mt-8 w-64 text-left text-xs text-zinc-300 bg-zinc-800 rounded px-3 py-2 shadow-lg"
                 >
                     {infoBox}
-                </button>
+                </div>
             )}
 
             <Slider.Root
@@ -78,12 +91,12 @@ export default function RatingSlider({
                 <Slider.Track className="relative h-2 w-full grow overflow-hidden rounded-full bg-zinc-700">
                     <Slider.Range
                         className="absolute h-full"
-                        style={{ backgroundColor: getColor(value) }}
+                        style={{backgroundColor: getColor(value)}}
                     />
                 </Slider.Track>
                 <Slider.Thumb
                     className="block h-5 w-5 rounded-full border-2 border-white shadow"
-                    style={{ backgroundColor: getColor(value) }}
+                    style={{backgroundColor: getColor(value)}}
                 />
             </Slider.Root>
 

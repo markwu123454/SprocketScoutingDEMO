@@ -19,7 +19,7 @@ import {
     Radar,
     PolarAngleAxis,
     PolarGrid,
-    PolarRadiusAxis
+    PolarRadiusAxis, ScatterChart, Scatter, ZAxis
 } from "recharts";
 import {AgGridReact} from "ag-grid-react";
 import {type GridReadyEvent, ModuleRegistry, AllCommunityModule} from "ag-grid-community";
@@ -31,6 +31,15 @@ import type * as DataTypes from '@/types/data';
 import {processScoutingData} from "@/lib/processScoutingData.ts";
 import {Input} from "@/components/ui/input";
 import {Switch} from "@/components/ui/switch";
+import {
+    DropdownMenu,
+    DropdownMenuCheckboxItem,
+    DropdownMenuContent,
+    DropdownMenuLabel,
+    DropdownMenuSeparator,
+    DropdownMenuTrigger
+} from "@/components/ui/dropdown-menu";
+import {Button} from "@/components/ui/button";
 
 ModuleRegistry.registerModules([AllCommunityModule]);
 
@@ -42,15 +51,45 @@ type TeamDetail = {
     summary: { label: string; summary: number; reliability: number; unit: string }[]
     capabilities: { label: string; enabled: "yes" | "no" | "not demonstrated" }[];
     rankings: { label: string; rank: number; percentile: number }[];
-    matches: { match: string; result: "W" | "L"; score: number; pred_ai: number; pred_heur: number }[];
+    matches: {
+        match: string;
+        result: "W" | "L";
+        score: number;
+        pred_ai: number;
+        pred_heur: number,
+        teammates: [number, number, number],
+        opponents: [number, number, number]
+    }[];
 };
 
 const totalTeam = 64
 
-type GraphType = "matchTimeline" | "scoreBreakdown" | "cycleEfficiency" | "objectiveContribution"
-    | "endgameSuccess" | "accuracyHeatmap" | "allianceScoreComparison" | "correlationMatrix"
-    | "performanceDistribution" | "rankingProgression" | "headToHead" | "consistencyMetric" | "autonClustering"
-    | "winProbability";
+const COLOR_PALETTE = [
+    "#4E79A7", // muted blue
+    "#F28E2B", // orange
+    "#E15759", // red
+    "#76B7B2", // teal
+    "#59A14F", // green
+    "#EDC948", // yellow
+    "#B07AA1", // purple
+    "#FF9DA7", // pink
+    "#9C755F", // brown
+    "#BAB0AC", // gray
+    "#4E79A7", // muted blue
+    "#F28E2B", // orange
+    "#E15759", // red
+    "#76B7B2", // teal
+    "#59A14F", // green
+    "#EDC948", // yellow
+    "#B07AA1", // purple
+    "#FF9DA7", // pink
+    "#9C755F", // brown
+    "#BAB0AC", // gray
+];
+
+
+type GraphType = "matchTimeline" | "scoreBreakdown" | "cycleEfficiency" | "objectiveContribution" | "accuracyMap" |
+    "correlationMatrix" | "performanceDistribution" | "rankingProgression" | "headToHead" | "autonClustering";
 
 type TableType = "matchData" | "pitData" | "rankings";
 
@@ -256,42 +295,72 @@ export function DataLayout() {
     const [teamNum, setTeamNum] = useState<number>(973)
 
     const [_teamMap, _setTeamMap] = useState<Map<number, TeamDetail>>(() =>
-        new Map([[973, {
-            teamNumber: 973,
-            nickname: "Greybots",
-            logoUrl: "/team_logo.png",
-            rank: 12,
-            summary: [
-                {label: "Auton", summary: 12, reliability: 65, unit: "pt"},
-                {label: "Coral", summary: 12.7, reliability: 97, unit: "cycles"},
-                {label: "Algae", summary: 3.5, reliability: 40, unit: "cycles"},
-                {label: "Endgame", summary: 8, reliability: 20, unit: "pt"},
+        new Map([
+            [
+                973,
+                {
+                    teamNumber: 973,
+                    nickname: "Greybots",
+                    logoUrl: "/team_logo.png",
+                    rank: 12,
+                    summary: [
+                        {label: "Auton", summary: 12, reliability: 65, unit: "pt"},
+                        {label: "Coral", summary: 12.7, reliability: 97, unit: "cycles"},
+                        {label: "Algae", summary: 3.5, reliability: 40, unit: "cycles"},
+                        {label: "Endgame", summary: 8, reliability: 20, unit: "pt"},
+                    ],
+                    capabilities: [
+                        {label: "Ground Intake", enabled: "yes"},
+                        {label: "Station Intake", enabled: "yes"},
+                        {label: "Full Auto", enabled: "yes"},
+                        {label: "4 Piece Auto", enabled: "not demonstrated"},
+                        {label: "Defense", enabled: "not demonstrated"},
+                        {label: "Deep Climb", enabled: "no"},
+                        {label: "Barge Scoring", enabled: "yes"},
+                        {label: "Algae Ground Intake", enabled: "no"},
+                        {label: "L4 Coral", enabled: "yes"},
+                    ],
+                    rankings: [
+                        {label: "Auton", rank: 3, percentile: 4},
+                        {label: "Coral", rank: 5, percentile: 8},
+                        {label: "Algae", rank: 12, percentile: 34},
+                        {label: "Climb", rank: 10, percentile: 16},
+                        {label: "Defense", rank: 7, percentile: 12},
+                        {label: "Point", rank: 18, percentile: 82},
+                    ],
+                    matches: [
+                        {
+                            match: "Q25",
+                            result: "W",
+                            score: 132,
+                            pred_ai: 128,
+                            pred_heur: 120,
+                            teammates: [254, 973, 2910],
+                            opponents: [1678, 118, 4414],
+                        },
+                        {
+                            match: "Q18",
+                            result: "L",
+                            score: 86,
+                            pred_ai: 94,
+                            pred_heur: 86,
+                            teammates: [973, 1323, 4414],
+                            opponents: [2910, 1671, 192],
+                        },
+                        {
+                            match: "Q12",
+                            result: "W",
+                            score: 115,
+                            pred_ai: 110,
+                            pred_heur: 102,
+                            teammates: [973, 1678, 1538],
+                            opponents: [254, 118, 192],
+                        },
+                    ],
+                },
             ],
-            capabilities: [
-                {label: "Ground Intake", enabled: "yes"},
-                {label: "Station Intake", enabled: "yes"},
-                {label: "Full Auto", enabled: "yes"},
-                {label: "4 Piece Auto", enabled: "not demonstrated"},
-                {label: "Defense", enabled: "not demonstrated"},
-                {label: "Deep Climb", enabled: "no"},
-                {label: "Barge Scoring", enabled: "yes"},
-                {label: "Algae Ground Intake", enabled: "no"},
-                {label: "L4 Coral", enabled: "yes"},
-            ],
-            rankings: [
-                {label: "Auton", rank: 3, percentile: 4},
-                {label: "Coral", rank: 5, percentile: 8},
-                {label: "Algae", rank: 12, percentile: 34},
-                {label: "Climb", rank: 10, percentile: 16},
-                {label: "Defense", rank: 7, percentile: 12},
-                {label: "Point", rank: 18, percentile: 82},
-            ],
-            matches: [
-                {match: "Q25", result: "W", score: 132, pred_ai: 128, pred_heur: 120},
-                {match: "Q18", result: "L", score: 86, pred_ai: 94, pred_heur: 86},
-                {match: "Q12", result: "W", score: 115, pred_ai: 110, pred_heur: 102},
-            ],
-        }]]));
+        ])
+    );
 
 
     const [graphType, setGraphType] = useState<GraphType>("matchTimeline");
@@ -303,8 +372,12 @@ export function DataLayout() {
         const [scoreBreakdownMatchType, setScoreBreakdownMatchType] = useState<MatchType>();
         const [scoreBreakdownNorm, setScoreBreakdownNorm] = useState<boolean>();
 
+        const [objectiveContributionSelectedTeams, setObjectiveContributionSelectedTeams] = useState<number[]>([]);
+
+        const [accuracyMapSelectedTeam, setAccuracyMapSelectedTeam] = useState<number>();
+
         const [headToHeadSelectedTeams, setHeadToHeadSelectedTeams] = useState<number[]>([]);
-        const [headToHeadNorm, setHeadToHeadNorm] = useState<boolean>(false);
+        const [headToHeadNorm, setHeadToHeadNorm] = useState<boolean>(true);
 
         return {
             matchTimeline: {
@@ -318,6 +391,14 @@ export function DataLayout() {
                 setMatchType: setScoreBreakdownMatchType,
                 norm: scoreBreakdownNorm,
                 setNorm: setScoreBreakdownNorm,
+            },
+            objectiveContribution: {
+                selectedTeams: objectiveContributionSelectedTeams,
+                setSelectedTeams: setObjectiveContributionSelectedTeams
+            },
+            accuracyMap: {
+                selectedTeam: accuracyMapSelectedTeam,
+                setSelectedTeam: setAccuracyMapSelectedTeam,
             },
             headToHead: {
                 selectedTeams: headToHeadSelectedTeams,
@@ -334,448 +415,584 @@ export function DataLayout() {
     type GraphConfigEntry = {
         label: string;
         controls: JSX.Element | null;
-        chart: JSX.Element;
+        chart: () => JSX.Element;
     };
 
-    const graphConfig: Record<GraphType, GraphConfigEntry> = {
-        matchTimeline: {
-            label: "Match Timeline",
+    const matchTimelineTESTDATA: Record<number, { match: string; [key: string]: number | string; }[]> = {
+        254: [
+            {match: "3", score: 85, pred_ai: 84, pred_heur: 79},
+            {match: "15", score: 90, pred_ai: 89, pred_heur: 88},
+            {match: "24", score: 70, pred_ai: 72, pred_heur: 68},
+        ],
+        1323: [
+            {match: "5", score: 78, pred_ai: 75, pred_heur: 70},
+            {match: "18", score: 88, pred_ai: 86, pred_heur: 82},
+            {match: "30", score: 91, pred_ai: 93, pred_heur: 89},
+        ],
+    };
 
-            controls: (
-                <Select
-                    onValueChange={(v) => {
-                        const teamId = Number(v);
-                        graphHooks.matchTimeline.setSelectedTeam(teamId);
-                    }}
-                >
-                    <SelectTrigger className="w-[200px]">
-                        <SelectValue placeholder="Select a team"/>
-                    </SelectTrigger>
-                    <SelectContent>
-                        {[{id: 1323, name: "MadTown Robotics"}, {id: 254, name: "Cheesy Poofs"}].map((t) => (
-                            <SelectItem key={t.id} value={t.id.toString()}>
-                                {t.name} ({t.id})
-                            </SelectItem>
-                        ))}
-                    </SelectContent>
-                </Select>
-            ),
-
-            chart: (
-                <ResponsiveContainer width="100%" height="100%">
-                    <LineChart
-                        data={
-                            graphHooks.matchTimeline.selectedTeam === 254
-                                ? [
-                                    {match: "3", score: 85, pred_ai: 84, pred_heur: 79},
-                                    {match: "15", score: 90, pred_ai: 89, pred_heur: 88},
-                                    {match: "24", score: 70, pred_ai: 72, pred_heur: 68},
-                                ]
-                                : graphHooks.matchTimeline.selectedTeam === 1323
-                                    ? [
-                                        {match: "5", score: 78, pred_ai: 75, pred_heur: 70},
-                                        {match: "18", score: 88, pred_ai: 86, pred_heur: 82},
-                                        {match: "30", score: 91, pred_ai: 93, pred_heur: 89},
-                                    ]
-                                    : []
-                        }
-
-                    >
-                        <CartesianGrid strokeDasharray="3 3"/>
-                        <XAxis dataKey="match"/>
-                        <YAxis/>
-                        <Tooltip/>
-                        <Legend/>
-                        <Line type="monotone" dataKey="score" stroke="#8884d8" name="Actual Score"/>
-                        <Line type="monotone" dataKey="pred_ai" stroke="#82ca9d" name="AI Prediction"/>
-                        <Line type="monotone" dataKey="pred_heur" stroke="#ff7300" name="Heuristic"/>
-                    </LineChart>
-                </ResponsiveContainer>
-            ),
+    const scoreBreakdownTESTDATA: Record<"qm" | "sf" | "f", Record<number, {
+        team: string;
+        [key: string]: string | number;
+    }[]>> = {
+        qm: {
+            1: [
+                {team: "Red 1690", auto: 37, teleop_coral: 35, teleop_algae: 4, endgame: 12},
+                {team: "Red 2054", auto: 16, teleop_coral: 28, teleop_algae: 14, endgame: 12},
+                {team: "Red 4414", auto: 18, teleop_coral: 30, teleop_algae: 12, endgame: 6},
+                {team: "Blue 2910", auto: 24, teleop_coral: 32, teleop_algae: 18, endgame: 12},
+                {team: "Blue 1323", auto: 20, teleop_coral: 30, teleop_algae: 16, endgame: 12},
+                {team: "Blue 118", auto: 12, teleop_coral: 20, teleop_algae: 10, endgame: 6},
+            ],
+            2: [
+                {team: "Red 4414", auto: 14, teleop_coral: 21, teleop_algae: 9, endgame: 26},
+                {team: "Red 1690", auto: 12, teleop_coral: 23, teleop_algae: 10, endgame: 22},
+                {team: "Red 2054", auto: 13, teleop_coral: 17, teleop_algae: 13, endgame: 19},
+                {team: "Blue 5406", auto: 10, teleop_coral: 15, teleop_algae: 12, endgame: 18},
+                {team: "Blue 111", auto: 11, teleop_coral: 19, teleop_algae: 11, endgame: 20},
+                {team: "Blue 148", auto: 13, teleop_coral: 18, teleop_algae: 14, endgame: 21},
+            ],
         },
+        sf: {},
+        f: {},
+    };
 
-        scoreBreakdown: {
-            label: "Score Breakdown",
+    const accuracyMapTESTDATA: Record<number, // team number
+        Array<{
+            match: number;
+            level: string;
+            accuracy: number;
+            attempts: number;
+        }>
+    > = {
+        1323: [
+            {match: 1, level: "l1", accuracy: 0.9, attempts: 6},
+            {match: 1, level: "l2", accuracy: 0.7, attempts: 3},
+            {match: 1, level: "l3", accuracy: 0.65, attempts: 5},
+            {match: 1, level: "l4", accuracy: 0.5, attempts: 2},
+            {match: 1, level: "barge", accuracy: 0.4, attempts: 4},
 
-            controls: (
-                <div className="flex gap-4 items-center">
-                    {/* Match Type Selector */}
+            {match: 2, level: "l1", accuracy: 0.85, attempts: 7},
+            {match: 2, level: "l2", accuracy: 0.6, attempts: 3},
+            {match: 2, level: "l3", accuracy: 0.55, attempts: 4},
+            {match: 2, level: "l4", accuracy: 0.45, attempts: 2},
+            {match: 2, level: "barge", accuracy: 0.3, attempts: 3},
+
+            {match: 3, level: "l1", accuracy: 0.88, attempts: 5},
+            {match: 3, level: "l2", accuracy: 0.65, attempts: 3},
+            {match: 3, level: "l3", accuracy: 0.6, attempts: 4},
+            {match: 3, level: "l4", accuracy: 0.5, attempts: 2},
+            {match: 3, level: "barge", accuracy: 0.25, attempts: 2},
+        ],
+        254: [
+            {match: 1, level: "l1", accuracy: 0.92, attempts: 6},
+            {match: 1, level: "l2", accuracy: 0.8, attempts: 5},
+            {match: 1, level: "l3", accuracy: 0.7, attempts: 4},
+            {match: 1, level: "l4", accuracy: 0.6, attempts: 2},
+            {match: 1, level: "barge", accuracy: 0.5, attempts: 3},
+
+            {match: 2, level: "l1", accuracy: 0.87, attempts: 5},
+            {match: 2, level: "l2", accuracy: 0.75, attempts: 4},
+            {match: 2, level: "l3", accuracy: 0.6, attempts: 3},
+            {match: 2, level: "l4", accuracy: 0.5, attempts: 2},
+            {match: 2, level: "barge", accuracy: 0.4, attempts: 2},
+
+            {match: 3, level: "l1", accuracy: 0.9, attempts: 6},
+            {match: 3, level: "l2", accuracy: 0.78, attempts: 4},
+            {match: 3, level: "l3", accuracy: 0.65, attempts: 3},
+            {match: 3, level: "l4", accuracy: 0.55, attempts: 2},
+            {match: 3, level: "barge", accuracy: 0.35, attempts: 2},
+        ],
+    };
+
+    const headToHeadTESTDATA: Record<number, Record<string, number>> = {
+        254: {
+            auto: 18,
+            teleop_coral: 56,
+            teleop_algae: 12,
+            climb: 12,
+            auto_reliability: 6,
+        },
+        1323: {
+            auto: 48,
+            teleop_coral: 100,
+            teleop_algae: 8,
+            climb: 7,
+            auto_reliability: 2,
+        },
+        2910: {
+            auto: 16,
+            teleop_coral: 143,
+            teleop_algae: 16,
+            climb: 7,
+            auto_reliability: 5,
+        },
+        1678: {
+            auto: 19,
+            teleop_coral: 96,
+            teleop_algae: 8,
+            climb: 12,
+            auto_reliability: 7,
+        },
+    };
+
+
+    const graphConfig: Record<GraphType, GraphConfigEntry> = {
+            matchTimeline: {
+                label: "Match Timeline",
+
+                controls: (
                     <Select
-                        value={graphHooks.scoreBreakdown.matchType as string}
-                        onValueChange={(v) => graphHooks.scoreBreakdown.setMatchType(v as "qm" | "sf" | "f")}
+                        onValueChange={(v) => {
+                            const teamId = Number(v);
+                            graphHooks.matchTimeline.setSelectedTeam(teamId);
+                        }}
                     >
-                        <SelectTrigger className="w-[120px]">
-                            <SelectValue placeholder="Match Type"/>
+                        <SelectTrigger className="w-[200px]">
+                            <SelectValue placeholder="Select a team"/>
                         </SelectTrigger>
                         <SelectContent>
-                            <SelectItem value="qm">Qualification</SelectItem>
-                            <SelectItem value="sf">Playoff</SelectItem>
-                            <SelectItem value="f">Final</SelectItem>
+                            {Object.entries(matchTimelineTESTDATA).map(([idStr]) => {
+                                const id = Number(idStr);
+                                return (
+                                    <SelectItem key={id} value={idStr}>
+                                        Team {id}
+                                    </SelectItem>
+                                );
+                            })}
                         </SelectContent>
                     </Select>
+                ),
 
-                    {/* Match Number Input */}
-                    <Input
-                        type="number"
-                        placeholder="Match #"
-                        value={graphHooks.scoreBreakdown.match ?? ""}
-                        onChange={(e) => {
-                            const val = e.target.value;
-                            graphHooks.scoreBreakdown.setMatch(val === "" ? undefined : Number(val));
-                        }}
-                        className="w-[100px]"
-                    />
+                chart: () => (
+                    <ResponsiveContainer width="100%" height="100%">
+                        <LineChart data={matchTimelineTESTDATA[graphHooks.matchTimeline.selectedTeam ?? -1] ?? []}>
+                            <CartesianGrid strokeDasharray="3 3"/>
+                            <XAxis dataKey="match"/>
+                            <YAxis/>
+                            <Tooltip/>
+                            <Legend/>
+                            {
+                                (() => {
+                                    const data = matchTimelineTESTDATA[graphHooks.matchTimeline.selectedTeam ?? -1];
+                                    if (!data || data.length === 0) return null;
+                                    return Object.keys(data[0])
+                                        .filter((key) => key !== "match")
+                                        .map((key, i) => (
+                                            <Line
+                                                key={key}
+                                                dataKey={key}
+                                                stroke={COLOR_PALETTE[i % COLOR_PALETTE.length]}
+                                                name={key.replace(/_/g, " ").replace(/\b\w/g, c => c.toUpperCase())}
+                                            />
+                                        ));
+                                })()
+                            }
+                        </LineChart>
+                    </ResponsiveContainer>
+                )
+            },
 
-                    {/* Normalization Toggle */}
-                    <label className="flex items-center gap-2 text-sm font-medium">
-                        <Switch
-                            checked={graphHooks.scoreBreakdown.norm}
-                            onCheckedChange={graphHooks.scoreBreakdown.setNorm}
-                        />
-                        Normalize
-                    </label>
-                </div>
-            ),
+            scoreBreakdown: {
+                label: "Score Breakdown",
 
-            chart: (
-                <ResponsiveContainer width="100%" height="100%">
-                    <BarChart
-                        layout="horizontal"
-                        data={
-                            (graphHooks.scoreBreakdown.matchType === "qm" &&
-                                (graphHooks.scoreBreakdown.match === 1 || graphHooks.scoreBreakdown.match === 2))
-                                ? (
-                                    {
-                                        1: [
-                                            {
-                                                team: "Red 254",
-                                                auto: 15,
-                                                teleop_coral: 20,
-                                                teleop_algae: 10,
-                                                endgame: 25,
-                                                foul: 5
-                                            },
-                                            {
-                                                team: "Red 1323",
-                                                auto: 10,
-                                                teleop_coral: 18,
-                                                teleop_algae: 12,
-                                                endgame: 20,
-                                                foul: 3
-                                            },
-                                            {
-                                                team: "Red 1678",
-                                                auto: 12,
-                                                teleop_coral: 22,
-                                                teleop_algae: 8,
-                                                endgame: 18,
-                                                foul: 2
-                                            },
-                                            {
-                                                team: "Blue 2910",
-                                                auto: 14,
-                                                teleop_coral: 16,
-                                                teleop_algae: 14,
-                                                endgame: 22,
-                                                foul: 6
-                                            },
-                                            {
-                                                team: "Blue 118",
-                                                auto: 13,
-                                                teleop_coral: 20,
-                                                teleop_algae: 11,
-                                                endgame: 21,
-                                                foul: 4
-                                            },
-                                            {
-                                                team: "Blue 2056",
-                                                auto: 11,
-                                                teleop_coral: 19,
-                                                teleop_algae: 10,
-                                                endgame: 24,
-                                                foul: 5
-                                            },
-                                        ],
-                                        2: [
-                                            {
-                                                team: "Red 4414",
-                                                auto: 14,
-                                                teleop_coral: 21,
-                                                teleop_algae: 9,
-                                                endgame: 26,
-                                                foul: 2
-                                            },
-                                            {
-                                                team: "Red 1690",
-                                                auto: 12,
-                                                teleop_coral: 23,
-                                                teleop_algae: 10,
-                                                endgame: 22,
-                                                foul: 3
-                                            },
-                                            {
-                                                team: "Red 2054",
-                                                auto: 13,
-                                                teleop_coral: 17,
-                                                teleop_algae: 13,
-                                                endgame: 19,
-                                                foul: 4
-                                            },
-                                            {
-                                                team: "Blue 5406",
-                                                auto: 10,
-                                                teleop_coral: 15,
-                                                teleop_algae: 12,
-                                                endgame: 18,
-                                                foul: 6
-                                            },
-                                            {
-                                                team: "Blue 111",
-                                                auto: 11,
-                                                teleop_coral: 19,
-                                                teleop_algae: 11,
-                                                endgame: 20,
-                                                foul: 5
-                                            },
-                                            {
-                                                team: "Blue 148",
-                                                auto: 13,
-                                                teleop_coral: 18,
-                                                teleop_algae: 14,
-                                                endgame: 21,
-                                                foul: 3
-                                            },
-                                        ],
-                                    }[graphHooks.scoreBreakdown.match]
-                                ).map((entry) => {
-                                    if (!graphHooks.scoreBreakdown.norm) return entry;
-                                    const total = entry.auto + entry.teleop_coral + entry.teleop_algae + entry.endgame + entry.foul;
-                                    return {
-                                        ...entry,
-                                        auto: (entry.auto / total) * 100,
-                                        teleop_coral: (entry.teleop_coral / total) * 100,
-                                        teleop_algae: (entry.teleop_algae / total) * 100,
-                                        endgame: (entry.endgame / total) * 100,
-                                        foul: (entry.foul / total) * 100,
-                                    };
-                                })
-                                : []
-                        }
-                        margin={{top: 20, right: 20, left: 40, bottom: 20}}
-                    >
-                        <CartesianGrid strokeDasharray="3 3"/>
-                        <XAxis dataKey="team" type="category" interval={0} angle={0} height={60}/>
-                        <YAxis type="number" domain={[0, graphHooks.scoreBreakdown.norm ? 100 : "auto"]}/>
-                        <Tooltip/>
-                        <Legend/>
-                        <Bar dataKey="auto" stackId="a" fill="#8884d8" name="Auto"/>
-                        <Bar dataKey="teleop_coral" stackId="a" fill="#4caf50" name="Teleop Coral"/>
-                        <Bar dataKey="teleop_algae" stackId="a" fill="#2196f3" name="Teleop Algae"/>
-                        <Bar dataKey="endgame" stackId="a" fill="#ffc658" name="Endgame"/>
-                        <Bar dataKey="foul" stackId="a" fill="#f44336" name="Fouls"/>
-                    </BarChart>
-                </ResponsiveContainer>
-            ),
-        },
-
-        cycleEfficiency: {
-            label: "Cycle Efficiency",
-            controls: null,
-            chart: (
-                <div className="h-full w-full border rounded bg-gray-100 flex items-center justify-center">
-                    Cycle Efficiency Chart Placeholder
-                </div>
-            ),
-        },
-
-        objectiveContribution: {
-            label: "Objective Contribution",
-            controls: null,
-            chart: (
-                <div className="h-full w-full border rounded bg-gray-100 flex items-center justify-center">
-                    Objective Contribution Chart Placeholder
-                </div>
-            ),
-        },
-
-        endgameSuccess: {
-            label: "Endgame Success",
-            controls: null,
-            chart: (
-                <div className="h-full w-full border rounded bg-gray-100 flex items-center justify-center">
-                    Endgame Success Chart Placeholder
-                </div>
-            ),
-        },
-
-        accuracyHeatmap: {
-            label: "Accuracy Heatmap",
-            controls: null,
-            chart: (
-                <div className="h-full w-full border rounded bg-gray-100 flex items-center justify-center">
-                    Accuracy Heatmap Chart Placeholder
-                </div>
-            ),
-        },
-
-        allianceScoreComparison: {
-            label: "Alliance Score Comparison",
-            controls: null,
-            chart: (
-                <div className="h-full w-full border rounded bg-gray-100 flex items-center justify-center">
-                    Alliance Score Comparison Chart Placeholder
-                </div>
-            ),
-        },
-
-        correlationMatrix: {
-            label: "Correlation Matrix",
-            controls: null,
-            chart: (
-                <div className="h-full w-full border rounded bg-gray-100 flex items-center justify-center">
-                    Correlation Matrix Chart Placeholder
-                </div>
-            ),
-        },
-
-        performanceDistribution: {
-            label: "Performance Distribution",
-            controls: null,
-            chart: (
-                <div className="h-full w-full border rounded bg-gray-100 flex items-center justify-center">
-                    Performance Distribution Chart Placeholder
-                </div>
-            ),
-        },
-
-        rankingProgression: {
-            label: "Ranking Progression",
-            controls: null,
-            chart: (
-                <div className="h-full w-full border rounded bg-gray-100 flex items-center justify-center">
-                    Ranking Progression Chart Placeholder
-                </div>
-            ),
-        },
-
-        headToHead: {
-            label: "Head-to-Head",
-            controls: (
-                <Select
-                    multiple
-                    onValueChange={(values) =>
-                        graphHooks.headToHead.setSelectedTeams((values).map((v) => Number(v)))
-                    }
-                >
-                    <SelectTrigger className="w-[300px]">
-                        <SelectValue placeholder="Select Teams..."/>
-                    </SelectTrigger>
-                    <SelectContent>
-                        {[254, 1323, 2910, 1678].map((teamId) => (
-                            <SelectItem key={teamId} value={teamId.toString()}>
-                                Team {teamId}
-                            </SelectItem>
-                        ))}
-                    </SelectContent>
-                </Select>
-            ),
-
-            chart: (
-                <ResponsiveContainer width="100%" height="100%">
-                    <RadarChart
-                        outerRadius="80%"
-                        data={
-                        ["auto", "teleop", "endgame", "fouls"].map((metric) => {
-                            const label = metric[0].toUpperCase() + metric.slice(1);
-                            const teamStats = {
-                                254: {auto: 18, teleop: 36, endgame: 30, fouls: 6},
-                                1323: {auto: 20, teleop: 28, endgame: 35, fouls: 4},
-                                2910: {auto: 16, teleop: 33, endgame: 27, fouls: 5},
-                                1678: {auto: 19, teleop: 30, endgame: 32, fouls: 7},
-                            };
-                            const selected = graphHooks.headToHead.selectedTeams ?? [];
-
-                            const max = graphHooks.headToHead.norm
-                                ? Math.max(...selected.map((id) => teamStats[id]?.[metric] ?? 0))
-                                : 1;
-
-                            return Object.fromEntries([
-                                ["metric", label],
-                                ...selected.map((id) => [
-                                    id.toString(),
-                                    graphHooks.headToHead.norm
-                                        ? ((teamStats[id]?.[metric] ?? 0) / max) * 100
-                                        : teamStats[id]?.[metric] ?? 0,
-                                ]),
-                            ]);
-                        })
-                    }
+                controls: (
+                    <div className="flex gap-4 items-center">
+                        {/* Match Type Selector */}
+                        <Select
+                            value={graphHooks.scoreBreakdown.matchType as string}
+                            onValueChange={(v) => graphHooks.scoreBreakdown.setMatchType(v as "qm" | "sf" | "f")}
                         >
-                    <PolarGrid/>
-                    <PolarAngleAxis dataKey="metric"/>
-                    <PolarRadiusAxis angle={30} domain={[0, graphHooks.headToHead.norm ? 100 : "auto"]}/>
-                        {graphHooks.headToHead.selectedTeams?.map((id) => (
-                            <Radar
-                                key={id}
-                                name={`Team ${id}`}
-                                dataKey={id.toString()}
-                                stroke={id === 254 ? "#8884d8" : id === 1323 ? "#82ca9d" : id === 2910 ? "#ffc658" : "#f44336"}
-                                fillOpacity={0.4}
-                                fill={id === 254 ? "#8884d8" : id === 1323 ? "#82ca9d" : id === 2910 ? "#ffc658" : "#f44336"}
+                            <SelectTrigger className="w-[160px]">
+                                <SelectValue placeholder="Match Type"/>
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectItem value="qm">Qualification</SelectItem>
+                                <SelectItem value="sf">Playoff</SelectItem>
+                                <SelectItem value="f">Final</SelectItem>
+                            </SelectContent>
+                        </Select>
+
+                        {/* Match Number Input */}
+                        <Input
+                            type="number"
+                            placeholder="Match #"
+                            value={graphHooks.scoreBreakdown.match ?? ""}
+                            onChange={(e) => {
+                                const val = e.target.value;
+                                graphHooks.scoreBreakdown.setMatch(val === "" ? undefined : Number(val));
+                            }}
+                            className="w-[100px]"
+                        />
+
+                        {/* Normalization Toggle */}
+                        <label className="flex items-center gap-2 text-sm font-medium">
+                            <Switch
+                                checked={graphHooks.scoreBreakdown.norm}
+                                onCheckedChange={graphHooks.scoreBreakdown.setNorm}
                             />
-                        ))}
-                    <Legend/>
-                    <Tooltip/>
-                </RadarChart>
-</ResponsiveContainer>
-),
-},
+                            Normalize
+                        </label>
+                    </div>
+                ),
 
-    consistencyMetric: {
-        label: "Consistency Metric",
-            controls
-    :
-        null,
-            chart
-    :
-        (
-            <div className="h-full w-full border rounded bg-gray-100 flex items-center justify-center">
-                Consistency Metric Chart Placeholder
-            </div>
-        ),
-    }
-,
+                chart: () => {
+                    const matchType = graphHooks.scoreBreakdown.matchType ?? "qm";
+                    const matchNum = graphHooks.scoreBreakdown.match ?? -1;
+                    const raw =
+                        scoreBreakdownTESTDATA[matchType]?.[matchNum] ?? [];
 
-    autonClustering: {
-        label: "Auton Clustering",
-            controls
-    :
-        null,
-            chart
-    :
-        (
-            <div className="h-full w-full border rounded bg-gray-100 flex items-center justify-center">
-                Auton Clustering Chart Placeholder
-            </div>
-        ),
-    }
-,
+                    const data = graphHooks.scoreBreakdown.norm
+                        ? raw.map((entry) => {
+                            const total = Object.entries(entry as Record<string, number>)
+                                .filter(([k]) => k !== "team")
+                                .reduce((acc, [, v]) => acc + v, 0);
+                            return {
+                                ...entry,
+                                ...Object.fromEntries(
+                                    Object.entries(entry)
+                                        .filter(([k]) => k !== "team")
+                                        .map(([k, v]) => [k, (v as number) / total * 100])
+                                ),
+                            };
+                        })
+                        : raw;
 
-    winProbability: {
-        label: "Win Probability",
-            controls
-    :
-        null,
-            chart
-    :
-        (
-            <div className="h-full w-full border rounded bg-gray-100 flex items-center justify-center">
-                Win Probability Chart Placeholder
-            </div>
-        ),
-    }
-,
-}
+                    const keys = data.length > 0
+                        ? Object.keys(data[0]).filter((k) => k !== "team")
+                        : [];
+
+                    return (
+                        <ResponsiveContainer width="100%" height="100%">
+                            <BarChart
+                                layout="horizontal"
+                                data={data}
+                                margin={{top: 20, right: 20, left: 40, bottom: 20}}
+                            >
+                                <CartesianGrid strokeDasharray="3 3"/>
+                                <XAxis dataKey="team" type="category" interval={0} angle={0} height={60}/>
+                                <YAxis
+                                    type="number"
+                                    domain={[0, graphHooks.scoreBreakdown.norm ? 100 : "auto"]}
+                                />
+                                <Tooltip/>
+                                <Legend/>
+                                {keys.map((key, i) => (
+                                    <Bar
+                                        key={key}
+                                        dataKey={key}
+                                        stackId="a"
+                                        fill={COLOR_PALETTE[i % COLOR_PALETTE.length]}
+                                        name={key.replace(/_/g, " ").replace(/\b\w/g, (l) => l.toUpperCase())}
+                                    />
+                                ))}
+                            </BarChart>
+                        </ResponsiveContainer>
+                    );
+                }
+            },
+
+            cycleEfficiency: {
+                label: "Cycle Efficiency",
+                controls:
+                    null,
+                chart: () => (
+                    <div className="h-full w-full border rounded bg-gray-100 flex items-center justify-center">
+                        Plot of coral cycles to algae cycles per match
+                    </div>
+                )
+
+            },
+
+            objectiveContribution: {
+                label: "Objective Contribution",
+                controls:
+                    (
+                        <div className="flex gap-4 items-center">
+                            <DropdownMenu>
+                                <DropdownMenuTrigger asChild>
+                                    <Button variant="outline" className="min-w-[200px] justify-start">
+                                        {graphHooks.objectiveContribution.selectedTeams?.length
+                                            ? `Teams: ${graphHooks.objectiveContribution.selectedTeams.join(", ")}`
+                                            : "Select Teams"}
+                                    </Button>
+                                </DropdownMenuTrigger>
+                                <DropdownMenuContent className="w-56">
+                                    <DropdownMenuLabel>Select Teams</DropdownMenuLabel>
+                                    <DropdownMenuSeparator/>
+                                    {[254, 1323, 2910, 1678].map((id) => (
+                                        <DropdownMenuCheckboxItem
+                                            key={id}
+                                            checked={graphHooks.objectiveContribution.selectedTeams?.includes(id)}
+                                            onCheckedChange={(checked) => {
+                                                const current = graphHooks.objectiveContribution.selectedTeams ?? [];
+                                                graphHooks.objectiveContribution.setSelectedTeams(
+                                                    checked
+                                                        ? [...current, id]
+                                                        : current.filter((x) => x !== id)
+                                                );
+                                            }}
+                                        >
+                                            Team {id}
+                                        </DropdownMenuCheckboxItem>
+                                    ))}
+                                </DropdownMenuContent>
+                            </DropdownMenu>
+                        </div>
+                    ),
+                chart:
+                    () => (
+                        <div className="h-full w-full border rounded bg-gray-100 p-4 overflow-auto">
+                            <div className="grid grid-cols-6 gap-2 min-w-[500px] text-sm">
+                                {/* Header Row */}
+                                <div className="font-semibold">Team</div>
+                                <div className="font-semibold text-center">Algae</div>
+                                <div className="font-semibold text-center">Climb</div>
+                                <div className="font-semibold text-center">Auto</div>
+                                <div className="font-semibold text-center">Coral</div>
+                                <div className="font-semibold text-center">Levels</div>
+
+                                {/* Team Rows */}
+                                {[
+                                    {team: 1323, algae: 7, climb: 5, autoGoal: true, coral: 4, levels: 2},
+                                    {team: 2910, algae: 9, climb: 14, autoGoal: true, coral: 6, levels: 3},
+                                    {team: 1690, algae: 5, climb: 0, autoGoal: false, coral: 3, levels: 1},
+                                    {team: 1678, algae: 8, climb: 14, autoGoal: true, coral: 5, levels: 3},
+                                ].map((data) => (
+                                    <React.Fragment key={data.team}>
+                                        <div className="font-medium">{data.team}</div>
+                                        <div className="text-center">{data.algae}</div>
+                                        <div className="text-center">{data.climb}</div>
+                                        <div className="text-center">{data.autoGoal ? "YES" : "NO"}</div>
+                                        <div className="text-center">{data.coral}</div>
+                                        <div className="text-center">{data.levels}</div>
+                                    </React.Fragment>
+                                ))}
+                            </div>
+                        </div>
+                    ),
+            },
+
+            accuracyMap: {
+                label: "Accuracy Map",
+                controls:
+                    (
+                        <Select
+                            onValueChange={(v) => {
+                                graphHooks.accuracyMap.setSelectedTeam(Number(v));
+                            }}
+                        >
+                            <SelectTrigger className="w-[200px]">
+                                <SelectValue placeholder="Select a team"/>
+                            </SelectTrigger>
+                            <SelectContent>
+                                {[{id: 1323, name: "MadTown Robotics"}, {id: 254, name: "Cheesy Poofs"}].map((t) => (
+                                    <SelectItem key={t.id} value={t.id.toString()}>
+                                        {t.name} ({t.id})
+                                    </SelectItem>
+                                ))}
+                            </SelectContent>
+                        </Select>
+                    ),
+                chart: () => {
+                    const selectedTeam = graphHooks.accuracyMap.selectedTeam ?? 0;
+                    const rawData = accuracyMapTESTDATA[selectedTeam] ?? [];
+
+                    const LEVELS = ["l1", "l2", "l3", "l4", "barge"];
+
+                    return (
+                        <ResponsiveContainer width="100%" height="100%">
+                            <ScatterChart margin={{top: 20, right: 20, bottom: 20, left: 20}}>
+                                <CartesianGrid/>
+                                <XAxis
+                                    dataKey="x"
+                                    type="number"
+                                    name="Match"
+                                    domain={["dataMin", "dataMax"]}
+                                />
+                                <YAxis
+                                    type="number"
+                                    dataKey="y"
+                                    name="Accuracy"
+                                    domain={[0, 100]}
+                                    tickFormatter={(v) => `${v}%`}
+                                />
+                                <ZAxis dataKey="size" range={[60, 400]} name="Attempts"/>
+                                <Tooltip
+                                    cursor={{strokeDasharray: "3 3"}}
+                                    formatter={(value, name) => {
+                                        if (name === "y") return [`${(value as number).toFixed(0)}%`, "Accuracy"];
+                                        if (name === "size") return [value, "Attempts"];
+                                        return [value, name];
+                                    }}
+                                />
+                                <Legend/>
+                                {LEVELS.map((level, i) => (
+                                    <Scatter
+                                        key={level}
+                                        name={level}
+                                        fill={COLOR_PALETTE[i % COLOR_PALETTE.length]}
+                                        data={rawData
+                                            .filter((d) => d.level === level)
+                                            .map((d) => ({
+                                                x: d.match,
+                                                y: d.accuracy * 100,
+                                                size: d.attempts,
+                                            }))
+                                        }
+                                    />
+                                ))}
+                            </ScatterChart>
+                        </ResponsiveContainer>
+                    );
+                }
+
+            },
+
+            correlationMatrix: {
+                label: "Correlation Matrix",
+                controls:
+                    null,
+                chart:
+                    () => (
+                        <div className="h-full w-full border rounded bg-gray-100 flex items-center justify-center">
+                            Correlation Matrix Chart Placeholder
+                        </div>
+                    ),
+            },
+
+            performanceDistribution: {
+                label: "Performance Distribution",
+                controls:
+                    null,
+                chart:
+                    () => (
+                        <div className="h-full w-full border rounded bg-gray-100 flex items-center justify-center">
+                            Performance Distribution Chart Placeholder
+                        </div>
+                    ),
+            },
+
+            rankingProgression: {
+                label: "Ranking Progression",
+                controls:
+                    null,
+                chart:
+                    () => (
+                        <div className="h-full w-full border rounded bg-gray-100 flex items-center justify-center">
+                            Ranking Progression Chart Placeholder
+                        </div>
+                    ),
+            },
+
+            headToHead: {
+                label: "Head-to-Head",
+
+                controls:
+                    (
+                        <div className="flex gap-4 items-center">
+                            <DropdownMenu>
+                                <DropdownMenuTrigger asChild>
+                                    <Button variant="outline" className="min-w-[200px] justify-start">
+                                        {graphHooks.headToHead.selectedTeams?.length
+                                            ? `Teams: ${graphHooks.headToHead.selectedTeams.join(", ")}`
+                                            : "Select Teams"}
+                                    </Button>
+                                </DropdownMenuTrigger>
+                                <DropdownMenuContent className="w-56">
+                                    <DropdownMenuLabel>Select Teams</DropdownMenuLabel>
+                                    <DropdownMenuSeparator/>
+                                    {[254, 1323, 2910, 1678].map((id) => (
+                                        <DropdownMenuCheckboxItem
+                                            key={id}
+                                            checked={graphHooks.headToHead.selectedTeams?.includes(id)}
+                                            onCheckedChange={(checked) => {
+                                                const current = graphHooks.headToHead.selectedTeams ?? [];
+                                                graphHooks.headToHead.setSelectedTeams(
+                                                    checked
+                                                        ? [...current, id]
+                                                        : current.filter((x) => x !== id)
+                                                );
+                                            }}
+                                        >
+                                            Team {id}
+                                        </DropdownMenuCheckboxItem>
+                                    ))}
+                                </DropdownMenuContent>
+                            </DropdownMenu>
+                            {/* Normalize Switch */}
+                            <label className="flex items-center gap-2 text-sm font-medium">
+                                <Switch
+                                    checked={graphHooks.headToHead.norm}
+                                    onCheckedChange={graphHooks.headToHead.setNorm}
+                                />
+                                Normalize
+                            </label>
+                        </div>
+                    ),
+
+                chart: () => {
+                    const selected = graphHooks.headToHead.selectedTeams ?? [];
+                    const norm = graphHooks.headToHead.norm;
+                    const teamStats = headToHeadTESTDATA;
+
+                    const metricKeys = Object.keys(teamStats[selected[0] ?? 254] ?? {});
+
+                    const data = metricKeys.map((metric) => {
+                        const max = norm
+                            ? Math.max(...selected.map((id) => teamStats[id]?.[metric] ?? 0)) || 1
+                            : 1;
+
+                        return Object.fromEntries([
+                            [
+                                "metric",
+                                metric.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase()),
+                            ],
+                            ...selected.map((id) => [
+                                id.toString(),
+                                norm
+                                    ? ((teamStats[id]?.[metric] ?? 0) / max) * 100
+                                    : teamStats[id]?.[metric] ?? 0,
+                            ]),
+                        ]);
+                    });
+
+                    return (
+                        <ResponsiveContainer width="100%" height="100%">
+                            <RadarChart outerRadius="80%" data={data}>
+                                <PolarGrid/>
+                                <PolarAngleAxis dataKey="metric"/>
+                                <PolarRadiusAxis angle={30} domain={[0, norm ? 100 : "auto"]}/>
+                                {selected.map((id, i) => (
+                                    <Radar
+                                        key={id}
+                                        name={`Team ${id}`}
+                                        dataKey={id.toString()}
+                                        stroke={COLOR_PALETTE[i % COLOR_PALETTE.length]}
+                                        fill={COLOR_PALETTE[i % COLOR_PALETTE.length]}
+                                        fillOpacity={0.4}
+                                    />
+                                ))}
+                                <Legend/>
+                                <Tooltip/>
+                            </RadarChart>
+                        </ResponsiveContainer>
+                    );
+                }
+            },
+
+            autonClustering: {
+                label: "Auton Clustering",
+                controls:
+                    null,
+                chart:
+                    () => (
+                        <div className="h-full w-full border rounded bg-gray-100 flex items-center justify-center">
+                            graph of all auto routines
+                        </div>
+                    ),
+            },
+        }
     ;
 
 
@@ -1228,7 +1445,9 @@ export function DataLayout() {
                                     {graphConfig[graphType].controls}
                                 </div>
 
-                                <div className="flex-1 overflow-hidden">{graphConfig[graphType].chart}</div>
+                                <div className="flex-1 overflow-hidden">
+                                    {graphConfig[graphType].chart()}
+                                </div>
                             </div>
 
                         </>
@@ -1273,7 +1492,7 @@ export function DataLayout() {
                                     } else {
                                         // Green → Blue
                                         const t = (rel - 90) / 10; // 0 to 1
-                                        r = Math.round((1 - t) * 0 + t * 0);
+                                        r = 0
                                         g = Math.round((1 - t) * 255 + t * 180);
                                         b = Math.round((1 - t) * 80 + t * 255);
                                     }
@@ -1335,13 +1554,13 @@ export function DataLayout() {
                         <div className="font-semibold mb-1">Rankings</div>
                         {(_teamMap.get(teamNum)?.rankings?.length ?? 0) > 0 ? (
                             <div className="flex-1 w-full flex items-center justify-center">
-                                <div className="grid grid-cols-2 gap-x-4 gap-y-2 text-xs">
+                                <div className="grid grid-cols-2 gap-x-6 gap-y-3 text-xs">
                                     {_teamMap.get(teamNum)?.rankings.map((r, i) => {
                                         const rankRatio = r.rank / totalTeam;
                                         const percentile = r.percentile;
 
-                                        let rankColor = "text-gray-500";
-                                        let percentileColor = "text-gray-500";
+                                        let rankColor;
+                                        let percentileColor;
 
                                         if (rankRatio <= 0.05) rankColor = "text-blue-500";
                                         else if (rankRatio <= 0.25) rankColor = "text-green-500";
@@ -1382,12 +1601,38 @@ export function DataLayout() {
                                 [..._teamMap.get(teamNum)!.matches].reverse().map((m, i) => {
                                     const color = m.result === "W" ? "text-green-600" : "text-red-600";
                                     return (
-                                        <div key={i} className="flex flex-col items-center w-24">
+                                        <div key={i} className="flex flex-col items-center w-28">
                                             <div className="font-mono">{m.match}</div>
                                             <div className={`font-bold ${color}`}>{m.result}</div>
                                             <div>{m.score} pts</div>
                                             <div className="text-gray-500">AI: {m.pred_ai}</div>
                                             <div className="text-gray-500">H: {m.pred_heur}</div>
+                                            <div className="text-gray-500">
+                                                w/{" "}
+                                                {m.teammates
+                                                    .filter((n: number) => n !== teamNum)
+                                                    .map((num: number, j: number) => (
+                                                        <span
+                                                            key={`tm-${j}`}
+                                                            className="cursor-pointer"
+                                                            onClick={() => setTeamNum(num)}
+                                                        >{num}
+                                                            {j < m.teammates.length - 2 ? ", " : ""}
+                                                        </span>
+                                                    ))}
+                                            </div>
+                                            <div className="text-gray-500">
+                                                vs{" "}
+                                                {m.opponents.map((num: number, j: number) => (
+                                                    <span
+                                                        key={`opp-${j}`}
+                                                        className="cursor-pointer"
+                                                        onClick={() => setTeamNum(num)}
+                                                    >{num}
+                                                        {j < m.opponents.length - 1 ? ", " : ""}
+                                                    </span>
+                                                ))}
+                                            </div>
                                         </div>
                                     );
                                 })
@@ -1396,7 +1641,6 @@ export function DataLayout() {
                             )}
                         </div>
                     </div>
-
                 </div>
             </div>
         </div>

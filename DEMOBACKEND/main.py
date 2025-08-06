@@ -16,6 +16,7 @@ import os
 import uuid
 import tba_fetcher
 from dotenv import load_dotenv
+import socket
 
 # <editor-fold desc="Setup">
 load_dotenv()
@@ -32,10 +33,14 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(lifespan=lifespan)
 
+s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+s.connect(("8.8.8.8", 80))
+local_ip = s.getsockname()[0]
+s.close()
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://192.168.1.22:5173", "http://10.176.209.233:5173", "http://192.168.1.194:5173",
-                   "http://192.168.1.106:5173", "http://192.168.1.126:5173"],
+    allow_origins=[f"http://{local_ip}:5173"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -686,6 +691,23 @@ def get_status(
         "scouter": entry.get("scouter"),
         "status": entry.get("status", "error")
     }
+
+
+@app.get("/data/processed")
+def get_data_processed(
+        _: dict = Depends(partial(verify_uuid, required="admin"))
+):
+    conn = get_db_conn()
+    cursor = conn.cursor()
+    query = "SELECT * FROM processed_data WHERE 1=1"
+    cursor.execute(query, [])
+    rows = cursor.fetchall()
+    conn.close()
+    #print(rows)
+    return {
+        "data": rows[0][1],
+    }
+
 
 
 @app.get("/ping")

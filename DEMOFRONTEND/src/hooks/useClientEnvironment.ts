@@ -2,7 +2,6 @@ import {useEffect, useState} from "react"
 import {useAPI} from "../api/API.ts"
 
 export interface ClientEnvironment {
-    // App/Platform Info
     isPWA: boolean
     isIOSPWA: boolean
     isStandalone: boolean
@@ -12,23 +11,20 @@ export interface ClientEnvironment {
     deviceType: "mobile" | "tablet" | "desktop"
     isTouchDevice: boolean
 
-    // Network
-    serverOnline: boolean,
+    serverOnline: boolean
     isOnline: boolean
     isWifi: boolean
-    networkQuality: number // 0.0 – 1.0
+    networkQuality: number
     qualityLevel: 0 | 1 | 2 | 3 | 4 | 5
     effectiveType: string | null
     rawSpeedMbps: number | null
     rawRTT: number | null
 
-    // Hardware
     bluetoothAvailable: boolean
     usbAvailable: boolean
     hasCamera: boolean
     hasMicrophone: boolean
 
-    // Battery
     batteryLevel: number | null
     batteryCharging: boolean | null
 }
@@ -65,10 +61,52 @@ export function useClientEnvironment(): ClientEnvironment {
     const {ping} = useAPI()
 
     useEffect(() => {
+        const updatePlatformInfo = () => {
+            const ua = navigator.userAgent
+
+            const isIOS = /iPhone|iPad|iPod/i.test(ua)
+            const isAndroid = /Android/i.test(ua)
+            const isTablet = /iPad|Tablet/i.test(ua)
+            const isMobile = /Mobi|Android|iPhone|iPod/i.test(ua)
+            const isTouch = "ontouchstart" in window || navigator.maxTouchPoints > 0
+
+            let deviceType: ClientEnvironment["deviceType"] = "desktop"
+            if (isTablet) deviceType = "tablet"
+            else if (isMobile) deviceType = "mobile"
+
+            let os: ClientEnvironment["os"] = "Other"
+            if (isIOS) os = "iOS"
+            else if (isAndroid) os = "Android"
+            else if (navigator.appVersion.includes("Win")) os = "Windows"
+            else if (navigator.appVersion.includes("Mac")) os = "macOS"
+            else if (navigator.appVersion.includes("Linux")) os = "Linux"
+
+            let browser: ClientEnvironment["browser"] = "Other"
+            if (/Chrome/i.test(ua)) browser = "Chrome"
+            else if (/Safari/i.test(ua)) browser = "Safari"
+            else if (/Firefox/i.test(ua)) browser = "Firefox"
+            else if (/Edg/i.test(ua)) browser = "Edge"
+
+            const isStandalone = window.matchMedia("(display-mode: standalone)").matches || (navigator as any).standalone === true
+            const isPWA = isStandalone || window.location.protocol === "app:"
+            const isIOSPWA = isIOS && (navigator as any).standalone === true
+
+            setEnv(prev => ({
+                ...prev,
+                userAgent: ua,
+                os,
+                browser,
+                deviceType,
+                isTouchDevice: isTouch,
+                isPWA,
+                isStandalone,
+                isIOSPWA,
+            }))
+        }
+
         const updateNetworkStatus = () => {
             const nav = navigator as any
             const conn = nav.connection || {}
-
             const type = conn.type ?? null
             const effectiveType = conn.effectiveType ?? null
             const downlink = typeof conn.downlink === "number" ? conn.downlink : null
@@ -76,12 +114,9 @@ export function useClientEnvironment(): ClientEnvironment {
             const isOnline = navigator.onLine
             const isWifi = type === "wifi" || effectiveType === "4g" || (downlink ?? 0) > 10
 
-            const quality =
-                !isOnline || downlink === null || rtt === null
-                    ? 0
-                    : Math.min(1,
-                        (downlink / 10) * 0.7 + (1 - Math.min(rtt / 300, 1)) * 0.3
-                    )
+            const quality = !isOnline || downlink === null || rtt === null
+                ? 0
+                : Math.min(1, (downlink / 10) * 0.7 + (1 - Math.min(rtt / 300, 1)) * 0.3)
 
             const level: ClientEnvironment["qualityLevel"] =
                 !isOnline ? 0
@@ -92,7 +127,7 @@ export function useClientEnvironment(): ClientEnvironment {
                                     : quality > 0.1 ? 1
                                         : 0
 
-            setEnv((prev) => ({
+            setEnv(prev => ({
                 ...prev,
                 isOnline,
                 isWifi,
@@ -109,11 +144,11 @@ export function useClientEnvironment(): ClientEnvironment {
             setEnv(prev => ({...prev, serverOnline: result}))
         }
 
+        updatePlatformInfo()
         updateNetworkStatus()
         void pingServer()
 
         const interval = setInterval(pingServer, 4500)
-
         window.addEventListener("online", updateNetworkStatus)
         window.addEventListener("offline", updateNetworkStatus)
         ;((navigator as any).connection)?.addEventListener("change", updateNetworkStatus)
@@ -125,7 +160,6 @@ export function useClientEnvironment(): ClientEnvironment {
             ;((navigator as any).connection)?.removeEventListener("change", updateNetworkStatus)
         }
     }, [])
-
 
     return env
 }
