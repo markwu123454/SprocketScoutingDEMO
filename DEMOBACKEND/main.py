@@ -1,7 +1,9 @@
 import asyncio
 import csv
 import json
+import random
 import sqlite3
+import string
 import time
 
 import redis
@@ -255,14 +257,125 @@ class PasscodeBody(BaseModel):
 def init_sessions_table():
     with sqlite3.connect("sessions.db") as conn:
         conn.execute("""
-            CREATE TABLE IF NOT EXISTS sessions (
-                uuid TEXT PRIMARY KEY,
-                data TEXT NOT NULL,
-                expires TEXT NOT NULL
-            )
-        """)
+                     CREATE TABLE IF NOT EXISTS sessions
+                     (
+                         uuid
+                         TEXT
+                         PRIMARY
+                         KEY,
+                         data
+                         TEXT
+                         NOT
+                         NULL,
+                         expires
+                         TEXT
+                         NOT
+                         NULL
+                     )
+                     """)
+
 
 init_sessions_table()
+
+
+def generate_frc_password(team_number: int, nickname: str, desired_length: int | None = None,
+                          randomness: float = 1.0) -> str:
+    randomness = max(0.0, min(1.0, randomness))
+
+    # === Helper: best in-order subset of words that fits ===
+    def best_word_subset(nickname: str, max_len: int) -> str:
+        words = [w for w in nickname.split() if w.isalnum()]
+        best = ""
+        n = len(words)
+        for i in range(1, n + 1):
+            for start in range(n - i + 1):
+                subset = words[start:start + i]
+                total_len = sum(len(w) for w in subset)
+                if total_len <= max_len and total_len > len(best):
+                    best = ''.join(subset)
+        return best or "Team"
+
+    # === Helper: leetify characters ===
+    LEET_MAP = {
+        'a': '@', 'A': '@',
+        'b': '8', 'B': '8',
+        'c': '(', 'C': '(',
+        'd': '[)', 'D': '[)',
+        'e': '3', 'E': '3',
+        'f': '|=', 'F': '|=',
+        'g': '6', 'G': '6',
+        'h': '#', 'H': '#',
+        'i': '1', 'I': '1', 'ı': '1', 'ï': '1',
+        'j': '_|', 'J': '_|',
+        'k': '|<', 'K': '|<',
+        'l': '1', 'L': '1', 'ł': '1',
+        'm': '|\\/|', 'M': '|\\/|',
+        'n': '|\\|', 'N': '|\\|',
+        'o': '0', 'O': '0', 'ö': '0', 'ø': '0',
+        'p': '|D', 'P': '|D',
+        'q': '9', 'Q': '9',
+        'r': '|2', 'R': '|2',
+        's': '$', 'S': '$', 'ß': '$',
+        't': '7', 'T': '7',
+        'u': '|_|', 'U': '|_|',
+        'v': '\\/', 'V': '\\/',
+        'w': '\\/\\/', 'W': '\\/\\/',
+        'x': '><', 'X': '><',
+        'y': '`/', 'Y': '`/',
+        'z': '2', 'Z': '2',
+        '0': 'O',
+        '1': 'I',
+        '2': 'Z',
+        '3': 'E',
+        '4': 'A',
+        '5': 'S',
+        '6': 'G',
+        '7': 'T',
+        '8': 'B',
+        '9': 'P',
+    }
+
+    def leetify_char(c: str, p: float) -> str:
+        return LEET_MAP[c] if c in LEET_MAP and random.random() < p else c
+
+    # === Helper: scramble string ===
+    def scramble_string(s: str, r: float) -> str:
+        leetified = [leetify_char(c, r) for c in s]
+        n_shuffle = round(len(leetified) * r)
+        indices = random.sample(range(len(leetified)), k=n_shuffle)
+        shuffled = [leetified[i] for i in indices]
+        random.shuffle(shuffled)
+        for i, idx in enumerate(indices):
+            leetified[idx] = shuffled[i]
+        return ''.join(leetified)
+
+    # === Helper: scatter digits ===
+    def scatter_digits(base: str, digits: list[str]) -> str:
+        base_chars = list(base)
+        insertion_indices = random.sample(range(len(base_chars) + 1), k=len(digits))
+        for idx, digit in sorted(zip(insertion_indices, digits), reverse=True):
+            base_chars.insert(idx, digit)
+        return ''.join(base_chars)
+
+    team_digits = list(str(team_number))
+
+    if randomness == 1.0:
+        final_len = desired_length or 14
+        body_len = final_len - len(team_digits)
+        rand_chars = ''.join(random.choices(string.ascii_letters + "!@#$%&*", k=body_len))
+        return scatter_digits(rand_chars, random.choices(team_digits, k=len(team_digits)))[:final_len]
+
+    # Reserve space for digits
+    max_base_len = (desired_length - len(team_digits)) if desired_length else 999
+    base = best_word_subset(nickname, max_base_len)
+    scrambled = scramble_string(base.capitalize(), randomness)
+    password = scatter_digits(scrambled, team_digits)
+
+    if desired_length and len(password) < desired_length:
+        filler = ''.join(random.choices(string.ascii_letters, k=desired_length - len(password)))
+        password += filler
+
+    return password[:desired_length] if desired_length else password
 
 
 @app.post("/auth/login")
@@ -336,8 +449,8 @@ def verify_session(x_uuid: str = Header(...)):
 
 
 def verify_uuid(
-    x_uuid: str = Header(..., alias="x-uuid"),
-    required: Optional[str] = None
+        x_uuid: str = Header(..., alias="x-uuid"),
+        required: Optional[str] = None
 ) -> Dict[str, Any]:
     with sqlite3.connect("sessions.db") as conn:
         cur = conn.execute("SELECT data, expires FROM sessions WHERE uuid = ?", (x_uuid,))
@@ -394,6 +507,8 @@ def expire_all(_: dict = Depends(partial(verify_uuid, required="admin"))):
         conn.execute("DELETE FROM sessions")
         conn.commit()
     return {"status": "all expired"}
+
+
 # </editor-fold>
 
 
@@ -703,11 +818,10 @@ def get_data_processed(
     cursor.execute(query, [])
     rows = cursor.fetchall()
     conn.close()
-    #print(rows)
+    # print(rows)
     return {
         "data": rows[0][1],
     }
-
 
 
 @app.get("/ping")

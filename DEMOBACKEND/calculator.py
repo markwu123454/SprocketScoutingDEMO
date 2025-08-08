@@ -3,13 +3,18 @@
 import sqlite3
 import json
 from collections import defaultdict
-
+import numpy as np
 from pympler import asizeof
 from pprint import pprint
 from typing import Literal, Callable, Union
 import pandas as pd
 from calculators.KMeans_Clustering import compute_ai_ratings
-from calculators.Bayesian_Elo_Calculator import make_quantile_binner, build_elo_games, train_feature_elo, team_axis_score
+from calculators.Bayesian_Elo_Calculator import make_quantile_binner, build_elo_games, train_feature_elo, \
+    team_axis_score
+from calculators.Random_Forest_Regressor import predict_all_playable_matches
+import warnings
+
+# TODO: make file future proof, right now it assumes all matches are already played
 
 # --- Type aliases ---
 AllianceType = Literal["red", "blue"]
@@ -193,7 +198,7 @@ def compute_all_stats(raw_data: list[dict]) -> dict:
                 invalid_matches.add((match_type, match_num))
                 break  # no need to check the other alliance
 
-    cleaned_data = [
+    submitted_matches = [
         entry for entry in submitted_matches
         if (entry["match_type"], entry["match"]) not in invalid_matches
     ]
@@ -279,7 +284,8 @@ def compute_all_stats(raw_data: list[dict]) -> dict:
             "processor": auto["processor"] * 2,
             "move": 3 if auto["moved"] else 0,
             "coral": 0,
-            "algae": 0
+            "algae": 0,
+            "total": 0
         }
 
         teleop_score = {
@@ -290,7 +296,8 @@ def compute_all_stats(raw_data: list[dict]) -> dict:
             "barge": teleop["barge"] * 4,
             "processor": teleop["processor"] * 2,
             "coral": 0,
-            "algae": 0
+            "algae": 0,
+            "total": 0
         }
 
         climb_score = int(match["data"]["postmatch"]["climbSpeed"] * 12) if match["data"]["postmatch"][
@@ -310,8 +317,10 @@ def compute_all_stats(raw_data: list[dict]) -> dict:
 
         auto_score["coral"] = auto_score["l1"] + auto_score["l2"] + auto_score["l3"] + auto_score["l4"]
         auto_score["algae"] = auto_score["barge"] + auto_score["processor"]
+        auto_score["total"] = auto_score["algae"] + auto_score["coral"] + auto_score["move"]
         teleop_score["coral"] = teleop_score["l1"] + teleop_score["l2"] + teleop_score["l3"] + teleop_score["l4"]
         teleop_score["algae"] = teleop_score["barge"] + teleop_score["processor"]
+        teleop_score["total"] = teleop_score["algae"] + teleop_score["coral"]
 
         # ===== Step 1.4: Compute score actions (raw counts) =====
         match_result["score_actions"] = {
@@ -322,9 +331,11 @@ def compute_all_stats(raw_data: list[dict]) -> dict:
                 "l1": auto["l1"],
                 "barge": auto["barge"],
                 "processor": auto["processor"],
-                "move": 1 if auto["moved"] else 0,
+                "move": 3 if auto["moved"] else 0,
                 "coral_cycle": sum(auto_branches.values()),
-                "algae_cycle": auto["barge"] + auto["processor"]
+                "algae_cycle": auto["barge"] + auto["processor"],
+                "total": auto_branches["l4"] + auto_branches["l3"] + auto_branches["l2"] + auto["l1"] + auto["barge"] +
+                         auto["processor"] + 3 if auto["moved"] else 0
             },
             "teleop": {
                 "l4": teleop_branches["l4"],
@@ -355,7 +366,7 @@ def compute_all_stats(raw_data: list[dict]) -> dict:
         "teleop_coral": lambda d: d["score_actions"]["teleop"]["coral_cycle"],
         "teleop_algae": lambda d: d["score_breakdown"]["teleop"]["algae"],
         "climb": lambda d: d["score_actions"]["climb"] if isinstance(d["score_actions"]["climb"], int)
-                 else sum(d["score_actions"]["climb"].values()),
+        else sum(d["score_actions"]["climb"].values()),
         "defense": defense_metric
     }
 
@@ -378,7 +389,7 @@ def compute_all_stats(raw_data: list[dict]) -> dict:
     algae_binner = make_quantile_binner(team_match_records, algae_extractor, tag_prefix="algae")
     climb_binner = make_quantile_binner(team_match_records, climb_extractor, tag_prefix="climb")
     defense_binner = make_quantile_binner(team_match_records, defense_extractor,
-                                                             tag_prefix="defense")
+                                          tag_prefix="defense")
 
     coral_elo = train_feature_elo(build_elo_games(per_match_data, coral_binner))
     auto_elo = train_feature_elo(build_elo_games(per_match_data, auto_binner))
@@ -511,12 +522,13 @@ def compute_all_stats(raw_data: list[dict]) -> dict:
     print("Finished KMeans clustering")
 
     # ======= Step 5: Rank teams =======
-    # --- Initialize ranking field ---
+    # Initialize ranking and ranking_pct dictionaries
     for team in per_team_data:
         if not str(team).startswith("_"):
             per_team_data[team]["ranking"] = {}
+            per_team_data[team]["ranking_pct"] = {}
 
-    # --- Rank overall (elo["team"]) ---
+    # === Overall Ranking ===
     scores = [
         (team, d["elo"]["team"])
         for team, d in per_team_data.items()
@@ -527,14 +539,20 @@ def compute_all_stats(raw_data: list[dict]) -> dict:
     last_score = None
     last_rank = 0
     position = 0
+    best = scores[0][1] if scores else None
+    worst = scores[-1][1] if scores else None
+    range_ = best - worst if best != worst else 1  # Avoid zero division
+
     for team, score in scores:
         position += 1
         if score != last_score:
             last_rank = position
             last_score = score
         per_team_data[team]["ranking"]["overall"] = last_rank
+        pct = 1 + round(99 * (best - score) / range_, 2)
+        per_team_data[team]["ranking_pct"]["overall"] = pct
 
-    # --- Rank each elo_featured aspect ---
+    # === Feature Rankings ===
     for feature in ["auto", "teleop_coral", "teleop_algae", "climb", "defense"]:
         scores = [
             (team, d["elo_featured"][feature])
@@ -549,19 +567,88 @@ def compute_all_stats(raw_data: list[dict]) -> dict:
         last_score = None
         last_rank = 0
         position = 0
+        best = scores[0][1] if scores else None
+        worst = scores[-1][1] if scores else None
+        range_ = best - worst if best != worst else 1
+
         for team, score in scores:
             position += 1
             if score != last_score:
                 last_rank = position
                 last_score = score
             per_team_data[team]["ranking"][feature] = last_rank
+            pct = 1 + round(99 * (best - score) / range_, 2)
+            per_team_data[team]["ranking_pct"][feature] = pct
 
-        # Ensure all teams have the key (even if unranked)
         for team in per_team_data:
             if str(team).startswith("_"):
                 continue
             if feature not in per_team_data[team]["ranking"]:
                 per_team_data[team]["ranking"][feature] = 0
+                per_team_data[team]["ranking_pct"][feature] = 100.0  # Worst possible
+
+    print("Finished elo ranking")
+
+    # ======= Step 6: Random Forest score predictor =======
+    aspect_extractors = {
+        "coral": lambda d: d["score_breakdown"]["teleop"].get("coral", 0),
+        "algae": lambda d: d["score_breakdown"]["teleop"].get("algae", 0),
+        "climb": lambda d: d["score_breakdown"].get("climb", 0),
+        "auto": lambda d: d["score_breakdown"]["auto"].get("total", 0)
+    }
+
+    def team_features_fn(team_id: int, match_type: str, match_num: int):
+        try:
+            alliance_data = per_match_data[match_type][match_num]
+        except KeyError:
+            raise KeyError(f"Missing match {match_type} {match_num}")
+
+        for alliance in ["red", "blue"]:
+            if team_id in alliance_data.get(alliance, {}):
+                team_data = alliance_data[alliance][team_id]
+                break
+        else:
+            raise KeyError(f"Team {team_id} not found in match {match_type} {match_num}")
+
+        sa = team_data["score_actions"]
+        tsl = team_data.get("teleop_scoring_location", {})
+
+        # Aggregate features
+        auto = sa.get("auto", {})
+        tele = sa.get("teleop", {})
+        total_coral_cycles = auto.get("coral_cycle", 0) + tele.get("coral_cycle", 0)
+        total_algae_cycles = auto.get("algae_cycle", 0) + tele.get("algae_cycle", 0)
+        move_flag = auto.get("move", 0)
+
+        total_attempts = sum(tsl.get(loc, {}).get("total_attempt", 0) for loc in ["l1", "l2", "l3", "l4", "barge"])
+        avg_accuracy = np.mean([
+            tsl.get(loc, {}).get("accuracy", 0.0)
+            for loc in ["l1", "l2", "l3", "l4", "barge"]
+            if tsl.get(loc, {}).get("total_attempt", 0) > 0
+        ]) if total_attempts > 0 else 0.0
+
+        return [
+            total_coral_cycles,
+            total_algae_cycles,
+            move_flag,
+            total_attempts,
+            avg_accuracy
+        ]
+
+    results = predict_all_playable_matches(
+        raw_match_data=per_match_data,
+        team_features_fn=team_features_fn,
+        aspect_extractors=aspect_extractors,
+        match_type="qm"
+    )
+
+    for match in results:
+        for alliance in ["blue", "red"]:
+            for match_team in match[alliance]:
+                per_match_data["qm"][match["match_num"]][alliance][match_team]["ai_prediction"] = \
+                    match["predicted"][alliance][match_team]
+
+    print("Finished random forest predictions")
 
     # ======= Step 99: Return safe JSON-compatible output =======
     return {
@@ -579,7 +666,7 @@ if __name__ == "__main__":
 
     processed_data = compute_all_stats(all_data)
     print("Calculations finished")
-    pprint(processed_data["team_data"])
+    pprint(processed_data["match_data"])
     print("uncompressed size: " + str(asizeof.asizeof(processed_data)))
     print("compressed size: " + str(asizeof.asizeof(json.dumps(processed_data))))
     write_processed_string(json.dumps(processed_data))

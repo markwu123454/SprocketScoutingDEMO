@@ -20,6 +20,20 @@ export type ScoutingData = {
                 defense: number
                 cluster: number
             }
+            ranking: {
+                auto: number
+                teleop_coral: number
+                teleop_algae: number
+                climb: number
+                overall: number
+            }
+            ranking_pct: {
+                auto: number
+                teleop_coral: number
+                teleop_algae: number
+                climb: number
+                overall: number
+            }
         }
         _cluster_summary: {
             [clusterId: number]: {
@@ -74,6 +88,7 @@ type ScoringBreakdown = {
     move: number
     coral: number
     algae: number
+    total: number
 }
 
 type ScoringActions = {
@@ -86,6 +101,7 @@ type ScoringActions = {
     move?: number           // optional in teleop
     coral_cycle: number
     algae_cycle: number
+    total?: number           // optional in teleop
 }
 
 

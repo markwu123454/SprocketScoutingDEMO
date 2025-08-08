@@ -79,7 +79,7 @@ export default function App() {
                                         }
                                     />
                                     <Route
-                                        path="match/:matchType/:matchNum"
+                                        path="match/:matchType/:matchNumStr"
                                         element={
                                             <AuthGate permission="admin" device="desktop" dialogTheme="light">
                                                 <MatchDetailPage/>
