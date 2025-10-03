@@ -61,6 +61,7 @@ export default function MatchDetailPage() {
 
     const data = useLargeData()
     const current_match_data = data["match_data"][matchType][matchNum]
+    console.log(data)
     const red_teams = (
         Object.keys(current_match_data["red"])
             .map(Number)
@@ -869,7 +870,7 @@ export default function MatchDetailPage() {
                                                                                 (<span
                                                                                 title={`${100-r.percentile}% to 1# performance.`}
                                                                                 className={`${percentileColor} font-semibold`}>
-                                                                        {r.percentile}%
+                                                                        {Number(r.percentile).toFixed(1)}%
                                                                     </span>)
                                                                             </div>
                                                                         </React.Fragment>

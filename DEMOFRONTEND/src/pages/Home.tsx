@@ -26,25 +26,11 @@ export function HomeLayout() {
     const [loginConfirmed, setLoginConfirmed] = useState(false)
 
     const greetings = [
-        `Welcome, ${name}, to Orange County Regionals.`,
+        `Welcome, ${name}, to FIRST Age.`,
         `Logged in as ${name}.`,
         `Session active for ${name}.`,
         `Authenticated. Good to have you back, ${name}.`,
         `Scouting interface ready for ${name}.`,
-
-        `Welcome, ${name}, to Orange County Regionals.`,
-        `Logged in as ${name}.`,
-        `Session active for ${name}.`,
-        `Authenticated. Good to have you back, ${name}.`,
-        `Scouting interface ready for ${name}.`,
-
-        `Welcome, ${name}, to Orange County Regionals.`,
-        `Logged in as ${name}.`,
-        `Session active for ${name}.`,
-        `Authenticated. Good to have you back, ${name}.`,
-        `Scouting interface ready for ${name}.`,
-
-        `HIIIIIIII, ${name}, I'VE BEEN CODING NON-STOP FOR 2 MONTH, HELP.`,
     ]
 
     const privilegeButtons = [

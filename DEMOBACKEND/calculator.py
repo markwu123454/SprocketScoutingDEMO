@@ -1,6 +1,8 @@
 # pylint: disable=line-too-long
 """Handles all large data calculation, including running the AI, Heuristics, and ELO team ranking and match prediction models"""
-import sqlite3
+import asyncio
+
+import asyncpg
 import json
 from collections import defaultdict
 import numpy as np
@@ -22,13 +24,8 @@ MatchType = Literal["qm", "sf", "f"]
 StatusType = Literal["unclaimed", "pre", "auto", "teleop", "post", "submitted"]
 
 
-# --- Database Connection ---
-def get_db_conn():
-    """Gets database."""
-    return sqlite3.connect("match_scouting.db", check_same_thread=False)
-
-
 # --- Query Function ---
+# FIXME: chang this from sqlite to postgresql
 def get_match_scouting() -> list[dict]:
     """gets data from database."""
     conn = get_db_conn()
@@ -55,38 +52,26 @@ def get_match_scouting() -> list[dict]:
     ]
 
 
-def write_processed_string(value: str):
-    """Writes a string to the first row, first column of the 'processed_data' table."""
-    conn = get_db_conn()
-    cursor = conn.cursor()
-
-    # Ensure the table exists
-    cursor.execute("""
-                   CREATE TABLE IF NOT EXISTS processed_data
-                   (
-                       id
-                       INTEGER
-                       PRIMARY
-                       KEY
-                       AUTOINCREMENT,
-                       value
-                       TEXT
-                   )
-                   """)
-
-    # Check if there's at least one row
-    cursor.execute("SELECT id FROM processed_data ORDER BY id ASC LIMIT 1")
-    row = cursor.fetchone()
-
-    if row:
-        # Update the first row
-        cursor.execute("UPDATE processed_data SET value = ? WHERE id = ?", (value, row[0]))
-    else:
-        # Insert new row
-        cursor.execute("INSERT INTO processed_data (value) VALUES (?)", (value,))
-
-    conn.commit()
-    conn.close()
+async def write_processed_string(data: str):
+    conn = await asyncpg.connect(
+        user="postgres", password="90Otter!", database="data", host="127.0.0.1", port=5432
+    )
+    try:
+        await conn.execute("""
+            CREATE TABLE IF NOT EXISTS processed_data (
+                id   integer PRIMARY KEY,
+                data text
+            );
+        """)
+        # Single-row table: keep id=1
+        await conn.execute("""
+            INSERT INTO processed_data (id, data)
+            VALUES (1, $1)
+            ON CONFLICT (id) DO UPDATE
+            SET data = EXCLUDED.data;
+        """, data)
+    finally:
+        await conn.close()
 
 
 def get_match_scouting_from_json(path: str = "converted_matches.json") -> list[dict]:
@@ -657,8 +642,7 @@ def compute_all_stats(raw_data: list[dict]) -> dict:
     }
 
 
-# --- Script Entry Point ---
-if __name__ == "__main__":
+async def main():
     print("Start fetching data")
     all_data = get_match_scouting_from_json()
     print("Fetched all data")
@@ -666,11 +650,15 @@ if __name__ == "__main__":
 
     processed_data = compute_all_stats(all_data)
     print("Calculations finished")
-    pprint(processed_data["match_data"])
-    print("uncompressed size: " + str(asizeof.asizeof(processed_data)))
-    print("compressed size: " + str(asizeof.asizeof(json.dumps(processed_data))))
-    write_processed_string(json.dumps(processed_data))
+    #pprint(processed_data["match_data"])
+    print("uncompressed size:", asizeof.asizeof(processed_data))
+    print("compressed size:", asizeof.asizeof(json.dumps(processed_data)))
+
+    await write_processed_string(json.dumps(processed_data))
     print("Write finished")
+
+if __name__ == "__main__":
+    asyncio.run(main())
 
 '''
 

@@ -150,7 +150,7 @@ export function LargeDataWrapper({children}: LargeDataWrapperProps) {
                     },
                 })
 
-                if (!res.ok) throw new Error("Failed to fetch")
+                if (!res.ok) console.error("Large data fetch failed", await res.json())
 
                 const json = await res.json()
 
@@ -163,7 +163,7 @@ export function LargeDataWrapper({children}: LargeDataWrapperProps) {
             }
         }
 
-        fetchData()
+        void fetchData()
 
         return () => {
             cancelled = true

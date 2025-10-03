@@ -4,7 +4,7 @@ import './index.css'
 
 import {HomeLayout} from './pages/Home'
 import {MatchScoutingLayout} from './pages/MatchScouting'
-//import PitScoutingLayout from './pages/PitScouting'
+import PitScoutingLayout from './pages/PitScouting'
 import {DataLayout} from './pages/Data'
 import MatchMonitoringLayout from './pages/MatchMonitoring'
 import AdminHomeLayout from "@/pages/AdminHome.tsx";
@@ -39,11 +39,9 @@ export default function App() {
                             <Route
                                 path="pit"
                                 element={
-                                    <NotFoundPage code={501}/>
-                                    // TODO: add pit scouting
-                                    //<AuthGate permission="pit_scouting" device="mobile" dialogTheme="dark">
-                                    //    <PitScoutingLayout/>
-                                    //</AuthGate>
+                                    <AuthGate permission="pit_scouting" device="mobile" dialogTheme="dark">
+                                        <PitScoutingLayout/>
+                                    </AuthGate>
                                 }
                             />
                         </Route>
@@ -97,6 +95,13 @@ export default function App() {
                                 //<AuthGate permission="dev" device="desktop" dialogTheme="light">
                                 //    <DevLayout/>
                                 //</AuthGate>
+                            }
+                        />
+                        <Route
+                            path="/guest"
+                            element={
+                                <NotFoundPage code={501}/>
+                                // TODO: add pit guest page
                             }
                         />
                         <Route path="*" element={<NotFoundPage/>}/>

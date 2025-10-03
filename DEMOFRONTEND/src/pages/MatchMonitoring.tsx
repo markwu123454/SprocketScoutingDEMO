@@ -5,6 +5,8 @@ import type {TeamInfo, UIInfo, MatchScoutingData, MatchType} from '@/types'
 import field_overlay from '@/assets/2025_FMS_In-Match.png'
 import {defaultUIINFO} from "@/components/seasons/2025/yearConfig.ts";
 import {usePollingEffect} from '@/contexts/pollingContext'
+import {Input} from '@/components/ui/input'
+import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/components/ui/select.tsx";
 
 
 export default function MatchMonitoringLayout() {
@@ -57,6 +59,18 @@ export default function MatchMonitoringLayout() {
         setActiveOnly(active)     // active only
     }
 
+    const handleMatchJump = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const newMatchNum = parseInt(e.target.value);
+        if (!isNaN(newMatchNum) && newMatchNum > 0) {
+            setMatchNum(newMatchNum);
+        }
+    };
+
+    // Function to handle match type change
+    const handleMatchTypeChange = (type: MatchType) => {
+        setMatchType(type);
+    };
+
     const loadTeams = async (m: number) => {
         const red = await getTeamList(m, matchType, 'red')
         const blue = await getTeamList(m, matchType, 'blue')
@@ -72,7 +86,7 @@ export default function MatchMonitoringLayout() {
             void loadStatuses()
         }, 2000)
         return () => clearInterval(interval)
-    }, [matchNum])
+    }, [matchNum, matchType])
 
     const nextMatch = () => {
         setActiveOnly((prev) =>
@@ -370,7 +384,42 @@ export default function MatchMonitoringLayout() {
             {/* Sticky Bottom Controls */}
             <div className="flex justify-between items-center px-6 py-4 bg-zinc-950 text-white text-lg">
                 <button onClick={prevMatch} className="px-4 py-2 bg-red-600 hover:bg-red-700 rounded">Prev</button>
-                <span>Match Monitoring — Powered by Scouting System</span>
+
+                {/* Match Type Dropdown */}
+                <Select value={matchType} onValueChange={handleMatchTypeChange}>
+                    <SelectTrigger className="w-[220px]">
+                        <SelectValue placeholder="Select Match Type"/>
+                    </SelectTrigger>
+                    <SelectContent>
+                        <SelectItem value="qm">Qualification</SelectItem>
+                        <SelectItem value="sf">Semi-Finals</SelectItem>
+                        <SelectItem value="f">Finals</SelectItem>
+                    </SelectContent>
+                </Select>
+
+                {/* Match Number Jump Input */}
+                <div className="flex items-center gap-2">
+                    <span>Jump to Match:</span>
+                    <Input
+                        type="text"
+                        value={matchNum === 0 ? '' : matchNum} // Display empty string when matchNum is 0
+                        onChange={(e) => {
+                        const value = e.target.value;
+                        const parsedValue = parseInt(value);
+
+                        // Update matchNum if the input is a valid number or empty
+                        if (value === '') {
+                            setMatchNum(0);  // Treat empty input as 0 internally
+                        } else if (!isNaN(parsedValue) && parsedValue >= 1) {
+                            setMatchNum(parsedValue);  // Update with a valid number
+                        }
+                    }}
+                        className="w-20 p-2 bg-zinc-800 text-white rounded"
+                        min={1}
+                        />
+
+                </div>
+
                 <button onClick={nextMatch} className="px-4 py-2 bg-green-600 hover:bg-green-700 rounded">Next</button>
             </div>
         </div>

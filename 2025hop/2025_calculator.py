@@ -4,7 +4,7 @@ import time
 from typing import Dict, List, Any
 import pandas as pd
 
-DB_PATH = "match_scouting.db"
+DB_PATH = "../DEMOBACKEND/data.db"
 
 
 # ─── Utilities ────────────────────────────────────────────────────
@@ -216,7 +216,7 @@ class PredictionEngine:
         self.conn = get_conn()
         self.interval = interval_sec
         self.fetcher = DataFetcher(self.conn)
-        self.fetcher = CSVDataFetcher("validated_matches.csv")
+        self.fetcher = CSVDataFetcher("../DEMOBACKEND/validated_matches.csv")
         self.calculator = EPACalculator(self.fetcher)
         self.writer = PredictionWriter(self.conn)
         self.writer = ConsoleWriter()

@@ -1,6 +1,8 @@
-passcode,name,dev,admin,match_scouting,pit_scouting
-M@rk1!,Mark,true,true,true,true
-B0th#1!,DEMO1,false,false,true,true
-Sc0uT!2,DEMO2,false,false,true,false
-Adm!n#03,DEMO3,true,true,true,true
-1,guest,false,false,true,true
+passcode,name,dev,admin,match_scouting,pit_scouting,match_access
+M@rk1!,Mark,true,true,true,true,[]
+B0th#1!,DEMO1,false,false,true,true,[]
+Sc0uT!2,DEMO2,false,false,true,false,[]
+Adm!n#03,DEMO3,true,true,true,true,[]
+Gu35T3743,guest,false,false,true,true,[]
+t4Am7S3prock3e,3473,false,false,false,false,"[[""qm"", 1], [""qm"", 2]]
+"

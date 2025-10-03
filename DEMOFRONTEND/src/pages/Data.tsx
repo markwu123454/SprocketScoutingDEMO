@@ -27,8 +27,6 @@ import {type GridReadyEvent, ModuleRegistry, AllCommunityModule} from "ag-grid-c
 import type {MatchScoutingData, MatchType, PitScoutingData} from '@/types'
 // @ts-ignore
 import type * as DataTypes from '@/types/data';
-// @ts-ignore
-import {processScoutingData} from "@/lib/processScoutingData.ts";
 import {Input} from "@/components/ui/input";
 import {Switch} from "@/components/ui/switch";
 import {
