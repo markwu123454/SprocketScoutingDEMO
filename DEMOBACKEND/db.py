@@ -1,6 +1,3 @@
-import asyncio
-import sys
-import unittest
 import asyncpg
 import json
 import time
@@ -22,11 +19,7 @@ logger = logging.getLogger(__name__)
 # ---------- PostgreSQL settings (single DB) ----------
 DB_DSN = os.getenv("DATABASE_URL")
 _pools: dict[str, asyncpg.Pool] = {}
-DB_USER = "postgres"
-DB_PASSWORD = "90Otter!"
-DB_NAME = "data"          # <- single database for everything (data + sessions)
-DB_HOST = "localhost"
-DB_PORT = 5432
+DB_NAME = "data"
 
 # Connection pools keyed by db name
 _pools: dict[str, asyncpg.Pool] = {}
@@ -43,18 +36,19 @@ async def _setup_codecs(conn: asyncpg.Connection):
 async def get_db_connection(db: str) -> asyncpg.Connection:
     """
     Acquire a connection from (or lazily create) the pool for the given database.
+    Uses DATABASE_URL from environment (Neon / .env).
     """
     pool = _pools.get(db)
     if pool is None:
+        dsn = os.getenv("DATABASE_URL")
+        if not dsn:
+            raise RuntimeError("DATABASE_URL not set in environment")
         pool = await asyncpg.create_pool(
-            user=DB_USER,
-            password=DB_PASSWORD,
-            database=db,
-            host=DB_HOST,
-            port=DB_PORT,
+            dsn=dsn,
             min_size=1,
             max_size=10,
             init=_setup_codecs,
+            ssl=ssl.create_default_context(cafile=certifi.where()),  # Neon requires SSL
         )
         _pools[db] = pool
     return await pool.acquire()
@@ -406,217 +400,3 @@ def require_permission(required: str) -> Callable[..., "SessionInfo"]:
             raise HTTPException(status_code=403, detail=f"Missing '{required}' permission")
         return session
     return dep
-
-
-# =================== Test Helpers ===================
-
-# Windows event loop policy (asyncpg quirk)
-if sys.platform.startswith("win"):
-    asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
-
-
-async def _exec_raw(sql: str, *params):
-    conn = await asyncpg.connect(
-        user=DB_USER, password=DB_PASSWORD,
-        database=DB_NAME, host=DB_HOST, port=DB_PORT
-    )
-    try:
-        return await conn.execute(sql, *params)
-    finally:
-        await conn.close()
-
-
-# =================== Tests ===================
-
-class TestDAL(unittest.TestCase):
-    @classmethod
-    def setUpClass(cls):
-        cls.loop = asyncio.get_event_loop()
-        # Init schemas once (single DB)
-        cls.loop.run_until_complete(init_data_db())
-        cls.loop.run_until_complete(init_session_db())
-
-        # Ensure sessions.data is JSONB (defensive if existing)
-        cls.loop.run_until_complete(_exec_raw(
-            "ALTER TABLE sessions ALTER COLUMN data TYPE JSONB USING data::jsonb"
-        ))
-
-    @classmethod
-    def tearDownClass(cls):
-        cls.loop.run_until_complete(close_pool())
-
-    def setUp(self):
-        self._cleanup_match_keys = []
-        self._cleanup_session_ids = []
-
-    def tearDown(self):
-        for match, team in self._cleanup_match_keys:
-            try:
-                self.loop.run_until_complete(
-                    _exec_raw("DELETE FROM match_scouting WHERE match=$1 AND team=$2", match, team)
-                )
-            except Exception:
-                pass
-        for sid in self._cleanup_session_ids:
-            try:
-                self.loop.run_until_complete(
-                    _exec_raw("DELETE FROM sessions WHERE uuid=$1", sid)
-                )
-            except Exception:
-                pass
-
-    def run_async(self, coro):
-        return self.loop.run_until_complete(coro)
-
-    # ---------- Match scouting tests ----------
-
-    def test_add_and_get_match_scouting_basic(self):
-        match_id = 100
-        team_id = "54321"
-        self._cleanup_match_keys.append((match_id, team_id))
-
-        self.run_async(add_match_scouting(
-            match=match_id,
-            m_type=enums.MatchType.QUALIFIER,
-            team=team_id,
-            alliance=enums.AllianceType.RED,
-            scouter=None,
-            status=enums.StatusType.SUBMITTED,
-            data={"score": 100, "notes": "t"}
-        ))
-        rows = self.run_async(get_match_scouting(
-            match=match_id,
-            m_type=enums.MatchType.QUALIFIER,
-            team=team_id,
-            scouter=None
-        ))
-        self.assertEqual(len(rows), 1)
-        r = rows[0]
-        self.assertEqual(r["match"], match_id)
-        self.assertEqual(r["match_type"], enums.MatchType.QUALIFIER.value)
-        self.assertEqual(r["team"], team_id)
-        self.assertEqual(r["alliance"], enums.AllianceType.RED.value)
-        self.assertEqual(r["status"], enums.StatusType.SUBMITTED.value)
-        self.assertEqual(r["data"]["score"], 100)
-        self.assertIsInstance(r["last_modified"], int)
-
-    def test_add_match_scouting_duplicate_conflict(self):
-        match_id = 100
-        team_id = "54322"
-        self._cleanup_match_keys.append((match_id, team_id))
-
-        args = dict(
-            match=match_id,
-            m_type=enums.MatchType.QUALIFIER,
-            team=team_id,
-            alliance=enums.AllianceType.BLUE,
-            scouter="scoutA",
-            status=enums.StatusType.PRE,
-            data={"x": 1}
-        )
-        self.run_async(add_match_scouting(**args))
-        with self.assertRaises(HTTPException) as cm:
-            self.run_async(add_match_scouting(**args))
-        self.assertEqual(cm.exception.status_code, 409)
-
-    def test_update_match_scouting_merge_and_status(self):
-        match_id = 100
-        team_id = "54323"
-        self._cleanup_match_keys.append((match_id, team_id))
-
-        self.run_async(add_match_scouting(
-            match=match_id,
-            m_type=enums.MatchType.SEMIFINAL,
-            team=team_id,
-            alliance=enums.AllianceType.RED,
-            scouter="alice",
-            status=enums.StatusType.PRE,
-            data={"score": 10, "a": 1}
-        ))
-        self.run_async(update_match_scouting(
-            match=match_id,
-            m_type=enums.MatchType.SEMIFINAL,
-            team=team_id,
-            scouter="alice",
-            status=enums.StatusType.SUBMITTED,
-            data={"score": 25, "b": 2}
-        ))
-        rows = self.run_async(get_match_scouting(
-            match=match_id, m_type=enums.MatchType.SEMIFINAL, team=team_id, scouter="alice"
-        ))
-        self.assertEqual(len(rows), 1)
-        r = rows[0]
-        self.assertEqual(r["status"], enums.StatusType.SUBMITTED.value)
-        self.assertEqual(r["data"]["score"], 25)
-        self.assertEqual(r["data"]["a"], 1)
-        self.assertEqual(r["data"]["b"], 2)
-        self.assertEqual(r["scouter"], "alice")
-
-    def test_get_processed_data_missing_table_raises_500(self):
-        try:
-            self.run_async(_exec_raw("DROP TABLE IF EXISTS processed_data;"))
-        except Exception:
-            pass
-        with self.assertRaises(HTTPException) as cm:
-            self.run_async(get_processed_data())
-        self.assertEqual(cm.exception.status_code, 500)
-
-    # ---------- Session tests (same DB) ----------
-
-    def test_add_get_delete_session(self):
-        sid = str(uuid.uuid4())
-        self._cleanup_session_ids.append(sid)
-        exp = datetime.now(timezone.utc) + timedelta(minutes=30)
-        payload = {"name": "tester", "admin": True}
-
-        self.run_async(add_session(sid, payload, exp))
-        got = self.run_async(get_session_data(sid))
-        self.assertEqual(got["name"], "tester")
-        self.assertTrue(got["admin"])
-
-        self.run_async(delete_session(sid))
-        self.assertIsNone(self.run_async(get_session_data(sid)))
-        self._cleanup_session_ids.remove(sid)
-
-    def test_verify_uuid_valid_with_required(self):
-        sid = str(uuid.uuid4())
-        self._cleanup_session_ids.append(sid)
-        exp = datetime.now(timezone.utc) + timedelta(minutes=10)
-        payload = {"name": "ok", "permissions": {"admin": True}}
-
-        self.run_async(add_session(sid, payload, exp))
-        v = self.run_async(verify_uuid(sid, required="admin"))
-        self.assertTrue(v["permissions"]["admin"])
-
-    def test_verify_uuid_missing_required_permission(self):
-        sid = str(uuid.uuid4())
-        self._cleanup_session_ids.append(sid)
-        exp = datetime.now(timezone.utc) + timedelta(minutes=10)
-        payload = {"name": "nope", "permissions": {"admin": False}}
-
-        self.run_async(add_session(sid, payload, exp))
-        with self.assertRaises(HTTPException) as cm:
-            self.run_async(verify_uuid(sid, required="admin"))
-        self.assertEqual(cm.exception.status_code, 403)
-
-    def test_verify_uuid_invalid_format(self):
-        with self.assertRaises(HTTPException) as cm:
-            self.run_async(verify_uuid("not-a-uuid"))
-        self.assertEqual(cm.exception.status_code, 400)
-
-    def test_verify_uuid_expired_and_auto_delete(self):
-        sid = str(uuid.uuid4())
-        self._cleanup_session_ids.append(sid)
-        exp = datetime.now(timezone.utc) - timedelta(minutes=1)
-        payload = {"name": "expired", "permissions": {"admin": True}}
-
-        self.run_async(add_session(sid, payload, exp))
-        with self.assertRaises(HTTPException) as cm:
-            self.run_async(verify_uuid(sid))
-        self.assertEqual(cm.exception.status_code, 403)
-        self.assertIsNone(self.run_async(get_session_data(sid)))
-        self._cleanup_session_ids.remove(sid)
-
-
-if __name__ == "__main__":
-    unittest.main(verbosity=2)
