@@ -65,11 +65,12 @@ with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as s:
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[f"http://{local_ip}:5173"],  # Allow frontend from the local IP
+    allow_origins=os.getenv("CORS_ORIGINS", "").split(","),
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
 
 app.include_router(endpoints.router)
 
