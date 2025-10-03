@@ -104,9 +104,6 @@ export function HomeLayout() {
     }
 
 
-    // <div className="min-h-screen text-white flex items-center justify-center px-4 touch-none
-    //     bg-[url('@/assets/2026_background_expanded.webp')] bg-[length:200px_200px] bg-repeat bg-top w-full">
-    // replace <div className="min-h-screen bg-zinc-900 text-white flex items-center justify-center px-4 touch-none\">
     return (
         <>
             <div className="relative min-h-screen text-white flex items-center justify-center px-4 touch-none
