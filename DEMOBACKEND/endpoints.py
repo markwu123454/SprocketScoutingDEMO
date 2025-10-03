@@ -201,6 +201,23 @@ async def guest_login(request: Request, body: enums.PasscodeBody):
     raise HTTPException(status_code=401, detail="Invalid passcode")
 
 
+@router.get("/auth/verify")
+async def verify_session(session: enums.SessionInfo = Depends(db.require_session())):
+    """
+    Verifies the UUID session from headers (x-uuid) and returns identity + permissions.
+    """
+    return {
+        "name": session.name,
+        "permissions": {
+            "dev": session.permissions.dev,
+            "admin": session.permissions.admin,
+            "match_scouting": session.permissions.match_scouting,
+            "pit_scouting": session.permissions.pit_scouting,
+        },
+    }
+
+
+
 @router.get
 async def verify_session(session: enums.SessionInfo = Depends(db.require_session())):
     return {
