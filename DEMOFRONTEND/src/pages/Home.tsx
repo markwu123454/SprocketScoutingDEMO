@@ -110,7 +110,7 @@ export function HomeLayout() {
     return (
         <>
             <div className="relative min-h-screen text-white flex items-center justify-center px-4 touch-none
-                    bg-[url('@/assets/2026_background_expanded.png')] bg-top bg-cover w-full">
+                    bg-[url('/2026_background_expanded.png')] bg-top bg-cover w-full">
 
                 {/* Top-left GIF */}
                 <img src={logo_animation} alt="logo animation"
