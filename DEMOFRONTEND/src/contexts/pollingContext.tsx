@@ -35,7 +35,7 @@ export function UpdateProvider({children}: { children: ReactNode }) {
         let active = true
 
         const poll = async () => {
-            const origin = `${window.location.protocol}//${window.location.hostname}:8000`
+            const origin = `${window.location.protocol}//${window.location.hostname}`
             while (active) {
                 const startTime = Date.now()
                 try {
