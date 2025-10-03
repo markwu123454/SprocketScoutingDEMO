@@ -1,6 +1,6 @@
 import type {TeamInfo, MatchScoutingData, MatchType, AllianceType} from '@/types'
 
-const BASE_URL = `${window.location.protocol}//${window.location.hostname}:8000`;
+const BASE_URL = `${import.meta.env.BACKEND_URL}:8000`;
 const UUID_COOKIE = "scouting_uuid"
 const NAME_COOKIE = "scouting_name"
 
