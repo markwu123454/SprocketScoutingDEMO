@@ -18,26 +18,26 @@ export default defineConfig({
                 start_url: "/",
                 display: "standalone",
                 background_color: "#000000",
-                theme_color: "#000000"/*,  TODO: Add icons
-                icons: [
-                    {
-                        src: "/pwa-192x192.png",
-                        sizes: "192x192",
-                        type: "image/png",
-                    },
-                    {
-                        src: "/pwa-512x512.png",
-                        sizes: "512x512",
-                        type: "image/png",
-                    },
-                ],*/
+                theme_color: "#000000"
             },
             workbox: {
-                navigateFallback: '/offline.html',
+                // Fallback to index.html for navigation requests (React Router)
+                navigateFallback: '/index.html',
+                // Keep offline.html as a real offline fallback if you want
+                runtimeCaching: [
+                    {
+                        urlPattern: ({request}) => request.mode === 'navigate',
+                        handler: 'NetworkFirst',
+                        options: {
+                            networkTimeoutSeconds: 3,
+                        },
+                    },
+                ],
                 globPatterns: ['**/*.{js,css,html,ico,png,svg}'],
                 maximumFileSizeToCacheInBytes: 5 * 1024 * 1024, // 5 MB
             },
-        }),
+        })
+
     ],
     resolve: {
         alias: {
