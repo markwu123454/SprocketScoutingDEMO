@@ -142,7 +142,7 @@ export function LargeDataWrapper({children}: LargeDataWrapperProps) {
 
         async function fetchData() {
             try {
-                const res = await fetch(`${window.location.protocol}//${window.location.hostname}:8000/data/processed`, {
+                const res = await fetch(`${import.meta.env.VITE_API_URL}:8000/data/processed`, {
                     method: 'GET',
                     headers: {
                         ...getAuthHeaders(),
