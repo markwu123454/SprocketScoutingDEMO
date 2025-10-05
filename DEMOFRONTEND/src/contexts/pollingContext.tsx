@@ -35,11 +35,10 @@ export function UpdateProvider({children}: { children: ReactNode }) {
         let active = true
 
         const poll = async () => {
-            const origin = `${window.location.protocol}//${window.location.hostname}`
             while (active) {
                 const startTime = Date.now()
                 try {
-                    const res = await fetch(origin + endpoint, {headers})
+                    const res = await fetch(`${import.meta.env.VITE_API_URL}${endpoint}`, { headers })
                     if (!res.ok) console.error(res)
                     const data = await res.json()
                     callback(data)
