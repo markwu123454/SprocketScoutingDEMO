@@ -159,6 +159,7 @@ async def init_data_db():
                                );
                                """)
 
+
     except PostgresError as e:
         logger.error("Failed to initialize data schema: %s", e)
         raise HTTPException(status_code=500, detail=f"Failed to initialize database: {e}")
