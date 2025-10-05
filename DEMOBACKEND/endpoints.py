@@ -426,14 +426,26 @@ async def get_match_info(
         m_type: enums.MatchType,
         _: enums.SessionInfo = Depends(db.require_permission("match_scouting"))
 ):
-    # TODO: HARD CODED EVENT
-    event_key = "2025caoc"
-    try:
-        team_numbers = tba_fetcher.get_match_alliance_teams_cached(event_key, m_type.value, match, alliance.value)
-    except (FileNotFoundError, ValueError) as e:
-        raise HTTPException(status_code=404, detail=str(e))
+    """
+    Retrieves match info directly from the database (no TBA fetcher).
+    Reads team numbers from `matches` table and ensures scouting entries exist.
+    """
+    event_key = "2025caoc"  # TODO: make configurable later
 
-    # Ensure each team has an entry in the database
+    # Fetch match info from DB
+    match_row = await db.get_match_info(event_key, m_type.value, match)
+    if not match_row:
+        raise HTTPException(status_code=404, detail="Match not found in database")
+
+    # Extract alliance-specific teams
+    if alliance == enums.AllianceType.RED:
+        team_numbers = [t for t in match_row["red"] if t is not None]
+    elif alliance == enums.AllianceType.BLUE:
+        team_numbers = [t for t in match_row["blue"] if t is not None]
+    else:
+        raise HTTPException(status_code=400, detail="Invalid alliance")
+
+    # Ensure each team has a corresponding scouting entry
     for t in team_numbers:
         existing = await db.get_match_scouting(match=match, m_type=m_type, team=str(t))
         if not existing:
@@ -447,12 +459,13 @@ async def get_match_info(
                 data={}
             )
 
+    # Return structured match info
     return {
         "teams": [
             {
                 "number": int(t),
-                "name": tba_fetcher.fetch_team_name_cached(f"frc{t}"),
-                "logo": tba_fetcher.resolve_team_logo_cached(int(t)),
+                "name": f"Team {t}",  # optionally use preloaded team_data if available
+                "logo": f"/assets/teams/{t}.png",
                 "scouter": (await db.get_match_scouting(match=match, m_type=m_type, team=t))[0].get("scouter")
             }
             for t in team_numbers
@@ -461,25 +474,26 @@ async def get_match_info(
 
 
 @router.get("/teams/{team}")
-async def get_team_info(
-        team: int,
-        request: Request,
-        _: enums.SessionInfo = Depends(db.require_permission("match_scouting"))
-
+async def get_team_info_route(
+    team: int,
+    _: enums.SessionInfo = Depends(db.require_permission("match_scouting"))
 ):
     """
     Returns basic info (number, nickname, logo URL) for a given team.
-    Uses preloaded CSV data.
+    Uses database query instead of preloaded CSV.
     """
-    # Load team data from db or preloaded CSV
-    if team not in request.app.state.team_data:
+    team_data = await db.get_team_info(team)
+    if not team_data:
         raise HTTPException(status_code=404, detail="Team not found")
 
     return {
-        "number": team,
-        "name": request.app.state.team_data[team],
-        "iconUrl": f"/assets/teams/{team}.png"
+        "number": team_data["team_number"],
+        "name": team_data["nickname"],
+        "rookie_year": team_data["rookie_year"],
+        "last_updated": team_data["last_updated"],
+        "iconUrl": f"/assets/teams/{team_data['team_number']}.png"
     }
+
 
 
 @router.get("/status/{match}/{team}")

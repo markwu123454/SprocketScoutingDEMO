@@ -154,6 +154,95 @@ async def init_session_db():
 
 # =================== Match Scouting ===================
 
+async def get_match_info(
+    event_key: str,
+    match_type: str,
+    match_number: int,
+    set_number: int = 1
+) -> Optional[dict]:
+    """
+    Fetches a single match record from the `matches` table.
+    Returns team numbers and times for the specified event + match.
+
+    Args:
+        event_key: Event key (e.g., "2025caoc")
+        match_type: Match type ("qm", "qf", "sf", "f", etc.)
+        match_number: Match number integer (e.g., 1, 2, ...)
+        set_number: Optional, defaults to 1 (used for elimination matches)
+
+    Returns:
+        dict with keys like "red1", "blue3", etc., or None if not found.
+    """
+    conn = await get_db_connection(DB_NAME)
+    try:
+        row = await conn.fetchrow("""
+            SELECT *
+            FROM matches
+            WHERE event_key = $1
+              AND match_type = $2
+              AND match_number = $3
+              AND set_number = $4
+            LIMIT 1
+        """, event_key, match_type, match_number, set_number)
+
+        if not row:
+            return None
+
+        # Convert record to dict, filtering None values for missing teams/times
+        return {
+            "event_key": row["event_key"],
+            "match_type": row["match_type"],
+            "match_number": row["match_number"],
+            "set_number": row["set_number"],
+            "scheduled_time": row["scheduled_time"].isoformat() if row["scheduled_time"] else None,
+            "actual_time": row["actual_time"].isoformat() if row["actual_time"] else None,
+            "red": [row["red1"], row["red2"], row["red3"]],
+            "blue": [row["blue1"], row["blue2"], row["blue3"]],
+        }
+
+    except PostgresError as e:
+        logger.error("Failed to fetch match info: %s", e)
+        raise HTTPException(status_code=500, detail=f"Failed to fetch match info: {e}")
+    finally:
+        await release_db_connection(DB_NAME, conn)
+
+async def get_team_info(team_number: int) -> Optional[dict]:
+    """
+    Fetches a single team record from the `teams` table.
+
+    Args:
+        team_number: The team number (e.g., 254, 1678, etc.)
+
+    Returns:
+        dict with team information, or None if not found.
+    """
+    conn = await get_db_connection(DB_NAME)
+    try:
+        row = await conn.fetchrow("""
+            SELECT team_number, nickname, rookie_year, last_updated
+            FROM teams
+            WHERE team_number = $1
+            LIMIT 1
+        """, team_number)
+
+        if not row:
+            return None
+
+        return {
+            "team_number": row["team_number"],
+            "nickname": row["nickname"],
+            "rookie_year": row["rookie_year"],
+            "last_updated": row["last_updated"].isoformat() if row["last_updated"] else None,
+        }
+
+    except PostgresError as e:
+        logger.error("Failed to fetch team info: %s", e)
+        raise HTTPException(status_code=500, detail=f"Failed to fetch team info: {e}")
+    finally:
+        await release_db_connection(DB_NAME, conn)
+
+
+
 async def add_match_scouting(
     match: int,
     m_type: enums.MatchType,
