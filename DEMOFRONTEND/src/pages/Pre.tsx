@@ -15,60 +15,54 @@ export default function Pre({
     const {isOnline, serverOnline} = useClientEnvironment()
 
     const [teamList, setTeamList] = useState<TeamInfo[] | null>(null)
+    const [manualEntry, setManualEntry] = useState(false)
+    const [manualTeam, setManualTeam] = useState<string>("")
+    const [iconSrc, setIconSrc] = useState<string | null>(null)
 
     const {match, alliance, match_type, teamNumber} = data
     const scouter = getScouterName()!
 
     const inputRef = useRef<HTMLInputElement>(null);
 
-    // 1. Debounced PATCH on input change
+    // === 1. Debounced PATCH on input change ===
     useEffect(() => {
         if (!match || !alliance || teamNumber === null) return
-
         const timeout = setTimeout(() => {
             void updateMatch(match, teamNumber, match_type, {
                 scouter: scouter, phase: 'pre'
             })
         }, 300)
-
         return () => clearTimeout(timeout)
     }, [match, alliance, teamNumber, match_type])
 
-    // 2. Initial team list load
+    // === 2. Load team list ===
     useEffect(() => {
         if (!(isOnline && serverOnline) || !match || !alliance) {
             setTeamList([])
             return
         }
-
         let alive = true
-
         void (async () => {
             setTeamList(null)
             const teams = await getTeamList(match, match_type, alliance)
-            console.log(teams)
             if (alive) setTeamList(teams)
         })()
-
         return () => {
             alive = false
         }
     }, [match, alliance, match_type, isOnline, serverOnline])
 
-
-    // 3. Refresh scouter state every 1s (non-polling endpoint)
+    // === 3. Refresh scouter state ===
     useEffect(() => {
-        if (!(isOnline && serverOnline) || !match || !alliance) return;
-
-        let alive = true;
-        let ticking = false;
-
+        if (!(isOnline && serverOnline) || !match || !alliance) return
+        let alive = true
+        let ticking = false
         const tick = async () => {
-            if (ticking) return; // prevent overlap
-            ticking = true;
-            const state = await getScouterState(match, match_type, alliance);
+            if (ticking) return
+            ticking = true
+            const state = await getScouterState(match, match_type, alliance)
             if (alive && state) {
-                const teamsMap = state.teams;
+                const teamsMap = state.teams
                 setTeamList(prev =>
                     !prev
                         ? prev
@@ -77,19 +71,42 @@ export default function Pre({
                                 ? {...t, scouter: teamsMap[t.number].scouter}
                                 : t
                         )
-                );
+                )
             }
-            ticking = false;
-        };
-
-        void tick();
-        const id = setInterval(tick, 1000);
-
+            ticking = false
+        }
+        void tick()
+        const id = setInterval(tick, 1000)
         return () => {
-            alive = false;
-            clearInterval(id);
-        };
-    }, [isOnline, serverOnline, match, alliance, match_type]);
+            alive = false
+            clearInterval(id)
+        }
+    }, [isOnline, serverOnline, match, alliance, match_type])
+
+    // === 4. Manual entry image preview ===
+    useEffect(() => {
+        if (!manualTeam || manualTeam.trim() === "") {
+            setIconSrc(null)
+            return
+        }
+        const num = parseInt(manualTeam)
+        if (isNaN(num)) {
+            setIconSrc(null)
+            return
+        }
+        const path = `/teams/team_icons/${num}.png`
+        const img = new Image()
+        img.src = path
+        img.onload = () => setIconSrc(path)
+        img.onerror = () => setIconSrc("/placeholder.png")
+    }, [manualTeam])
+
+    // === 5. Offline auto-activate manual entry ===
+    useEffect(() => {
+        if (!(isOnline && serverOnline)) {
+            setManualEntry(true)
+        }
+    }, [isOnline, serverOnline])
 
     const handleTeamSelect = async (newTeamNumber: number) => {
         if (match && teamNumber !== null && teamNumber !== newTeamNumber) {
@@ -103,7 +120,6 @@ export default function Pre({
                 scouter: "__UNCLAIM__", phase: 'pre'
             })
         }
-
         setData((d) => ({
             ...d,
             teamNumber: newTeamNumber,
@@ -112,188 +128,189 @@ export default function Pre({
 
     return (
         <div className="p-4 w-full h-full flex flex-col justify gap-2">
-    <div>Pre-Match</div>
+            <div>Pre-Match</div>
 
-    {/* Match Type Select */}
-    <div>
-        <label className="block text-lg font-medium mb-1">Match Type</label>
-        <div className="flex gap-2 grid-cols-3">
-            {([
-                ["qm", "Qualifications"],
-                ["sf", "Playoffs"],
-                ["f", "Finals"],
-            ] as const).map(([key, label]) => (
-                <button
-                    key={key}
-                    onClick={() => {
-                        if ((isOnline && serverOnline) && match && teamNumber !== null) {
-                            void updateMatch(match, teamNumber, match_type, {
-                                scouter: "__UNCLAIM__", phase: 'pre'
-                            })
-                        }
-
-                        setData((d) => ({
-                            ...d,
-                            match_type: key,
-                            teamNumber: d.match_type === key ? d.teamNumber : null,
-                        }))
-                    }}
-                    className={`py-1 w-[33%] h-10 rounded text-base ${
-                        data.match_type === key
-                            ? "bg-zinc-400 text-white"
-                            : "bg-zinc-700 text-white"
-                    }`}
-                >
-                    {label}
-                </button>
-            ))}
-        </div>
-    </div>
-
-    {/* Match Number */}
-    <div>
-        <label className="block text-lg font-medium mb-1">Match Number</label>
-        <input
-            type="text"
-            inputMode="numeric"
-            defaultValue={match === 0 ? "" : match!}
-            ref={inputRef}
-            onChange={(e) => {
-                const raw = e.target.value.replace(/\s/g, '');
-                const newMatch = /^-?\d*\.?\d+$/.test(raw) ? parseFloat(raw) : 0;
-
-                if ((isOnline && serverOnline) && match && teamNumber !== null) {
-                    void updateMatch(match, teamNumber, match_type, {
-                        scouter: "__UNCLAIM__", phase: 'pre'
-                    })
-                }
-
-                setData((d) => ({
-                    ...d,
-                    match: newMatch,
-                    teamNumber: d.match === newMatch ? d.teamNumber : null,
-                }))
-            }}
-            className="w-full p-2 rounded bg-zinc-800 border border-zinc-700 text-white"
-        />
-    </div>
-
-    {/* Alliance Selection */}
-    <div>
-        <label className="block text-lg font-medium mb-1">Select Alliance</label>
-        <div className="flex gap-4">
-            {(['red', 'blue'] as const).map((color) => (
-                <button
-                    key={color}
-                    onClick={() => {
-                        if ((isOnline && serverOnline) && match && teamNumber !== null) {
-                            void updateMatch(match, teamNumber, match_type, {
-                                scouter: "__UNCLAIM__", phase: 'pre'
-                            })
-                        }
-
-                        setData((d) => ({
-                            ...d,
-                            alliance: color,
-                            teamNumber: d.alliance === color ? d.teamNumber : null,
-                        }))
-                    }}
-                    className={`w-16 h-16 rounded ${alliance === color ? 'outline-2 ' : ''} ${color === 'red' ? 'bg-red-600 outline-red-300' : 'bg-blue-600 outline-blue-300'}`}
-                />
-            ))}
-        </div>
-    </div>
-
-    {/* Team Selection */}
-    <div>
-        <label className="block text-lg font-medium mb-1">Select Team</label>
-        <div className="flex flex-col gap-2">
-            {!(isOnline && serverOnline) ? (
-                <>
-                    <input
-                        type="number"
-                        inputMode="numeric"
-                        placeholder="Enter team number"
-                        onChange={(e) => {
-                            const num = parseInt(e.target.value)
-                            if (!isNaN(num)) {
+            {/* Match Type Select */}
+            <div>
+                <label className="block text-lg font-medium mb-1">Match Type</label>
+                <div className="flex gap-2 grid-cols-3">
+                    {([
+                        ["qm", "Qualifications"],
+                        ["sf", "Playoffs"],
+                        ["f", "Finals"],
+                    ] as const).map(([key, label]) => (
+                        <button
+                            key={key}
+                            onClick={() => {
+                                if ((isOnline && serverOnline) && match && teamNumber !== null) {
+                                    void updateMatch(match, teamNumber, match_type, {
+                                        scouter: "__UNCLAIM__", phase: 'pre'
+                                    })
+                                }
                                 setData((d) => ({
                                     ...d,
-                                    teamNumber: num
+                                    match_type: key,
+                                    teamNumber: d.match_type === key ? d.teamNumber : null,
                                 }))
-                            }
-                        }}
-                        className="w-full p-2 rounded bg-zinc-800 border border-zinc-700 text-white"
-                    />
-                    <button disabled className="w-full py-2 rounded bg-zinc-800 opacity-50">---</button>
-                    <button disabled className="w-full py-2 rounded bg-zinc-800 opacity-50">---</button>
-                </>
-            ) : (
-                (teamList === null
-                        ? Array(3).fill(null)
-                        : teamList.length > 0
-                            ? teamList
-                            : Array(3).fill(undefined)
-                ).map((team, i) => {
-                    if (!team) {
-                        return (
-                            <button
-                                key={i}
-                                disabled
-                                className="w-full py-2 rounded bg-zinc-800 opacity-50"
-                            >
-                                ---
-                            </button>
-                        )
-                    }
-
-                    const isSelected = teamNumber === team.number
-                    const isClaimed = team.scouter !== null && team.number !== teamNumber
-
-                    // === 🟩 LOCAL ICON PATH FIX ===
-                    const localIcon = `/teams/team_icons/${team.number}.png`
-
-                    return (
-                        <button
-                            key={team.number}
-                            disabled={isClaimed}
-                            onClick={() => handleTeamSelect(team.number)}
-                            className={`w-full py-2 px-4 rounded flex items-center justify-center gap-3 ${isSelected ? 'bg-zinc-500' : 'bg-zinc-700'} ${isClaimed ? 'opacity-50 cursor-not-allowed' : ''}`}
+                            }}
+                            className={`py-1 w-[33%] h-10 rounded text-base ${
+                                data.match_type === key
+                                    ? "bg-zinc-400 text-white"
+                                    : "bg-zinc-700 text-white"
+                            }`}
                         >
-                            <div
-                                className={`w-10 h-10 rounded flex items-center justify-center ${
-                                    alliance === 'red' ? 'bg-red-700' : alliance === 'blue' ? 'bg-blue-700' : 'bg-zinc-600'
-                                }`}
-                            >
-                                <img
-                                    src={localIcon}
-                                    onError={(e) => {
-                                        // fallback to placeholder or team.logo if missing
-                                        (e.target as HTMLImageElement).src = team.logo ?? '/placeholder.png'
-                                    }}
-                                    alt={team.name}
-                                    className="w-8 h-8 rounded object-contain"
-                                />
-                            </div>
-
-                            <div className="text-xl flex items-center gap-1 max-w-full">
-                                <span>{team.name.nickname}</span>
-                                <span>({team.number})</span>
-                            </div>
-
-                            {isClaimed && (
-                                <span className="text-sm">
-                                    {`Scouting by ${team.scouter === scouter ? 'you' : team.scouter}`}
-                                </span>
-                            )}
+                            {label}
                         </button>
-                    )
-                })
-            )}
+                    ))}
+                </div>
+            </div>
+
+            {/* Match Number */}
+            <div>
+                <label className="block text-lg font-medium mb-1">Match Number</label>
+                <input
+                    type="text"
+                    inputMode="numeric"
+                    defaultValue={match === 0 ? "" : match!}
+                    ref={inputRef}
+                    onChange={(e) => {
+                        const raw = e.target.value.replace(/\s/g, '');
+                        const newMatch = /^-?\d*\.?\d+$/.test(raw) ? parseFloat(raw) : 0;
+                        if ((isOnline && serverOnline) && match && teamNumber !== null) {
+                            void updateMatch(match, teamNumber, match_type, {
+                                scouter: "__UNCLAIM__", phase: 'pre'
+                            })
+                        }
+                        setData((d) => ({
+                            ...d,
+                            match: newMatch,
+                            teamNumber: d.match === newMatch ? d.teamNumber : null,
+                        }))
+                    }}
+                    className="w-full p-2 rounded bg-zinc-800 border border-zinc-700 text-white"
+                />
+            </div>
+
+            {/* Alliance Selection */}
+            <div>
+                <label className="block text-lg font-medium mb-1">Select Alliance</label>
+                <div className="flex gap-4">
+                    {(['red', 'blue'] as const).map((color) => (
+                        <button
+                            key={color}
+                            onClick={() => {
+                                if ((isOnline && serverOnline) && match && teamNumber !== null) {
+                                    void updateMatch(match, teamNumber, match_type, {
+                                        scouter: "__UNCLAIM__", phase: 'pre'
+                                    })
+                                }
+                                setData((d) => ({
+                                    ...d,
+                                    alliance: color,
+                                    teamNumber: d.alliance === color ? d.teamNumber : null,
+                                }))
+                            }}
+                            className={`w-16 h-16 rounded ${alliance === color ? 'outline-2 ' : ''} ${color === 'red' ? 'bg-red-600 outline-red-300' : 'bg-blue-600 outline-blue-300'}`}
+                        />
+                    ))}
+                </div>
+            </div>
+
+            {/* Team Selection */}
+            <div>
+                <div className="flex items-center justify-between mb-1">
+                    <label className="text-lg font-medium">Select Team</label>
+                    {(isOnline && serverOnline) && (
+                        <button
+                            onClick={() => setManualEntry(!manualEntry)}
+                            className="text-sm text-zinc-400 hover:text-zinc-300"
+                        >
+                            I don’t see my team
+                        </button>
+                    )}
+                </div>
+
+                {/* Manual Entry Mode or Offline */}
+                {manualEntry ? (
+                    <div className="flex flex-col gap-2">
+                        <div className="flex items-center gap-3">
+                            <div className="w-14 h-14 rounded bg-zinc-700 flex items-center justify-center">
+                                {iconSrc && (
+                                    <img
+                                        src={iconSrc}
+                                        alt="Team icon"
+                                        className="w-12 h-12 object-contain rounded"
+                                    />
+                                )}
+                            </div>
+                            <input
+                                type="text"
+                                inputMode="numeric"
+                                placeholder="Enter team number"
+                                value={manualTeam}
+                                onChange={(e) => setManualTeam(e.target.value)}
+                                className="flex-1 p-2 rounded bg-zinc-800 border border-zinc-700 text-white"
+                            />
+                        </div>
+                        <button disabled className="w-full py-2 rounded bg-zinc-800 opacity-50">---</button>
+                        <button disabled className="w-full py-2 rounded bg-zinc-800 opacity-50">---</button>
+                    </div>
+                ) : (
+                    <div className="flex flex-col gap-2">
+                        {(teamList === null
+                                ? Array(3).fill(null)
+                                : teamList.length > 0
+                                    ? teamList
+                                    : Array(3).fill(undefined)
+                        ).map((team, i) => {
+                            if (!team) {
+                                return (
+                                    <button
+                                        key={i}
+                                        disabled
+                                        className="w-full py-2 rounded bg-zinc-800 opacity-50"
+                                    >
+                                        ---
+                                    </button>
+                                )
+                            }
+                            const isSelected = teamNumber === team.number
+                            const isClaimed = team.scouter !== null && team.number !== teamNumber
+                            const localIcon = `/teams/team_icons/${team.number}.png`
+                            return (
+                                <button
+                                    key={team.number}
+                                    disabled={isClaimed}
+                                    onClick={() => handleTeamSelect(team.number)}
+                                    className={`w-full py-2 px-4 rounded flex items-center justify-center gap-3 ${isSelected ? 'bg-zinc-500' : 'bg-zinc-700'} ${isClaimed ? 'opacity-50 cursor-not-allowed' : ''}`}
+                                >
+                                    <div className={`w-10 h-10 rounded flex items-center justify-center ${
+                                        alliance === 'red' ? 'bg-red-700' : alliance === 'blue' ? 'bg-blue-700' : 'bg-zinc-600'
+                                    }`}>
+                                        <img
+                                            src={localIcon}
+                                            onError={(e) => {
+                                                (e.target as HTMLImageElement).src = team.logo ?? '/placeholder.png'
+                                            }}
+                                            alt={team.name}
+                                            className="w-8 h-8 rounded object-contain"
+                                        />
+                                    </div>
+                                    <div className="text-xl flex items-center gap-1 max-w-full">
+                                        <span>{team.name.nickname}</span>
+                                        <span>({team.number})</span>
+                                    </div>
+                                    {isClaimed && (
+                                        <span className="text-sm">
+                                            {`Scouting by ${team.scouter === scouter ? 'you' : team.scouter}`}
+                                        </span>
+                                    )}
+                                </button>
+                            )
+                        })}
+                    </div>
+                )}
+            </div>
         </div>
-    </div>
-</div>
     )
-
 }
-

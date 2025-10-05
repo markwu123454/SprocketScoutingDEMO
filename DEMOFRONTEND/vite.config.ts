@@ -23,6 +23,7 @@ export default defineConfig({
             workbox: {
                 // Fallback to index.html for navigation requests (React Router)
                 navigateFallback: '/index.html',
+                globIgnores: ['**/teams/team_icons/**'],
                 // Keep offline.html as a real offline fallback if you want
                 runtimeCaching: [
                     {
