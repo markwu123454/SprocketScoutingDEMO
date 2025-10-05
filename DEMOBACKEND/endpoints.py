@@ -189,7 +189,7 @@ async def guest_login(request: Request, body: enums.PasscodeBody):
 
 
 @router.get("/auth/verify")
-async def verify_session(session: enums.SessionInfo = Depends(db.require_session())):
+async def verify(session: enums.SessionInfo = Depends(db.require_session())):
     """
     Verifies the UUID session from headers (x-uuid) and returns identity + permissions.
     """
@@ -257,12 +257,11 @@ async def set_event(event: str, _: enums.SessionInfo = Depends(db.require_permis
 async def update_state(
     match: int,
     team: int,
-    scouter: str,                      # query param: desired scouter or "__UNCLAIM__"
+    scouter: str,  # "__UNCLAIM__" → "__NONE__"
     status: enums.StatusType,
     m_type: enums.MatchType,
     _: enums.SessionInfo = Depends(db.require_permission("match_scouting")),
 ):
-    # normalize enum
     if not isinstance(m_type, enums.MatchType):
         m_type = enums.MatchType(m_type)
 
@@ -271,29 +270,24 @@ async def update_state(
         raise HTTPException(status_code=404, detail="Entry not found")
     entry = rows[0]
 
-    # normalize row match_type to enum
     if not isinstance(entry["match_type"], enums.MatchType):
         entry["match_type"] = enums.MatchType(entry["match_type"])
 
     current_scouter: str | None = entry["scouter"]
-    desired_scouter: str | None = None if scouter == "__UNCLAIM__" else scouter
-
-    # Determine if we’re changing scouter or just status/data
+    desired_scouter = "__NONE__" if scouter == "__UNCLAIM__" else scouter
     scouter_change = (desired_scouter != current_scouter)
 
-    # One call updates both (merge data=None)
     try:
         await db.update_match_scouting(
             match=entry["match"],
             m_type=entry["match_type"],
             team=entry["team"],
-            scouter=current_scouter,   # where-clause scouter (None → "__NONE__")
-            status=status,                     # keep same if you want: pass entry["status"]
+            scouter=current_scouter,
+            status=status,
             data=None,
-            scouter_new=desired_scouter,       # target scouter (None or name)
+            scouter_new=desired_scouter,
         )
     except HTTPException as e:
-        # 409 can happen if target (match, m_type, team, scouter_new) already exists
         if e.status_code == 409:
             raise
         raise
@@ -304,6 +298,7 @@ async def update_state(
         "phase": status,
         "changed_scouter": scouter_change,
     }
+
 
 
 @router.patch("/scouting/{m_type}/{match}/{team}/{scouter}")
@@ -548,53 +543,30 @@ async def get_data_processed(_: enums.SessionInfo = Depends(db.require_permissio
     }
 
 
-@router.get("/poll/match/{match}/{m_type}/{alliance}")
-async def poll_scouter_changes(
-        match: int,
+@router.get("/state/match/{m_type}/{match}/{alliance}")
+async def get_scouter_state(
         m_type: enums.MatchType,
+        match: int,
         alliance: str,
-        client_ts: str = "",
         _: enums.SessionInfo = Depends(db.require_permission("match_scouting"))
 ):
-    timeout_ns = 10 * 1_000_000_000  # 10 seconds in nanoseconds
-    check_interval = 0.2  # seconds
+    entries = await db.get_match_scouting(match=match, m_type=m_type)
+    relevant = [e for e in entries if e["alliance"] == alliance]
 
-    def parse_ts(ts: str) -> int:
-        try:
-            return int(ts)
-        except Exception:
-            return 0
+    latest_ns = max(
+        (e["last_modified"] for e in relevant if e["last_modified"]),
+        default=0
+    )
 
-    client_ns = parse_ts(client_ts)
+    team_data = {
+        str(e["team"]): {"scouter": e.get("scouter")}
+        for e in relevant
+    }
 
-    async def get_current_state():
-        entries = await db.get_match_scouting(match=match, m_type=m_type)
-        relevant = [e for e in entries if e["alliance"] == alliance]
-        latest_ns = max((e["last_modified"] for e in relevant if e["last_modified"]), default=0)
-        team_data = {
-            str(e["team"]): {"scouter": e.get("scouter")}
-            for e in relevant
-        }
-        return team_data, latest_ns
-
-    start = time.time_ns()
-    while True:
-        current_state, latest_ns = await get_current_state()
-        if latest_ns > client_ns:
-            await asyncio.sleep(0.3)
-            current_state, latest_ns = await get_current_state()
-            return {
-                "timestamp": str(latest_ns),
-                "teams": current_state
-            }
-
-        if time.time_ns() - start > timeout_ns:
-            return {
-                "timestamp": str(latest_ns) if latest_ns else None,
-                "teams": current_state
-            }
-
-        await asyncio.sleep(check_interval)
+    return {
+        "timestamp": str(latest_ns),
+        "teams": team_data
+    }
 
 
 @router.get("/poll/admin_match/{match}/{match_type}")

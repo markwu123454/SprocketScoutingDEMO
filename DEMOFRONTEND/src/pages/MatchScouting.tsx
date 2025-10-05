@@ -25,7 +25,7 @@ export function MatchScoutingLayout() {
     // 1. External hooks
     const navigate = useNavigate()
 
-    const {patchData, submitData, verify, updateMatchData} = useAPI()
+    const {updateMatch, submitData, verify, updateMatchData} = useAPI()
     const {isOnline, serverOnline} = useClientEnvironment()
     const scouterName = getScouterName()!
 
@@ -160,7 +160,7 @@ export function MatchScoutingLayout() {
         if (baseDisabled) return
         const nextIndex = phaseIndex + 1
         setPhaseIndex(nextIndex)
-        await patchData(scoutingData.match!, scoutingData.teamNumber!, scoutingData.match_type, {
+        await updateMatch(scoutingData.match!, scoutingData.teamNumber!, scoutingData.match_type, {
             scouter: scouterName,
             phase: PHASE_ORDER[nextIndex],
         })
@@ -175,7 +175,7 @@ export function MatchScoutingLayout() {
         const prevIndex = phaseIndex - 1
         setPhaseIndex(prevIndex)
 
-        await patchData(scoutingData.match!, scoutingData.teamNumber!, scoutingData.match_type, {
+        await updateMatch(scoutingData.match!, scoutingData.teamNumber!, scoutingData.match_type, {
             scouter: scouterName,
             phase: PHASE_ORDER[prevIndex],
         })

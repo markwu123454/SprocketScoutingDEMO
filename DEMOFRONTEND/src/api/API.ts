@@ -52,6 +52,94 @@ export function useAPI() {
 
     const getCachedName = (): string | null => cachedName
 
+    const ping = async (): Promise<boolean> => {
+        const controller = new AbortController();
+        const timeout = setTimeout(() => controller.abort(), 4000);
+
+        try {
+            const res = await fetch(`${BASE_URL}/ping`, {
+                method: "GET",
+                signal: controller.signal,
+            });
+
+            clearTimeout(timeout);
+
+            if (!res.ok) return false;
+
+            const data = await res.json();
+            return data.ping === "pong";
+        } catch {
+            return false;
+        }
+    };
+
+    const login = async (passcode: string): Promise<{
+        success: boolean
+        name?: string
+        error?: string
+        permissions?: {
+            dev: boolean
+            admin: boolean
+            match_scouting: boolean
+            pit_scouting: boolean
+        }
+    }> => {
+        deleteCookie(UUID_COOKIE)
+        deleteCookie(NAME_COOKIE)
+
+        try {
+            const res = await fetch(`${BASE_URL}/auth/login`, {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({passcode}),
+            })
+
+            if (!res.ok) {
+                return {success: false, error: `Login failed: ${res.statusText}`}
+            }
+
+            const json = await res.json()
+            setCookie(UUID_COOKIE, json.uuid, 1)
+            setCookie(NAME_COOKIE, json.name, 1)
+            cachedName = json.name
+            return {
+                success: true,
+                name: json.name,
+                permissions: json.permissions
+            }
+        } catch (err) {
+            console.error("login failed:", err)
+            return {success: false, error: "Network error"}
+        }
+    }
+
+    const verify = async (): Promise<{
+        success: boolean
+        name?: string
+        permissions?: {
+            dev: boolean
+            admin: boolean
+            match_scouting: boolean
+            pit_scouting: boolean
+        }
+    }> => {
+        try {
+            const res = await fetch(`${BASE_URL}/auth/verify`, {
+                headers: getAuthHeaders(),
+            })
+            if (!res.ok) return {success: false}
+
+            const json = await res.json()
+            cachedName = json.name
+            return {
+                success: true,
+                name: json.name,
+                permissions: json.permissions,
+            }
+        } catch {
+            return {success: false}
+        }
+    }
 
     const submitData = async (
         match: number,
@@ -86,7 +174,7 @@ export function useAPI() {
     };
 
 
-    const patchData = async (
+    const updateMatch = async (
         match: number,
         team: number,
         match_type: MatchType,
@@ -95,6 +183,7 @@ export function useAPI() {
         try {
             const scouter = updates.scouter ?? "__UNCLAIM__";
             const phase = updates.phase;
+            console.log("unclaiming")
 
             if (!updates.scouter && !phase) {
                 console.warn("patchData: called with no valid updates.");
@@ -220,100 +309,46 @@ export function useAPI() {
     }
 
 
-    const login = async (passcode: string): Promise<{
-        success: boolean
-        name?: string
-        error?: string
-        permissions?: {
-            dev: boolean
-            admin: boolean
-            match_scouting: boolean
-            pit_scouting: boolean
-        }
-    }> =>
-    {
-        deleteCookie(UUID_COOKIE)
-        deleteCookie(NAME_COOKIE)
-
-        try {
-            const res = await fetch(`${BASE_URL}/auth/login`, {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({passcode}),
-            })
-
-            if (!res.ok) {
-                return {success: false, error: `Login failed: ${res.statusText}`}
-            }
-
-            const json = await res.json()
-            setCookie(UUID_COOKIE, json.uuid, 1)
-            setCookie(NAME_COOKIE, json.name, 1)
-            cachedName = json.name
-            return {
-                success: true,
-                name: json.name,
-                permissions: json.permissions
-            }
-        } catch (err) {
-            console.error("login failed:", err)
-            return {success: false, error: "Network error"}
-        }
-    }
-
-    const verify = async (): Promise<{
-        success: boolean
-        name?: string
-        permissions?: {
-            dev: boolean
-            admin: boolean
-            match_scouting: boolean
-            pit_scouting: boolean
-        }
-    }> =>
+    const getScouterState = async (
+        match: number,
+        m_type: MatchType,
+        alliance: 'red' | 'blue'
+    ): Promise<{
+        timestamp: string | null
+        teams: Record<string, { scouter: string | null }>
+    } | null> =>
     {
         try {
-            const res = await fetch(`${BASE_URL}/auth/verify`, {
+            const res = await fetch(`${BASE_URL}/state/match/${m_type}/${match}/${alliance}`, {
                 headers: getAuthHeaders(),
-            })
-            if (!res.ok) return {success: false}
-
-            const json = await res.json()
-            cachedName = json.name
-            return {
-                success: true,
-                name: json.name,
-                permissions: json.permissions,
-            }
-        } catch {
-            return {success: false}
-        }
-    }
-
-    const ping = async (): Promise<boolean> => {
-        const controller = new AbortController();
-        const timeout = setTimeout(() => controller.abort(), 4000);
-
-        try {
-            const res = await fetch(`${BASE_URL}/ping`, {
-                method: "GET",
-                signal: controller.signal,
             });
 
-            clearTimeout(timeout);
+            if (!res.ok) {
+                console.warn(`getScouterState: ${res.status} ${res.statusText}`);
+                return null;
+            }
 
-            if (!res.ok) return false;
+            const json = await res.json();
 
-            const data = await res.json();
-            return data.ping === "pong";
-        } catch {
-            return false;
+            // Basic shape validation
+            if (!json || typeof json !== 'object' || !json.teams) {
+                console.error('getScouterState: malformed response', json);
+                return null;
+            }
+
+            return {
+                timestamp: json.timestamp ?? null,
+                teams: json.teams,
+            };
+        } catch (err) {
+            console.error('getScouterState failed:', err);
+            return null;
         }
     };
 
 
     return {
-        patchData,
+        updateMatch,
         updateMatchData,
         submitData,
         getStatus,
@@ -324,6 +359,7 @@ export function useAPI() {
 
         login,
         verify,
-        ping
+        ping,
+        getScouterState
     }
 }

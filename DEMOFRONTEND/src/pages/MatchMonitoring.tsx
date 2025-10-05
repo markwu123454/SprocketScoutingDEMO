@@ -142,7 +142,9 @@ export default function MatchMonitoringLayout() {
     }
 
     usePollingEffect(
-        `/poll/admin_match/${matchNum}/${matchType}?client_ts=${encodeURIComponent(lastTimestamp)}`,
+        matchNum && matchType
+            ? `/poll/admin_match/${matchNum}/${matchType}?client_ts=${encodeURIComponent(lastTimestamp)}`
+            : null,
         (data: { entries: MatchScoutingData[]; timestamp?: string }) => {
             if (data.timestamp) setLastTimestamp(data.timestamp)
             setFullMatchInfo(data.entries)
@@ -151,6 +153,7 @@ export default function MatchMonitoringLayout() {
         300,
         getAuthHeaders()
     )
+
 
     useEffect(() => {
         const alliances: ("red" | "blue")[] = ["red", "blue"]
@@ -404,19 +407,19 @@ export default function MatchMonitoringLayout() {
                         type="text"
                         value={matchNum === 0 ? '' : matchNum} // Display empty string when matchNum is 0
                         onChange={(e) => {
-                        const value = e.target.value;
-                        const parsedValue = parseInt(value);
+                            const value = e.target.value;
+                            const parsedValue = parseInt(value);
 
-                        // Update matchNum if the input is a valid number or empty
-                        if (value === '') {
-                            setMatchNum(0);  // Treat empty input as 0 internally
-                        } else if (!isNaN(parsedValue) && parsedValue >= 1) {
-                            setMatchNum(parsedValue);  // Update with a valid number
-                        }
-                    }}
+                            // Update matchNum if the input is a valid number or empty
+                            if (value === '') {
+                                setMatchNum(0);  // Treat empty input as 0 internally
+                            } else if (!isNaN(parsedValue) && parsedValue >= 1) {
+                                setMatchNum(parsedValue);  // Update with a valid number
+                            }
+                        }}
                         className="w-20 p-2 bg-zinc-800 text-white rounded"
                         min={1}
-                        />
+                    />
 
                 </div>
 
