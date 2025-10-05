@@ -88,6 +88,7 @@ async def init_data_db():
     Initialize tables in the 'data' database:
       - match_scouting
       - processed_data
+      - users
     Creates indices if missing.
     """
     conn = await get_db_connection(DB_NAME)
@@ -99,7 +100,7 @@ async def init_data_db():
                     match_type TEXT NOT NULL,
                     team TEXT NOT NULL,
                     alliance TEXT NOT NULL,
-                    scouter TEXT NOT NULL, -- sentinel "__NONE__" used for logical NULL
+                    scouter TEXT NOT NULL,
                     status TEXT NOT NULL,
                     data JSONB NOT NULL,
                     last_modified BIGINT NOT NULL,
@@ -113,58 +114,22 @@ async def init_data_db():
             """)
             await conn.execute("CREATE TABLE IF NOT EXISTS processed_data (data TEXT)")
             await conn.execute("""
-                               CREATE TABLE IF NOT EXISTS users
-                               (
-                                   name
-                                   TEXT
-                                   PRIMARY
-                                   KEY,
-                                   passcode_hash
-                                   TEXT
-                                   NOT
-                                   NULL,
-                                   dev
-                                   BOOLEAN
-                                   NOT
-                                   NULL
-                                   DEFAULT
-                                   FALSE,
-                                   admin
-                                   BOOLEAN
-                                   NOT
-                                   NULL
-                                   DEFAULT
-                                   FALSE,
-                                   match_scouting
-                                   BOOLEAN
-                                   NOT
-                                   NULL
-                                   DEFAULT
-                                   FALSE,
-                                   pit_scouting
-                                   BOOLEAN
-                                   NOT
-                                   NULL
-                                   DEFAULT
-                                   FALSE,
-                                   match_access
-                                   JSONB
-                                   NOT
-                                   NULL
-                                   DEFAULT
-                                   '[]'
-                                   :
-                                   :
-                                   jsonb
-                               );
-                               """)
-
-
+                CREATE TABLE IF NOT EXISTS users(
+                    name TEXT PRIMARY KEY,
+                    passcode_hash TEXT NOT NULL,
+                    dev BOOLEAN NOT NULL DEFAULT FALSE,
+                    admin BOOLEAN NOT NULL DEFAULT FALSE,
+                    match_scouting BOOLEAN NOT NULL DEFAULT FALSE,
+                    pit_scouting BOOLEAN NOT NULL DEFAULT FALSE,
+                    match_access JSONB NOT NULL DEFAULT '[]'::jsonb
+                );
+            """)
     except PostgresError as e:
         logger.error("Failed to initialize data schema: %s", e)
         raise HTTPException(status_code=500, detail=f"Failed to initialize database: {e}")
     finally:
         await release_db_connection(DB_NAME, conn)
+
 
 
 async def init_session_db():
