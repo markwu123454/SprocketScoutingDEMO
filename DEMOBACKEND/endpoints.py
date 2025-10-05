@@ -1,9 +1,7 @@
-import ast
 import asyncio
 import uuid
-import csv
 import time
-from datetime import datetime, timezone
+from datetime import datetime, timezone, timedelta
 from typing import Optional, Dict, Any
 from fastapi import Depends, HTTPException, Body, APIRouter, Request
 from starlette.responses import HTMLResponse
@@ -124,81 +122,70 @@ def ping():
 @router.post("/auth/login")
 async def login(request: Request, body: enums.PasscodeBody):
     """
-    Authenticates via passcode and returns UUID session and permissions.
+    Authenticates via passcode stored in Neon users table.
     """
-    try:
-        with open("users.csv", newline="", encoding="utf-8") as f:
-            reader = csv.DictReader(f)
-            for row in reader:
-                if str(row["passcode"]) == body.passcode:
-                    session_id = str(uuid.uuid4())
-                    expires_dt = datetime.now(timezone.utc) + request.app.state.config["UUID_DURATION"]
+    user = await db.get_user_by_passcode(body.passcode)
+    if not user:
+        raise HTTPException(status_code=401, detail="Invalid passcode")
 
-                    session_data = {
-                        "name": row["name"],
-                        "permissions": {
-                            "dev": row["dev"].lower() == "true",
-                            "admin": row["admin"].lower() == "true",
-                            "match_scouting": row["match_scouting"].lower() == "true",
-                            "pit_scouting": row["pit_scouting"].lower() == "true",
-                            "match_access": []
-                        },
-                        "expires": expires_dt.isoformat()  # for JSON payload
-                    }
+    session_id = str(uuid.uuid4())
+    expires_dt = datetime.now(timezone.utc) + request.app.state.config.get("UUID_DURATION", timedelta(hours=8))
 
-                    # Store session in the database with datetime, not string
-                    await db.add_session(session_id, session_data, expires_dt)
+    session_data = {
+        "name": user["name"],
+        "permissions": {
+            "dev": user["dev"],
+            "admin": user["admin"],
+            "match_scouting": user["match_scouting"],
+            "pit_scouting": user["pit_scouting"],
+            "match_access": user["match_access"],
+        },
+        "expires": expires_dt.isoformat()
+    }
 
-                    return {
-                        "uuid": session_id,
-                        "name": session_data["name"],
-                        "expires": session_data["expires"],  # ISO string for response
-                        "permissions": session_data["permissions"]
-                    }
-    except FileNotFoundError:
-        raise HTTPException(status_code=500, detail="User file not found")
+    await db.add_session(session_id, session_data, expires_dt)
 
-    raise HTTPException(status_code=401, detail="Invalid passcode")
+    return {
+        "uuid": session_id,
+        "name": user["name"],
+        "expires": session_data["expires"],
+        "permissions": session_data["permissions"]
+    }
+
 
 
 @router.post("/auth/login/guest")
 async def guest_login(request: Request, body: enums.PasscodeBody):
     """
-    Authenticates via passcode and returns UUID session and permissions.
+    Guest login: limited permissions; passcode still verified in users table.
     """
-    try:
-        with open("users.csv", newline="", encoding="utf-8") as f:
-            reader = csv.DictReader(f)
-            for row in reader:
-                if str(row["passcode"]) == body.passcode:
-                    session_id = str(uuid.uuid4())
-                    expires_dt = datetime.now(timezone.utc) + request.app.state.config["SESSION_DURATION"]
+    user = await db.get_user_by_passcode(body.passcode)
+    if not user:
+        raise HTTPException(status_code=401, detail="Invalid passcode")
 
-                    session_data = {
-                        "name": row["name"],
-                        "permissions": {
-                            "dev": False,
-                            "admin": False,
-                            "match_scouting": False,
-                            "pit_scouting": False,
-                            "match_access": ast.literal_eval(row["match_access"])
-                        },
-                        "expires": expires_dt.isoformat()  # for JSON payload
-                    }
+    session_id = str(uuid.uuid4())
+    expires_dt = datetime.now(timezone.utc) + request.app.state.config.get("SESSION_DURATION", timedelta(hours=2))
 
-                    # Store session in the database with datetime, not string
-                    await db.add_session(session_id, session_data, expires_dt)
+    session_data = {
+        "name": user["name"],
+        "permissions": {
+            "dev": False,
+            "admin": False,
+            "match_scouting": False,
+            "pit_scouting": False,
+            "match_access": user["match_access"]
+        },
+        "expires": expires_dt.isoformat()
+    }
 
-                    return {
-                        "uuid": session_id,
-                        "name": session_data["name"],
-                        "expires": session_data["expires"],  # ISO string for response
-                        "permissions": session_data["permissions"]
-                    }
-    except FileNotFoundError:
-        raise HTTPException(status_code=500, detail="User file not found")
+    await db.add_session(session_id, session_data, expires_dt)
 
-    raise HTTPException(status_code=401, detail="Invalid passcode")
+    return {
+        "uuid": session_id,
+        "name": session_data["name"],
+        "expires": session_data["expires"],
+        "permissions": session_data["permissions"]
+    }
 
 
 @router.get("/auth/verify")
@@ -206,20 +193,6 @@ async def verify_session(session: enums.SessionInfo = Depends(db.require_session
     """
     Verifies the UUID session from headers (x-uuid) and returns identity + permissions.
     """
-    return {
-        "name": session.name,
-        "permissions": {
-            "dev": session.permissions.dev,
-            "admin": session.permissions.admin,
-            "match_scouting": session.permissions.match_scouting,
-            "pit_scouting": session.permissions.pit_scouting,
-        },
-    }
-
-
-
-@router.get
-async def verify_session(session: enums.SessionInfo = Depends(db.require_session())):
     return {
         "name": session.name,
         "permissions": {
@@ -331,8 +304,6 @@ async def update_state(
         "phase": status,
         "changed_scouter": scouter_change,
     }
-
-
 
 
 @router.patch("/scouting/{m_type}/{match}/{team}/{scouter}")

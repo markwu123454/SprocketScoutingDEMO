@@ -1,3 +1,5 @@
+import hashlib
+
 import asyncpg
 import json
 import time
@@ -28,15 +30,16 @@ S_NONE = "__NONE__"  # sentinel stored when scouter is logically NULL
 
 
 async def _setup_codecs(conn: asyncpg.Connection):
-    # JSON/JSONB <-> dict, transparently
+    """Register JSON and JSONB codecs for transparent dict <-> JSON conversion."""
     await conn.set_type_codec("jsonb", encoder=json.dumps, decoder=json.loads, schema="pg_catalog")
     await conn.set_type_codec("json",  encoder=json.dumps, decoder=json.loads, schema="pg_catalog")
 
 
 async def get_db_connection(db: str) -> asyncpg.Connection:
     """
-    Acquire a connection from (or lazily create) the pool for the given database.
-    Uses DATABASE_URL from environment (Neon / .env).
+    Acquire a connection from a cached pool for the given database.
+    Lazily creates a pool if not already initialized.
+    Uses DATABASE_URL from environment and SSL (for Neon).
     """
     pool = _pools.get(db)
     if pool is None:
@@ -55,23 +58,26 @@ async def get_db_connection(db: str) -> asyncpg.Connection:
 
 
 async def release_db_connection(db: str, conn: asyncpg.Connection):
+    """Release a connection back to its pool."""
     pool = _pools.get(db)
     if pool is not None:
         await pool.release(conn)
 
 
 async def close_pool():
-    """Closes all connection pools."""
+    """Close all open database pools and clear the global cache."""
     for pool in _pools.values():
         await pool.close()
     _pools.clear()
 
 
 def _to_db_scouter(s: Optional[str]) -> str:
+    """Convert None scouter value to the sentinel string '__NONE__'."""
     return S_NONE if s is None else s
 
 
 def _from_db_scouter(s: str) -> Optional[str]:
+    """Convert sentinel '__NONE__' string back to None."""
     return None if s == S_NONE else s
 
 
@@ -79,9 +85,10 @@ def _from_db_scouter(s: str) -> Optional[str]:
 
 async def init_data_db():
     """
-    Initializes tables in the single 'data' database:
+    Initialize tables in the 'data' database:
       - match_scouting
       - processed_data
+    Creates indices if missing.
     """
     conn = await get_db_connection(DB_NAME)
     try:
@@ -105,6 +112,53 @@ async def init_data_db():
                 ON match_scouting (match, match_type, team, scouter)
             """)
             await conn.execute("CREATE TABLE IF NOT EXISTS processed_data (data TEXT)")
+            await conn.execute("""
+                               CREATE TABLE IF NOT EXISTS users
+                               (
+                                   name
+                                   TEXT
+                                   PRIMARY
+                                   KEY,
+                                   passcode_hash
+                                   TEXT
+                                   NOT
+                                   NULL,
+                                   dev
+                                   BOOLEAN
+                                   NOT
+                                   NULL
+                                   DEFAULT
+                                   FALSE,
+                                   admin
+                                   BOOLEAN
+                                   NOT
+                                   NULL
+                                   DEFAULT
+                                   FALSE,
+                                   match_scouting
+                                   BOOLEAN
+                                   NOT
+                                   NULL
+                                   DEFAULT
+                                   FALSE,
+                                   pit_scouting
+                                   BOOLEAN
+                                   NOT
+                                   NULL
+                                   DEFAULT
+                                   FALSE,
+                                   match_access
+                                   JSONB
+                                   NOT
+                                   NULL
+                                   DEFAULT
+                                   '[]'
+                                   :
+                                   :
+                                   jsonb
+                               );
+                               """)
+
     except PostgresError as e:
         logger.error("Failed to initialize data schema: %s", e)
         raise HTTPException(status_code=500, detail=f"Failed to initialize database: {e}")
@@ -113,9 +167,7 @@ async def init_data_db():
 
 
 async def init_session_db():
-    """
-    Initializes the 'sessions' table in the same 'data' database.
-    """
+    """Initialize the 'sessions' table in the 'data' database if it does not exist."""
     conn = await get_db_connection(DB_NAME)
     try:
         async with conn.transaction():
@@ -145,6 +197,7 @@ async def add_match_scouting(
     status: enums.StatusType,
     data: Dict[str, Any]
 ):
+    """Insert a new match scouting entry. Raises 409 if the (match, team, scouter) combination already exists."""
     conn = await get_db_connection(DB_NAME)
     try:
         await conn.execute("""
@@ -165,11 +218,16 @@ async def update_match_scouting(
     match: int,
     m_type: enums.MatchType,
     team: int | str,
-    scouter: Optional[str],                # current value (None => "__NONE__")
+    scouter: Optional[str],
     status: Optional[enums.StatusType] = None,
     data: Optional[Dict[str, Any]] = None,
-    scouter_new: Optional[str] = None      # new desired value (claim/reassign)
+    scouter_new: Optional[str] = None
 ):
+    """
+    Update an existing match scouting entry.
+    Can modify data, status, or scouter assignment.
+    Raises 404 if entry not found or 409 on conflicting reassignment.
+    """
     conn = await get_db_connection(DB_NAME)
     try:
         async with conn.transaction():
@@ -207,6 +265,11 @@ async def get_match_scouting(
     team: Optional[int | str] = None,
     scouter: Optional[str] = "__NOTPASSED__"
 ) -> list[Dict[str, Any]]:
+    """
+    Fetch match scouting records with optional filters.
+    Any combination of parameters can be supplied.
+    Returns a list of records as dictionaries.
+    """
     conn = await get_db_connection(DB_NAME)
     try:
         query = "SELECT * FROM match_scouting WHERE 1=1"
@@ -232,7 +295,7 @@ async def get_match_scouting(
                 "alliance": r["alliance"],
                 "scouter": _from_db_scouter(r["scouter"]),
                 "status": r["status"],
-                "data": r["data"],  # dict via codec
+                "data": r["data"],
                 "last_modified": r["last_modified"],
             }
             for r in rows
@@ -245,6 +308,7 @@ async def get_match_scouting(
 
 
 async def get_processed_data() -> Optional[str]:
+    """Retrieve the processed data text blob (first row only)."""
     conn = await get_db_connection(DB_NAME)
     try:
         row = await conn.fetchrow("SELECT data FROM processed_data LIMIT 1")
@@ -258,27 +322,11 @@ async def get_processed_data() -> Optional[str]:
 
 # =================== Sessions (same DB) ===================
 
-async def init_session_db():
-    """(redeclared above) kept separate for clarity; same DB."""
-    conn = await get_db_connection(DB_NAME)
-    try:
-        async with conn.transaction():
-            await conn.execute("""
-                CREATE TABLE IF NOT EXISTS sessions (
-                    uuid TEXT PRIMARY KEY,
-                    data JSONB NOT NULL,
-                    expires TIMESTAMP WITH TIME ZONE NOT NULL
-                );
-            """)
-            await conn.execute("CREATE INDEX IF NOT EXISTS idx_sessions_expires ON sessions (expires);")
-    except PostgresError as e:
-        logger.error("Failed to initialize sessions schema: %s", e)
-        raise HTTPException(status_code=500, detail=f"Failed to initialize sessions schema: {e}")
-    finally:
-        await release_db_connection(DB_NAME, conn)
-
-
 async def add_session(session_id: str, session_data: Dict[str, Any], expires_dt: datetime):
+    """
+    Insert or update a user session.
+    Overwrites if UUID already exists.
+    """
     try:
         uuid.UUID(session_id)
     except ValueError:
@@ -301,6 +349,7 @@ async def add_session(session_id: str, session_data: Dict[str, Any], expires_dt:
 
 
 async def get_session_data(session_id: str) -> Optional[Dict[str, Any]]:
+    """Retrieve session data for a given UUID. Returns None if not found."""
     try:
         uuid.UUID(session_id)
     except ValueError:
@@ -318,6 +367,7 @@ async def get_session_data(session_id: str) -> Optional[Dict[str, Any]]:
 
 
 async def delete_session(session_id: str):
+    """Delete a single session by UUID."""
     try:
         uuid.UUID(session_id)
     except ValueError:
@@ -334,6 +384,7 @@ async def delete_session(session_id: str):
 
 
 async def delete_all_sessions():
+    """Delete all rows in the sessions table."""
     conn = await get_db_connection(DB_NAME)
     try:
         await conn.execute("TRUNCATE sessions")
@@ -345,6 +396,11 @@ async def delete_all_sessions():
 
 
 async def verify_uuid(x_uuid: str, required: Optional[str] = None) -> Dict[str, Any]:
+    """
+    Validate a session UUID and return its session data.
+    - Raises 401 if invalid or missing.
+    - Raises 403 if expired or lacking required permission.
+    """
     try:
         uuid.UUID(x_uuid)
     except ValueError:
@@ -365,7 +421,7 @@ async def verify_uuid(x_uuid: str, required: Optional[str] = None) -> Dict[str, 
             await conn.execute("DELETE FROM sessions WHERE uuid = $1", x_uuid)
             raise HTTPException(status_code=403, detail="Expired session")
 
-        session = row["data"]  # dict via JSONB codec
+        session = row["data"]
 
         if required:
             perms = session.get("permissions", {})
@@ -381,9 +437,23 @@ async def verify_uuid(x_uuid: str, required: Optional[str] = None) -> Dict[str, 
         await release_db_connection(DB_NAME, conn)
 
 
+async def get_user_by_passcode(passcode: str) -> Optional[dict]:
+    """
+    Return the user row whose stored passcode_hash matches the given passcode.
+    """
+    conn = await get_db_connection(DB_NAME)
+    try:
+        h = hashlib.sha256(passcode.encode()).hexdigest()
+        row = await conn.fetchrow("SELECT * FROM users WHERE passcode_hash = $1", h)
+        return dict(row) if row else None
+    finally:
+        await release_db_connection(DB_NAME, conn)
+
+
 # =================== FastAPI dependencies ===================
 
 def require_session() -> Callable[..., "SessionInfo"]:
+    """FastAPI dependency: verifies the X-UUID header and returns a SessionInfo object."""
     async def dep(x_uuid: Annotated[str, Header(alias="x-uuid")]) -> enums.SessionInfo:
         s = await verify_uuid(x_uuid)
         return enums.SessionInfo(
@@ -394,6 +464,10 @@ def require_session() -> Callable[..., "SessionInfo"]:
 
 
 def require_permission(required: str) -> Callable[..., "SessionInfo"]:
+    """
+    FastAPI dependency: validates an existing session and ensures
+    the user has a given permission flag (e.g. 'admin' or 'dev').
+    """
     async def dep(session: enums.SessionInfo = Depends(require_session())) -> enums.SessionInfo:
         if not getattr(session.permissions, required, False):
             from fastapi import HTTPException
