@@ -20,6 +20,7 @@ export default function Pre({
     const [manualEntry, setManualEntry] = useState(false)
     const [manualTeam, setManualTeam] = useState<string>("")
     const [iconSrc, setIconSrc] = useState<string | null>(null)
+    const [lastClaimedTeam, setLastClaimedTeam] = useState<number | null>(null)
 
     const {match, alliance, match_type, teamNumber} = data
     const scouter = getScouterName()!
@@ -233,7 +234,24 @@ export default function Pre({
                     <label className="text-lg font-medium">Select Team</label>
                     {(isOnline && serverOnline) && (
                         <button
-                            onClick={() => setManualEntry(!manualEntry)}
+                            onClick={async () => {
+                                if (!manualEntry) {
+                                    // entering manual mode: unclaim current team
+                                    if ((isOnline && serverOnline) && match && teamNumber !== null) {
+                                        setLastClaimedTeam(teamNumber)
+                                        await unclaimTeam(match, teamNumber, match_type, scouter)
+                                        setData(d => ({...d, teamNumber: null}))
+                                    }
+                                    setManualEntry(true)
+                                } else {
+                                    // leaving manual mode: reclaim last team
+                                    if ((isOnline && serverOnline) && match && lastClaimedTeam !== null) {
+                                        await claimTeam(match, lastClaimedTeam, match_type, scouter)
+                                        setData(d => ({...d, teamNumber: lastClaimedTeam}))
+                                    }
+                                    setManualEntry(false)
+                                }
+                            }}
                             className="text-sm text-zinc-400 hover:text-zinc-300"
                         >
                             I don’t see my team
