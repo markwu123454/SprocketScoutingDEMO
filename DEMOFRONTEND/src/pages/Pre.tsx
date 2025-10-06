@@ -11,7 +11,7 @@ export default function Pre({
     data: MatchScoutingData
     setData: React.Dispatch<React.SetStateAction<MatchScoutingData>>
 }) {
-    const {updateMatch, getTeamList, getScouterState} = useAPI()
+    const {claimTeam, unclaimTeam, updateState, getTeamList, getScouterState} = useAPI()
     const {isOnline, serverOnline} = useClientEnvironment()
 
     const [teamList, setTeamList] = useState<TeamInfo[] | null>(null)
@@ -28,9 +28,7 @@ export default function Pre({
     useEffect(() => {
         if (!match || !alliance || teamNumber === null) return
         const timeout = setTimeout(() => {
-            void updateMatch(match, teamNumber, match_type, {
-                scouter: scouter, phase: 'pre'
-            })
+            void updateState(match, teamNumber, match_type, scouter, "pre")
         }, 300)
         return () => clearTimeout(timeout)
     }, [match, alliance, teamNumber, match_type])
@@ -103,10 +101,11 @@ export default function Pre({
 
     // === 5. Offline auto-activate manual entry ===
     useEffect(() => {
-        if (!(isOnline && serverOnline)) {
+        if (!(isOnline)) {
+            console.log(isOnline, serverOnline)
             setManualEntry(true)
         }
-    }, [isOnline, serverOnline])
+    }, [isOnline])
 
     const handleTeamSelect = async (newTeamNumber: number) => {
         if (match && teamNumber !== null && teamNumber !== newTeamNumber) {
@@ -116,14 +115,16 @@ export default function Pre({
                     t.number === oldTeamNumber ? {...t, scouter: null} : t
                 ) ?? null
             )
-            await updateMatch(match, oldTeamNumber, match_type, {
-                scouter: "__UNCLAIM__", phase: 'pre'
-            })
+            await unclaimTeam(match, oldTeamNumber, match_type, scouter)
         }
         setData((d) => ({
             ...d,
             teamNumber: newTeamNumber,
         }))
+        if (match && newTeamNumber !== null) {
+            await claimTeam(match, newTeamNumber, match_type, scouter)
+            await updateState(match, newTeamNumber, match_type, scouter, "pre")
+        }
     }
 
     return (
@@ -143,9 +144,7 @@ export default function Pre({
                             key={key}
                             onClick={() => {
                                 if ((isOnline && serverOnline) && match && teamNumber !== null) {
-                                    void updateMatch(match, teamNumber, match_type, {
-                                        scouter: "__UNCLAIM__", phase: 'pre'
-                                    })
+                                    void unclaimTeam(match, teamNumber, match_type, scouter)
                                 }
                                 setData((d) => ({
                                     ...d,
@@ -177,9 +176,7 @@ export default function Pre({
                         const raw = e.target.value.replace(/\s/g, '');
                         const newMatch = /^-?\d*\.?\d+$/.test(raw) ? parseFloat(raw) : 0;
                         if ((isOnline && serverOnline) && match && teamNumber !== null) {
-                            void updateMatch(match, teamNumber, match_type, {
-                                scouter: "__UNCLAIM__", phase: 'pre'
-                            })
+                            void updateState(match, teamNumber, match_type, scouter, "pre")
                         }
                         setData((d) => ({
                             ...d,
@@ -200,9 +197,7 @@ export default function Pre({
                             key={color}
                             onClick={() => {
                                 if ((isOnline && serverOnline) && match && teamNumber !== null) {
-                                    void updateMatch(match, teamNumber, match_type, {
-                                        scouter: "__UNCLAIM__", phase: 'pre'
-                                    })
+                                    void unclaimTeam(match, teamNumber, match_type, scouter)
                                 }
                                 setData((d) => ({
                                     ...d,
@@ -234,7 +229,15 @@ export default function Pre({
                 {manualEntry ? (
                     <div className="flex flex-col gap-2">
                         <div className="flex items-center gap-3">
-                            <div className="w-14 h-14 rounded bg-zinc-700 flex items-center justify-center">
+                            <div
+                                className={`flex-shrink-0 w-16 h-16 rounded flex items-center justify-center ${
+                                    alliance === 'red'
+                                        ? 'bg-red-700'
+                                        : alliance === 'blue'
+                                            ? 'bg-blue-700'
+                                            : 'bg-zinc-700'
+                                }`}
+                            >
                                 {iconSrc && (
                                     <img
                                         src={iconSrc}
@@ -249,7 +252,7 @@ export default function Pre({
                                 placeholder="Enter team number"
                                 value={manualTeam}
                                 onChange={(e) => setManualTeam(e.target.value)}
-                                className="flex-1 p-2 rounded bg-zinc-800 border border-zinc-700 text-white"
+                                className="flex-1 min-w-0 p-2 rounded bg-zinc-800 border border-zinc-700 text-white"
                             />
                         </div>
                         <button disabled className="w-full py-2 rounded bg-zinc-800 opacity-50">---</button>

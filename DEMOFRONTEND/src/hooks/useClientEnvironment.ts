@@ -12,6 +12,7 @@ export interface ClientEnvironment {
     isTouchDevice: boolean
 
     serverOnline: boolean
+    serverChecked: boolean   // ← added
     isOnline: boolean
     isWifi: boolean
     networkQuality: number
@@ -41,6 +42,7 @@ export function useClientEnvironment(): ClientEnvironment {
         isTouchDevice: false,
 
         serverOnline: false,
+        serverChecked: false,     // ← added
         isOnline: navigator.onLine,
         isWifi: false,
         networkQuality: 0,
@@ -87,7 +89,9 @@ export function useClientEnvironment(): ClientEnvironment {
             else if (/Firefox/i.test(ua)) browser = "Firefox"
             else if (/Edg/i.test(ua)) browser = "Edge"
 
-            const isStandalone = window.matchMedia("(display-mode: standalone)").matches || (navigator as any).standalone === true
+            const isStandalone =
+                window.matchMedia("(display-mode: standalone)").matches ||
+                (navigator as any).standalone === true
             const isPWA = isStandalone || window.location.protocol === "app:"
             const isIOSPWA = isIOS && (navigator as any).standalone === true
 
@@ -114,18 +118,25 @@ export function useClientEnvironment(): ClientEnvironment {
             const isOnline = navigator.onLine
             const isWifi = type === "wifi" || effectiveType === "4g" || (downlink ?? 0) > 10
 
-            const quality = !isOnline || downlink === null || rtt === null
-                ? 0
-                : Math.min(1, (downlink / 10) * 0.7 + (1 - Math.min(rtt / 300, 1)) * 0.3)
+            const quality =
+                !isOnline || downlink === null || rtt === null
+                    ? 0
+                    : Math.min(1, (downlink / 10) * 0.7 + (1 - Math.min(rtt / 300, 1)) * 0.3)
 
             const level: ClientEnvironment["qualityLevel"] =
-                !isOnline ? 0
-                    : quality > 0.9 ? 5
-                        : quality > 0.7 ? 4
-                            : quality > 0.5 ? 3
-                                : quality > 0.3 ? 2
-                                    : quality > 0.1 ? 1
-                                        : 0
+                !isOnline
+                    ? 0
+                    : quality > 0.9
+                    ? 5
+                    : quality > 0.7
+                    ? 4
+                    : quality > 0.5
+                    ? 3
+                    : quality > 0.3
+                    ? 2
+                    : quality > 0.1
+                    ? 1
+                    : 0
 
             setEnv(prev => ({
                 ...prev,
@@ -141,7 +152,11 @@ export function useClientEnvironment(): ClientEnvironment {
 
         const pingServer = async () => {
             const result = await ping()
-            setEnv(prev => ({...prev, serverOnline: result}))
+            setEnv(prev => ({
+                ...prev,
+                serverOnline: result,
+                serverChecked: true,     // ← mark first ping done
+            }))
         }
 
         updatePlatformInfo()

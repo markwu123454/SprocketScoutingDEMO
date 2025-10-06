@@ -25,7 +25,7 @@ export function MatchScoutingLayout() {
     // 1. External hooks
     const navigate = useNavigate()
 
-    const {updateMatch, submitData, verify, updateMatchData} = useAPI()
+    const {submitData, verify, unclaimTeam, updateState} = useAPI()
     const {isOnline, serverOnline} = useClientEnvironment()
     const scouterName = getScouterName()!
 
@@ -160,10 +160,7 @@ export function MatchScoutingLayout() {
         if (baseDisabled) return
         const nextIndex = phaseIndex + 1
         setPhaseIndex(nextIndex)
-        await updateMatch(scoutingData.match!, scoutingData.teamNumber!, scoutingData.match_type, {
-            scouter: scouterName,
-            phase: PHASE_ORDER[nextIndex],
-        })
+        await updateState(scoutingData.match!, scoutingData.teamNumber!, scoutingData.match_type, scouterName, PHASE_ORDER[nextIndex],)
     }
 
     const handleBack = async () => {
@@ -171,14 +168,9 @@ export function MatchScoutingLayout() {
             navigate("/")
             return
         }
-
         const prevIndex = phaseIndex - 1
         setPhaseIndex(prevIndex)
-
-        await updateMatch(scoutingData.match!, scoutingData.teamNumber!, scoutingData.match_type, {
-            scouter: scouterName,
-            phase: PHASE_ORDER[prevIndex],
-        })
+        await updateState(scoutingData.match!, scoutingData.teamNumber!, scoutingData.match_type, scouterName, PHASE_ORDER[prevIndex],)
     }
 
 
@@ -200,6 +192,21 @@ export function MatchScoutingLayout() {
                             variant="destructive"
                             onClick={async () => {
                                 if (resumeCandidate) {
+                                    if (isOnline && serverOnline &&
+                                        resumeCandidate.match &&
+                                        resumeCandidate.match_type &&
+                                        resumeCandidate.teamNumber) {
+                                        try {
+                                            await unclaimTeam(
+                                                resumeCandidate.match,
+                                                resumeCandidate.teamNumber,
+                                                resumeCandidate.match_type,
+                                                scouterName
+                                            );
+                                        } catch (err) {
+                                            console.warn("Failed to unclaim during discard:", err);
+                                        }
+                                    }
                                     await db.scouting.delete(resumeCandidate.key)
                                 }
                                 setScoutingData({...defaultScoutingData, scouter: scouterName})

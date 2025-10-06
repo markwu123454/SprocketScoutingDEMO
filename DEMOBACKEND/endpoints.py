@@ -1,12 +1,9 @@
-import asyncio
 import uuid
-import time
 from datetime import datetime, timezone, timedelta
 from typing import Optional, Dict, Any
-from fastapi import Depends, HTTPException, Body, APIRouter, Request
+from fastapi import Depends, HTTPException, Body, APIRouter, Request, Query
 from starlette.responses import HTMLResponse
 
-import tba_fetcher
 import db
 import enums
 
@@ -113,11 +110,9 @@ async function sendPing(event) {
 </html>
     """
 
-
 @router.get("/ping")
 def ping():
     return {"ping": "pong"}
-
 
 @router.post("/auth/login")
 async def login(request: Request, body: enums.PasscodeBody):
@@ -153,7 +148,7 @@ async def login(request: Request, body: enums.PasscodeBody):
     }
 
 
-
+'''
 @router.post("/auth/login/guest")
 async def guest_login(request: Request, body: enums.PasscodeBody):
     """
@@ -186,7 +181,7 @@ async def guest_login(request: Request, body: enums.PasscodeBody):
         "expires": session_data["expires"],
         "permissions": session_data["permissions"]
     }
-
+'''
 
 @router.get("/auth/verify")
 async def verify(session: enums.SessionInfo = Depends(db.require_session())):
@@ -203,7 +198,7 @@ async def verify(session: enums.SessionInfo = Depends(db.require_session())):
         },
     }
 
-
+'''
 @router.post("/admin/expire/{session_id}")
 async def expire_uuid(session_id: str, _: enums.SessionInfo = Depends(db.require_permission("admin"))):
     """
@@ -251,7 +246,7 @@ async def set_event(event: str, _: enums.SessionInfo = Depends(db.require_permis
                 )
 
     return {"status": "event initialized", "matches": len(matches)}
-
+'''
 
 @router.patch("/scouting/{m_type}/{match}/{team}/state")
 async def update_state(
@@ -298,6 +293,132 @@ async def update_state(
         "phase": status,
         "changed_scouter": scouter_change,
     }
+
+@router.patch("/scouting/{m_type}/{match}/{team}/claim")
+async def claim_team(
+    m_type: enums.MatchType,
+    match: int,
+    team: int,
+    scouter: str = Query(...),
+    _: enums.SessionInfo = Depends(db.require_permission("match_scouting")),
+):
+    """
+    Claims a team for the given scouter.
+    Fails if the team is already claimed by someone else.
+    """
+    if not isinstance(m_type, enums.MatchType):
+        m_type = enums.MatchType(m_type)
+
+    rows = await db.get_match_scouting(match=match, m_type=m_type, team=team)
+    if not rows:
+        raise HTTPException(status_code=404, detail="Entry not found")
+    entry = rows[0]
+
+    # Race-safe: only update if currently unclaimed
+    updated = await db.update_match_scouting(
+        match=match,
+        m_type=m_type,
+        team=team,
+        scouter="__NONE__",
+        scouter_new=scouter,
+        status=None,
+        data=None,
+    )
+
+    if not updated:
+        raise HTTPException(status_code=409, detail="Already claimed by another scouter")
+
+    return {"status": "claimed", "team": team, "scouter": scouter}
+
+
+@router.patch("/scouting/{m_type}/{match}/{team}/unclaim")
+async def unclaim_team(
+    m_type: enums.MatchType,
+    match: int,
+    team: int,
+    scouter: str = Query(...),
+    _: enums.SessionInfo = Depends(db.require_permission("match_scouting")),
+):
+    """
+    Unclaims a team if the requester currently owns it.
+    Also resets its state to UNCLAIMED.
+    """
+    if not isinstance(m_type, enums.MatchType):
+        m_type = enums.MatchType(m_type)
+
+    rows = await db.get_match_scouting(match=match, m_type=m_type, team=team)
+    if not rows:
+        raise HTTPException(status_code=404, detail="Entry not found")
+    entry = rows[0]
+
+    if entry["scouter"] != scouter:
+        raise HTTPException(status_code=403, detail="Cannot unclaim another scouter's team")
+
+    updated = await db.update_match_scouting(
+        match=match,
+        m_type=m_type,
+        team=team,
+        scouter=scouter,
+        scouter_new="__NONE__",
+        status=enums.StatusType.UNCLAIMED,   # ← explicitly reset to unclaimed
+        data=None,
+    )
+
+    if not updated:
+        raise HTTPException(status_code=409, detail="Failed to unclaim (possible race)")
+
+    return {"status": "unclaimed", "team": team}
+
+
+@router.patch("/scouting/{m_type}/{match}/{team}/state")
+async def update_state(
+    m_type: enums.MatchType,
+    match: int,
+    team: int,
+    scouter: str = Query(...),
+    status: enums.StatusType = Query(...),
+    _: enums.SessionInfo = Depends(db.require_permission("match_scouting")),
+):
+    """
+    Updates the phase/state (pre, auto, teleop, post, submitted).
+    Only the current scouter can update their own team's phase.
+    """
+    if not isinstance(m_type, enums.MatchType):
+        m_type = enums.MatchType(m_type)
+
+    rows = await db.get_match_scouting(match=match, m_type=m_type, team=team)
+    if not rows:
+        raise HTTPException(status_code=404, detail="Entry not found")
+    entry = rows[0]
+
+    current_scouter = entry["scouter"]
+    current_status = entry["status"]
+
+    if current_scouter != scouter:
+        raise HTTPException(status_code=403, detail="Only current scouter may update state")
+
+    # Optional: enforce monotonic phase progression
+    allowed_order = [
+        enums.StatusType.PRE,
+        enums.StatusType.AUTO,
+        enums.StatusType.TELEOP,
+        enums.StatusType.POST,
+        enums.StatusType.SUBMITTED,
+    ]
+    if allowed_order.index(status) < allowed_order.index(current_status):
+        raise HTTPException(status_code=400, detail="Cannot regress to earlier phase")
+
+    await db.update_match_scouting(
+        match=match,
+        m_type=m_type,
+        team=team,
+        scouter=scouter,
+        scouter_new=scouter,  # no ownership change
+        status=status,
+        data=None,
+    )
+
+    return {"status": "updated", "team": team, "phase": status}
 
 
 
@@ -414,11 +535,11 @@ async def get_current_scouting(
     return None
 
 
-@router.get("/match/{match}/{alliance}/{m_type}")
+@router.get("/match/{m_type}/{match}/{alliance}")
 async def get_match_info(
+        m_type: enums.MatchType,
         match: int,
         alliance: enums.AllianceType,
-        m_type: enums.MatchType,
         _: enums.SessionInfo = Depends(db.require_permission("match_scouting"))
 ):
     """
@@ -460,7 +581,6 @@ async def get_match_info(
             {
                 "number": int(t),
                 "name": f"Team {t}",  # optionally use preloaded team_data if available
-                "logo": f"/assets/teams/{t}.png",
                 "scouter": (await db.get_match_scouting(match=match, m_type=m_type, team=t))[0].get("scouter")
             }
             for t in team_numbers
@@ -534,6 +654,25 @@ async def get_status(
     }
 
 
+@router.get("/match/{m_type}/{match}/{alliance}/state")
+async def get_scouter_state(
+    m_type: enums.MatchType,
+    match: int,
+    alliance: enums.AllianceType,
+    _: enums.SessionInfo = Depends(db.require_permission("match_scouting")),
+):
+    entries = await db.get_match_scouting(match=match, m_type=m_type)
+    relevant = [e for e in entries if e["alliance"] == alliance.value]
+
+    return {
+        "teams": {
+            str(e["team"]): {"scouter": e.get("scouter")}
+            for e in relevant
+        }
+    }
+
+
+'''
 @router.get("/data/processed")
 async def get_data_processed(_: enums.SessionInfo = Depends(db.require_permission("admin"))):
     rows = await db.get_processed_data()
@@ -543,30 +682,7 @@ async def get_data_processed(_: enums.SessionInfo = Depends(db.require_permissio
     }
 
 
-@router.get("/state/match/{m_type}/{match}/{alliance}")
-async def get_scouter_state(
-        m_type: enums.MatchType,
-        match: int,
-        alliance: str,
-        _: enums.SessionInfo = Depends(db.require_permission("match_scouting"))
-):
-    entries = await db.get_match_scouting(match=match, m_type=m_type)
-    relevant = [e for e in entries if e["alliance"] == alliance]
 
-    latest_ns = max(
-        (e["last_modified"] for e in relevant if e["last_modified"]),
-        default=0
-    )
-
-    team_data = {
-        str(e["team"]): {"scouter": e.get("scouter")}
-        for e in relevant
-    }
-
-    return {
-        "timestamp": str(latest_ns),
-        "teams": team_data
-    }
 
 
 @router.get("/poll/admin_match/{match}/{match_type}")
@@ -611,3 +727,4 @@ async def poll_admin_match_changes(
             }
 
         await asyncio.sleep(check_interval)
+'''

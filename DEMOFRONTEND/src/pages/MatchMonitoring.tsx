@@ -4,7 +4,6 @@ import {Badge} from '@/components/ui/badge'
 import type {TeamInfo, UIInfo, MatchScoutingData, MatchType} from '@/types'
 import field_overlay from '@/assets/2025_FMS_In-Match.png'
 import {defaultUIINFO} from "@/components/seasons/2025/yearConfig.ts";
-import {usePollingEffect} from '@/contexts/pollingContext'
 import {Input} from '@/components/ui/input'
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/components/ui/select.tsx";
 
@@ -140,19 +139,6 @@ export default function MatchMonitoringLayout() {
             </div>
         )
     }
-
-    usePollingEffect(
-        matchNum && matchType
-            ? `/poll/admin_match/${matchNum}/${matchType}?client_ts=${encodeURIComponent(lastTimestamp)}`
-            : null,
-        (data: { entries: MatchScoutingData[]; timestamp?: string }) => {
-            if (data.timestamp) setLastTimestamp(data.timestamp)
-            setFullMatchInfo(data.entries)
-        },
-        [matchNum, matchType, lastTimestamp],
-        300,
-        getAuthHeaders()
-    )
 
 
     useEffect(() => {
