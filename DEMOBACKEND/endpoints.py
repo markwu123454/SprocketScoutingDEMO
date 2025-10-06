@@ -357,6 +357,7 @@ async def update_state(
     entry = rows[0]
 
     current_scouter = entry["scouter"]
+    current_status = entry["status"]
     try:
         current_status = (
             current_status
