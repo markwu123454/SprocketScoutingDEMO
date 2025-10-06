@@ -107,6 +107,23 @@ export default function Pre({
         }))
     }, [manualEntry, manualTeam, setData])
 
+    useEffect(() => {
+    if (!isOnline || !serverOnline) return
+    if (!match || !teamNumber) return
+
+    void (async () => {
+        try {
+            await unclaimTeam(match, teamNumber, match_type, scouter)
+        } finally {
+            setData(d => ({
+                ...d,
+                teamNumber: null,
+            }))
+        }
+    })()
+}, [match, match_type, alliance])
+
+
 
     // === Offline auto-activate manual entry ===
     useEffect(() => {
