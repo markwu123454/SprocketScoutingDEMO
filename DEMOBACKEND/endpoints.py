@@ -248,51 +248,6 @@ async def set_event(event: str, _: enums.SessionInfo = Depends(db.require_permis
     return {"status": "event initialized", "matches": len(matches)}
 '''
 
-@router.patch("/scouting/{m_type}/{match}/{team}/state")
-async def update_state(
-    match: int,
-    team: int,
-    scouter: str,  # "__UNCLAIM__" → "__NONE__"
-    status: enums.StatusType,
-    m_type: enums.MatchType,
-    _: enums.SessionInfo = Depends(db.require_permission("match_scouting")),
-):
-    if not isinstance(m_type, enums.MatchType):
-        m_type = enums.MatchType(m_type)
-
-    rows = await db.get_match_scouting(match=match, m_type=m_type, team=team)
-    if not rows:
-        raise HTTPException(status_code=404, detail="Entry not found")
-    entry = rows[0]
-
-    if not isinstance(entry["match_type"], enums.MatchType):
-        entry["match_type"] = enums.MatchType(entry["match_type"])
-
-    current_scouter: str | None = entry["scouter"]
-    desired_scouter = "__NONE__" if scouter == "__UNCLAIM__" else scouter
-    scouter_change = (desired_scouter != current_scouter)
-
-    try:
-        await db.update_match_scouting(
-            match=entry["match"],
-            m_type=entry["match_type"],
-            team=entry["team"],
-            scouter=current_scouter,
-            status=status,
-            data=None,
-            scouter_new=desired_scouter,
-        )
-    except HTTPException as e:
-        if e.status_code == 409:
-            raise
-        raise
-
-    return {
-        "status": "patched",
-        "scouter": desired_scouter,
-        "phase": status,
-        "changed_scouter": scouter_change,
-    }
 
 @router.patch("/scouting/{m_type}/{match}/{team}/claim")
 async def claim_team(
@@ -304,7 +259,8 @@ async def claim_team(
 ):
     """
     Claims a team for the given scouter.
-    Fails if the team is already claimed by someone else.
+    Automatically sets its state to PRE.
+    Fails if already claimed by someone else.
     """
     if not isinstance(m_type, enums.MatchType):
         m_type = enums.MatchType(m_type)
@@ -314,21 +270,22 @@ async def claim_team(
         raise HTTPException(status_code=404, detail="Entry not found")
     entry = rows[0]
 
-    # Race-safe: only update if currently unclaimed
+    # Race-safe: only claim if currently unclaimed
     updated = await db.update_match_scouting(
         match=match,
         m_type=m_type,
         team=team,
         scouter="__NONE__",
         scouter_new=scouter,
-        status=None,
+        status=enums.StatusType.PRE,  # ← set to PRE automatically
         data=None,
     )
 
     if not updated:
         raise HTTPException(status_code=409, detail="Already claimed by another scouter")
 
-    return {"status": "claimed", "team": team, "scouter": scouter}
+    return {"status": "claimed", "team": team, "scouter": scouter, "phase": "pre"}
+
 
 
 @router.patch("/scouting/{m_type}/{match}/{team}/unclaim")
@@ -382,22 +339,38 @@ async def update_state(
     """
     Updates the phase/state (pre, auto, teleop, post, submitted).
     Only the current scouter can update their own team's phase.
+    Allows UNCLAIMED → PRE for initialization.
     """
+    # --- Normalize enum ---
     if not isinstance(m_type, enums.MatchType):
         m_type = enums.MatchType(m_type)
+    if not isinstance(status, enums.StatusType):
+        try:
+            status = enums.StatusType(status)
+        except ValueError:
+            raise HTTPException(status_code=400, detail=f"Invalid status: {status}")
 
+    # --- Fetch entry ---
     rows = await db.get_match_scouting(match=match, m_type=m_type, team=team)
     if not rows:
         raise HTTPException(status_code=404, detail="Entry not found")
     entry = rows[0]
 
     current_scouter = entry["scouter"]
-    current_status = entry["status"]
+    try:
+        current_status = (
+            current_status
+            if isinstance(entry["status"], enums.StatusType)
+            else enums.StatusType(entry["status"])
+        )
+    except ValueError:
+        raise HTTPException(status_code=400, detail=f"Invalid stored status: {entry['status']}")
 
+    # --- Access control ---
     if current_scouter != scouter:
         raise HTTPException(status_code=403, detail="Only current scouter may update state")
 
-    # Optional: enforce monotonic phase progression
+    # --- Valid progression order ---
     allowed_order = [
         enums.StatusType.PRE,
         enums.StatusType.AUTO,
@@ -405,9 +378,22 @@ async def update_state(
         enums.StatusType.POST,
         enums.StatusType.SUBMITTED,
     ]
-    if allowed_order.index(status) < allowed_order.index(current_status):
-        raise HTTPException(status_code=400, detail="Cannot regress to earlier phase")
 
+    # --- Handle UNCLAIMED safely ---
+    if current_status == enums.StatusType.UNCLAIMED:
+        # Allow transition to PRE only
+        if status != enums.StatusType.PRE:
+            raise HTTPException(status_code=400, detail="First phase after UNCLAIMED must be PRE")
+    else:
+        # Validate both are valid phases
+        if current_status not in allowed_order or status not in allowed_order:
+            raise HTTPException(status_code=400, detail=f"Invalid phase transition: {current_status} → {status}")
+
+        # Enforce monotonic progression
+        if allowed_order.index(status) < allowed_order.index(current_status):
+            raise HTTPException(status_code=400, detail="Cannot regress to earlier phase")
+
+    # --- Apply update ---
     await db.update_match_scouting(
         match=match,
         m_type=m_type,
@@ -419,6 +405,7 @@ async def update_state(
     )
 
     return {"status": "updated", "team": team, "phase": status}
+
 
 
 
@@ -474,8 +461,9 @@ async def update_match(
     }
 
 
-@router.post("/scouting/{match}/{team}/submit")
+@router.post("/scouting/{m_type}/{match}/{team}/submit")
 async def submit_data(
+        m_type: enums.MatchType,
         match: int,
         team: int,
         full_data: enums.FullData,
@@ -489,7 +477,7 @@ async def submit_data(
     # Check if entry exists
     existing = await db.get_match_scouting(
         match=match,
-        m_type=full_data.match_type,
+        m_type=m_type,
         team=team,
         scouter=full_data.scouter
     )
@@ -498,7 +486,7 @@ async def submit_data(
         # Add it first
         await db.add_match_scouting(
             match=match,
-            m_type=full_data.match_type,
+            m_type=m_type,
             team=team,
             alliance=full_data.alliance,
             scouter=full_data.scouter,
@@ -509,7 +497,7 @@ async def submit_data(
     # Then update it with the submitted data
     await db.update_match_scouting(
         match=match,
-        m_type=full_data.match_type,
+        m_type=m_type,
         team=team,
         scouter=full_data.scouter,
         status=enums.StatusType.SUBMITTED,
@@ -517,23 +505,6 @@ async def submit_data(
     )
 
     return {"status": "submitted"}
-
-
-@router.get("/scouting/current")
-async def get_current_scouting(
-        session: enums.SessionInfo = Depends(db.require_permission("match_scouting"))
-) -> Optional[dict]:
-    scouter = session.get("name")
-    if not scouter:
-        raise HTTPException(status_code=400, detail="Scouter name not found in session")
-
-    entries = await db.get_match_scouting(scouter=scouter)
-    for e in entries:
-        if e["status"] != "submitted":
-            return e
-
-    return None
-
 
 @router.get("/match/{m_type}/{match}/{alliance}")
 async def get_match_info(
@@ -581,76 +552,11 @@ async def get_match_info(
             {
                 "number": int(t),
                 "name": f"Team {t}",  # optionally use preloaded team_data if available
-                "scouter": (await db.get_match_scouting(match=match, m_type=m_type, team=t))[0].get("scouter")
+                "scouter": (await db.get_match_scouting(match=match, m_type=m_type, team=t))[0].get("scouter"),
+                "nickname": (await db.get_team_info(t))["nickname"]
             }
             for t in team_numbers
         ]
-    }
-
-
-@router.get("/teams/{team}")
-async def get_team_info_route(
-    team: int,
-    _: enums.SessionInfo = Depends(db.require_permission("match_scouting"))
-):
-    """
-    Returns basic info (number, nickname, logo URL) for a given team.
-    Uses database query instead of preloaded CSV.
-    """
-    team_data = await db.get_team_info(team)
-    if not team_data:
-        raise HTTPException(status_code=404, detail="Team not found")
-
-    return {
-        "number": team_data["team_number"],
-        "name": team_data["nickname"],
-        "rookie_year": team_data["rookie_year"],
-        "last_updated": team_data["last_updated"],
-        "iconUrl": f"/assets/teams/{team_data['team_number']}.png"
-    }
-
-
-
-@router.get("/status/{match}/{team}")
-async def get_status(
-        match: str,
-        team: str,
-        _: enums.SessionInfo = Depends(db.require_permission("match_scouting"))
-):
-    if match == "All" and team == "All":
-        all_entries = await db.get_match_scouting(None, None, None, None)
-        full_status = {}
-        for e in all_entries:
-            m = str(e["match"])
-            t = int(e["team"])
-            if m not in full_status:
-                full_status[m] = {}
-            full_status[m][t] = {
-                "status": e["status"],
-                "scouter": e["scouter"]
-            }
-        return full_status
-
-    try:
-        team_int = int(team)
-        match_int = int(match)
-    except ValueError:
-        raise HTTPException(status_code=400, detail="Invalid match or team")
-
-    entries = await db.get_match_scouting(match=match_int, m_type=None, team=team_int, scouter=None)
-    if not entries:
-        return {
-            "exists": False,
-            "scouter": None,
-            "status": "unclaimed"
-        }
-
-    entry = entries[0]
-    return {
-        "exists": True,
-        "lastModified": datetime.fromtimestamp(entry["last_modified"] / 1e9, tz=timezone.utc).isoformat(),
-        "scouter": entry.get("scouter"),
-        "status": entry.get("status", "error")
     }
 
 

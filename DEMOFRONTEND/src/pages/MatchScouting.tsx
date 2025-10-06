@@ -80,11 +80,14 @@ export function MatchScoutingLayout() {
             })
 
             // If online, also update server
+            // TODO: implement with new endpoints
+            /*
             if (isOnline && serverOnline) {
                 updateMatchData(match, teamNumber, match_type, getScouterName()!, scoutingData).catch(err => {
                     console.error("updateMatchData failed", err)
                 })
             }
+            */
         }, 3000)
 
         return () => clearInterval(interval)

@@ -241,8 +241,6 @@ async def get_team_info(team_number: int) -> Optional[dict]:
     finally:
         await release_db_connection(DB_NAME, conn)
 
-
-
 async def add_match_scouting(
     match: int,
     m_type: enums.MatchType,
@@ -307,9 +305,10 @@ async def update_match_scouting(
                     SET data=$1, status=$2, last_modified=$3, scouter=$4
                     WHERE match=$5 AND match_type=$6 AND team=$7 AND scouter=$8
                 """, current_data, new_status, time.time_ns(), new_scouter_db,
-                     match, m_type.value, str(team), _to_db_scouter(scouter))
+                                   match, m_type.value, str(team), _to_db_scouter(scouter))
             except UniqueViolationError:
                 raise HTTPException(status_code=409, detail="Target scouter row already exists")
+            return True
     finally:
         await release_db_connection(DB_NAME, conn)
 

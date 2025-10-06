@@ -143,7 +143,7 @@ export function useAPI() {
         }
     }
 
-    // --- Endpoint: POST /scouting/{match}/{team}/submit ---
+    // --- Endpoint: POST /scouting/{m_type}/{match}/{team}/submit ---
     const submitData = async (
         match: number,
         team: number,
@@ -153,7 +153,7 @@ export function useAPI() {
             const {match_type, alliance, scouter, data} = fullData;
             const body = {match_type, alliance, scouter, ...data};
 
-            const res = await fetch(`${BASE_URL}/scouting/${match}/${team}/submit`, {
+            const res = await fetch(`${BASE_URL}/scouting/${match_type}/${match}/${team}/submit`, {
                 method: 'POST',
                 headers: {
                     ...getAuthHeaders(),
@@ -224,7 +224,15 @@ export function useAPI() {
         phase: "pre" | "auto" | "teleop" | "post" | "submitted"
     ): Promise<boolean> => {
         try {
+            // Prevent updates from non-owners
+            if (!scouter) {
+                console.warn("updateState aborted: missing scouter");
+                return false;
+            }
+
+            // Build query — backend still expects scouter for verification
             const query = new URLSearchParams({scouter, status: phase});
+
             const res = await fetch(
                 `${BASE_URL}/scouting/${match_type}/${match}/${team}/state?${query.toString()}`,
                 {
@@ -232,6 +240,17 @@ export function useAPI() {
                     headers: getAuthHeaders(),
                 }
             );
+
+            // Handle explicit rejections
+            if (res.status === 403) {
+                console.warn("updateState rejected: not current scouter");
+                return false;
+            }
+            if (res.status === 400) {
+                console.warn("updateState rejected: cannot regress phase");
+                return false;
+            }
+
             return res.ok;
         } catch (err) {
             console.error("updateState failed:", err);
@@ -239,35 +258,6 @@ export function useAPI() {
         }
     };
 
-
-    // --- Endpoint: GET /scouting/current ---
-    const getCurrentScoutingEntry = async (): Promise<any | null> => {
-        try {
-            const res = await fetch(`${BASE_URL}/scouting/current`, {
-                headers: getAuthHeaders(),
-            })
-            return res.ok ? await res.json() : null
-        } catch (err) {
-            console.error("getCurrentScoutingEntry failed:", err)
-            return null
-        }
-    }
-
-    // --- Endpoint: GET /status/{match}/{team} ---
-    const getStatus = async (
-        match: string,
-        team: number
-    ): Promise<any | null> => {
-        try {
-            const res = await fetch(`${BASE_URL}/status/${match}/${team}`, {
-                headers: getAuthHeaders(),
-            })
-            return res.ok ? await res.json() : null
-        } catch (err) {
-            console.error('getStatus failed:', err)
-            return null
-        }
-    }
 
     // --- Endpoint: GET /match/{m_type}/{match}/{alliance} ---
     const getTeamList = async (
@@ -355,11 +345,9 @@ export function useAPI() {
         unclaimTeam,
         updateState,
         submitData,
-        getStatus,
         getTeamList,
         getAllStatuses,
         getCachedName,
-        getCurrentScoutingEntry,
         login,
         verify,
         ping,

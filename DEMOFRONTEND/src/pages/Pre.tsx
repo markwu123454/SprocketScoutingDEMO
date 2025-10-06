@@ -11,46 +11,41 @@ export default function Pre({
     data: MatchScoutingData
     setData: React.Dispatch<React.SetStateAction<MatchScoutingData>>
 }) {
-    const {claimTeam, unclaimTeam, updateState, getTeamList, getScouterState} = useAPI()
+    const {claimTeam, unclaimTeam, getTeamList, getScouterState} = useAPI()
     const {isOnline, serverOnline} = useClientEnvironment()
 
     const [teamList, setTeamList] = useState<TeamInfo[] | null>(null)
+    const [loadingTeams, setLoadingTeams] = useState(false)
+    const [claiming, setClaiming] = useState(false)
     const [manualEntry, setManualEntry] = useState(false)
     const [manualTeam, setManualTeam] = useState<string>("")
     const [iconSrc, setIconSrc] = useState<string | null>(null)
 
     const {match, alliance, match_type, teamNumber} = data
     const scouter = getScouterName()!
+    const inputRef = useRef<HTMLInputElement>(null)
 
-    const inputRef = useRef<HTMLInputElement>(null);
-
-    // === 1. Debounced PATCH on input change ===
-    useEffect(() => {
-        if (!match || !alliance || teamNumber === null) return
-        const timeout = setTimeout(() => {
-            void updateState(match, teamNumber, match_type, scouter, "pre")
-        }, 300)
-        return () => clearTimeout(timeout)
-    }, [match, alliance, teamNumber, match_type])
-
-    // === 2. Load team list ===
+    // === Load team list ===
     useEffect(() => {
         if (!(isOnline && serverOnline) || !match || !alliance) {
             setTeamList([])
             return
         }
         let alive = true
+        setLoadingTeams(true)
         void (async () => {
-            setTeamList(null)
             const teams = await getTeamList(match, match_type, alliance)
-            if (alive) setTeamList(teams)
+            if (alive) {
+                setTeamList(teams)
+                setLoadingTeams(false)
+            }
         })()
         return () => {
             alive = false
         }
     }, [match, alliance, match_type, isOnline, serverOnline])
 
-    // === 3. Refresh scouter state ===
+    // === Refresh scouter state ===
     useEffect(() => {
         if (!(isOnline && serverOnline) || !match || !alliance) return
         let alive = true
@@ -81,7 +76,7 @@ export default function Pre({
         }
     }, [isOnline, serverOnline, match, alliance, match_type])
 
-    // === 4. Manual entry image preview ===
+    // === Manual entry image preview ===
     useEffect(() => {
         if (!manualTeam || manualTeam.trim() === "") {
             setIconSrc(null)
@@ -99,31 +94,50 @@ export default function Pre({
         img.onerror = () => setIconSrc("/placeholder.png")
     }, [manualTeam])
 
-    // === 5. Offline auto-activate manual entry ===
+    // === Manual entry hook to sync team number ===
     useEffect(() => {
-        if (!(isOnline)) {
-            console.log(isOnline, serverOnline)
+        if (!manualEntry) return
+        const num = parseInt(manualTeam)
+        if (isNaN(num) || num <= 0) return
+
+        setData(d => ({
+            ...d,
+            teamNumber: num,
+        }))
+    }, [manualEntry, manualTeam, setData])
+
+
+    // === Offline auto-activate manual entry ===
+    useEffect(() => {
+        if (!isOnline) {
             setManualEntry(true)
         }
     }, [isOnline])
 
     const handleTeamSelect = async (newTeamNumber: number) => {
-        if (match && teamNumber !== null && teamNumber !== newTeamNumber) {
-            const oldTeamNumber = teamNumber
-            setTeamList((prev) =>
-                prev?.map((t) =>
-                    t.number === oldTeamNumber ? {...t, scouter: null} : t
-                ) ?? null
-            )
-            await unclaimTeam(match, oldTeamNumber, match_type, scouter)
-        }
-        setData((d) => ({
-            ...d,
-            teamNumber: newTeamNumber,
-        }))
-        if (match && newTeamNumber !== null) {
-            await claimTeam(match, newTeamNumber, match_type, scouter)
-            await updateState(match, newTeamNumber, match_type, scouter, "pre")
+        if (claiming) return
+        setClaiming(true)
+        try {
+            if (match && teamNumber !== null && teamNumber !== newTeamNumber) {
+                const oldTeamNumber = teamNumber
+                setTeamList(prev =>
+                    prev?.map(t =>
+                        t.number === oldTeamNumber ? {...t, scouter: null} : t
+                    ) ?? null
+                )
+                await unclaimTeam(match, oldTeamNumber, match_type, scouter)
+            }
+
+            setData(d => ({
+                ...d,
+                teamNumber: newTeamNumber,
+            }))
+
+            if (match && newTeamNumber !== null) {
+                await claimTeam(match, newTeamNumber, match_type, scouter)
+            }
+        } finally {
+            setClaiming(false)
         }
     }
 
@@ -131,7 +145,7 @@ export default function Pre({
         <div className="p-4 w-full h-full flex flex-col justify gap-2">
             <div>Pre-Match</div>
 
-            {/* Match Type Select */}
+            {/* Match Type */}
             <div>
                 <label className="block text-lg font-medium mb-1">Match Type</label>
                 <div className="flex gap-2 grid-cols-3">
@@ -142,11 +156,12 @@ export default function Pre({
                     ] as const).map(([key, label]) => (
                         <button
                             key={key}
+                            disabled={claiming}
                             onClick={() => {
                                 if ((isOnline && serverOnline) && match && teamNumber !== null) {
                                     void unclaimTeam(match, teamNumber, match_type, scouter)
                                 }
-                                setData((d) => ({
+                                setData(d => ({
                                     ...d,
                                     match_type: key,
                                     teamNumber: d.match_type === key ? d.teamNumber : null,
@@ -156,7 +171,7 @@ export default function Pre({
                                 data.match_type === key
                                     ? "bg-zinc-400 text-white"
                                     : "bg-zinc-700 text-white"
-                            }`}
+                            } ${claiming ? "opacity-50 cursor-not-allowed" : ""}`}
                         >
                             {label}
                         </button>
@@ -172,13 +187,11 @@ export default function Pre({
                     inputMode="numeric"
                     defaultValue={match === 0 ? "" : match!}
                     ref={inputRef}
+                    disabled={claiming}
                     onChange={(e) => {
-                        const raw = e.target.value.replace(/\s/g, '');
-                        const newMatch = /^-?\d*\.?\d+$/.test(raw) ? parseFloat(raw) : 0;
-                        if ((isOnline && serverOnline) && match && teamNumber !== null) {
-                            void updateState(match, teamNumber, match_type, scouter, "pre")
-                        }
-                        setData((d) => ({
+                        const raw = e.target.value.replace(/\s/g, '')
+                        const newMatch = /^-?\d*\.?\d+$/.test(raw) ? parseFloat(raw) : 0
+                        setData(d => ({
                             ...d,
                             match: newMatch,
                             teamNumber: d.match === newMatch ? d.teamNumber : null,
@@ -188,24 +201,27 @@ export default function Pre({
                 />
             </div>
 
-            {/* Alliance Selection */}
+            {/* Alliance */}
             <div>
                 <label className="block text-lg font-medium mb-1">Select Alliance</label>
                 <div className="flex gap-4">
-                    {(['red', 'blue'] as const).map((color) => (
+                    {(['red', 'blue'] as const).map(color => (
                         <button
                             key={color}
+                            disabled={claiming}
                             onClick={() => {
                                 if ((isOnline && serverOnline) && match && teamNumber !== null) {
                                     void unclaimTeam(match, teamNumber, match_type, scouter)
                                 }
-                                setData((d) => ({
+                                setData(d => ({
                                     ...d,
                                     alliance: color,
                                     teamNumber: d.alliance === color ? d.teamNumber : null,
                                 }))
                             }}
-                            className={`w-16 h-16 rounded ${alliance === color ? 'outline-2 ' : ''} ${color === 'red' ? 'bg-red-600 outline-red-300' : 'bg-blue-600 outline-blue-300'}`}
+                            className={`w-16 h-16 rounded ${alliance === color ? 'outline-2 ' : ''} ${
+                                color === 'red' ? 'bg-red-600 outline-red-300' : 'bg-blue-600 outline-blue-300'
+                            } ${claiming ? 'opacity-50 cursor-not-allowed' : ''}`}
                         />
                     ))}
                 </div>
@@ -225,7 +241,6 @@ export default function Pre({
                     )}
                 </div>
 
-                {/* Manual Entry Mode or Offline */}
                 {manualEntry ? (
                     <div className="flex flex-col gap-2">
                         <div className="flex items-center gap-3">
@@ -259,58 +274,87 @@ export default function Pre({
                         <button disabled className="w-full py-2 rounded bg-zinc-800 opacity-50">---</button>
                     </div>
                 ) : (
+                    // existing team list
                     <div className="flex flex-col gap-2">
-                        {(teamList === null
-                                ? Array(3).fill(null)
-                                : teamList.length > 0
-                                    ? teamList
-                                    : Array(3).fill(undefined)
-                        ).map((team, i) => {
-                            if (!team) {
+                        {loadingTeams ? (
+                            // Skeleton loading for team list
+                            Array.from({length: 3}).map((_, i) => (
+                                <div
+                                    key={i}
+                                    className="w-full py-2 px-4 rounded bg-zinc-800 flex items-center gap-3 animate-pulse"
+                                >
+                                    <div className="w-10 h-10 rounded bg-zinc-700"/>
+                                    <div className="flex flex-col flex-1 gap-2">
+                                        <div className="h-4 bg-zinc-700 rounded w-2/3"/>
+                                        <div className="h-3 bg-zinc-700 rounded w-1/3"/>
+                                    </div>
+                                </div>
+                            ))
+                        ) : (
+                            (teamList === null
+                                    ? Array(3).fill(null)
+                                    : teamList.length > 0
+                                        ? teamList
+                                        : Array(3).fill(undefined)
+                            ).map((team, i) => {
+                                if (!team) {
+                                    return (
+                                        <button
+                                            key={i}
+                                            disabled
+                                            className="w-full py-2 rounded bg-zinc-800 opacity-50"
+                                        >
+                                            ---
+                                        </button>
+                                    )
+                                }
+                                const isSelected = teamNumber === team.number
+                                const isClaimed = team.scouter !== null && team.number !== teamNumber
+                                const localIcon = `/teams/team_icons/${team.number}.png`
                                 return (
                                     <button
-                                        key={i}
-                                        disabled
-                                        className="w-full py-2 rounded bg-zinc-800 opacity-50"
+                                        key={team.number}
+                                        disabled={isClaimed || claiming}
+                                        onClick={() => handleTeamSelect(team.number)}
+                                        className={`w-full py-2 px-4 rounded flex items-center justify-center gap-3 ${
+                                            isSelected ? 'bg-zinc-500' : 'bg-zinc-700'
+                                        } ${
+                                            (isClaimed || claiming)
+                                                ? 'opacity-50 cursor-not-allowed'
+                                                : ''
+                                        }`}
                                     >
-                                        ---
+                                        <div className={`w-10 h-10 rounded flex items-center justify-center ${
+                                            alliance === 'red'
+                                                ? 'bg-red-700'
+                                                : alliance === 'blue'
+                                                    ? 'bg-blue-700'
+                                                    : 'bg-zinc-600'
+                                        }`}>
+                                            <img
+                                                src={localIcon}
+                                                onError={(e) => {
+                                                    (e.target as HTMLImageElement).src =
+                                                        team.logo ?? '/placeholder.png'
+                                                }}
+                                                alt={team.name}
+                                                className="w-8 h-8 rounded object-contain"
+                                            />
+                                        </div>
+                                        <div className="text-xl flex items-center gap-1 max-w-full">
+                                            <span>{team.nickname}</span>
+                                            <span>{team.number}</span>
+                                        </div>
+
+                                        {isClaimed && (
+                                            <span className="text-sm">
+                                                {`Scouting by ${team.scouter === scouter ? 'you' : team.scouter}`}
+                                            </span>
+                                        )}
                                     </button>
                                 )
-                            }
-                            const isSelected = teamNumber === team.number
-                            const isClaimed = team.scouter !== null && team.number !== teamNumber
-                            const localIcon = `/teams/team_icons/${team.number}.png`
-                            return (
-                                <button
-                                    key={team.number}
-                                    disabled={isClaimed}
-                                    onClick={() => handleTeamSelect(team.number)}
-                                    className={`w-full py-2 px-4 rounded flex items-center justify-center gap-3 ${isSelected ? 'bg-zinc-500' : 'bg-zinc-700'} ${isClaimed ? 'opacity-50 cursor-not-allowed' : ''}`}
-                                >
-                                    <div className={`w-10 h-10 rounded flex items-center justify-center ${
-                                        alliance === 'red' ? 'bg-red-700' : alliance === 'blue' ? 'bg-blue-700' : 'bg-zinc-600'
-                                    }`}>
-                                        <img
-                                            src={localIcon}
-                                            onError={(e) => {
-                                                (e.target as HTMLImageElement).src = team.logo ?? '/placeholder.png'
-                                            }}
-                                            alt={team.name}
-                                            className="w-8 h-8 rounded object-contain"
-                                        />
-                                    </div>
-                                    <div className="text-xl flex items-center gap-1 max-w-full">
-                                        <span>{team.name.nickname}</span>
-                                        <span>({team.number})</span>
-                                    </div>
-                                    {isClaimed && (
-                                        <span className="text-sm">
-                                            {`Scouting by ${team.scouter === scouter ? 'you' : team.scouter}`}
-                                        </span>
-                                    )}
-                                </button>
-                            )
-                        })}
+                            })
+                        )}
                     </div>
                 )}
             </div>
