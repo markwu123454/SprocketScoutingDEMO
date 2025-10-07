@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Loading...</title>
+  <style>
+    :root{
+      --bg1:#140a2a; --bg2:#1f0b46; --ok:#8b5cf6;
+    }
+    html, body {
+      margin: 0;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background:
+        radial-gradient(80% 110% at 10% 10%, #4c2c7a, var(--bg2)) fixed,
+        linear-gradient(135deg, var(--bg1), var(--bg2)) fixed;
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      overflow: hidden;
+    }
+
+    .logo {
+      position: relative;
+      width: 160px;
+      height: 160px;
+    }
+
+    .logo img {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      user-select: none;
+      -webkit-user-drag: none;
+    }
+
+    .ring {
+      animation: spin 14s linear infinite;
+      transform-origin: 50% 50%;
+      opacity: 0.9;
+    }
+
+    .gear {
+      animation: spin-rev 10s linear infinite;
+      transform-origin: 50% 50%;
+      opacity: 0.9;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+    @keyframes spin-rev { to { transform: rotate(-360deg); } }
+  </style>
+</head>
+<body>
+  <div class="logo">
+    <img class="ring" src="/static/sprocket_logo_ring.png" alt="">
+    <img class="gear" src="/static/sprocket_logo_gear.png" alt="">
+  </div>
+</body>
+</html>

@@ -11,7 +11,13 @@ export default defineConfig({
         tailwindcss(),
         VitePWA({
             registerType: "autoUpdate",
-            includeAssets: ['offline.html'],
+            includeAssets: [
+                'offline.html',
+                "favicon.ico",
+                "manifest.webmanifest",
+                "static/sprocket_logo_ring.png",
+                "static/sprocket_logo_gear.png",
+            ],
             manifest: {
                 name: "Your App Name",
                 short_name: "App",
@@ -44,7 +50,7 @@ export default defineConfig({
             },
             workbox: {
                 // Fallback to index.html for navigation requests (React Router)
-                navigateFallback: '/index.html',
+                navigateFallback: "/splash.html",
                 globIgnores: ['**/teams/team_icons/**'],
                 // Keep offline.html as a real offline fallback if you want
                 runtimeCaching: [
