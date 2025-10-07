@@ -18,7 +18,29 @@ export default defineConfig({
                 start_url: "/",
                 display: "standalone",
                 background_color: "#000000",
-                theme_color: "#000000"
+                theme_color: "#000000",
+                icons: [
+                    {
+                        src: "/pwa/sprocket_logo_128.png",
+                        sizes: "128x128",
+                        type: "image/png",
+                    },
+                    {
+                        src: "/pwa/sprocket_logo_192.png",
+                        sizes: "192x192",
+                        type: "image/png",
+                    },
+                    {
+                        src: "/pwa/sprocket_logo_256.png",
+                        sizes: "256x256",
+                        type: "image/png",
+                    },
+                    {
+                        src: "/pwa/sprocket_logo_512.png",
+                        sizes: "512x512",
+                        type: "image/png",
+                    },
+                ],
             },
             workbox: {
                 // Fallback to index.html for navigation requests (React Router)

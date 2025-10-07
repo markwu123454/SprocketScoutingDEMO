@@ -4,7 +4,6 @@ import './index.css'
 
 import {HomeLayout} from './pages/Home'
 import {MatchScoutingLayout} from './pages/MatchScouting'
-import PitScoutingLayout from './pages/PitScouting'
 import {DataLayout} from './pages/Data'
 import MatchMonitoringLayout from './pages/MatchMonitoring'
 import AdminHomeLayout from "@/pages/AdminHome.tsx";
@@ -14,6 +13,7 @@ import MatchDetailPage from "@/pages/DataMatch.tsx";
 //import DevLayout from "@/pages/Dev.tsx";
 import NotFoundPage from "@/pages/NotFoundPage.tsx";
 import {LargeDataWrapper} from "@/contexts/dataProvider.tsx";
+import PitScoutingLayout from "@/pages/PitScouting.tsx";
 
 // import ScoutingSyncProvider from './contexts/useScoutingSync.ts'
 

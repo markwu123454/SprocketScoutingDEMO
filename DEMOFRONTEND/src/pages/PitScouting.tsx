@@ -1,11 +1,12 @@
-import * as React from "react"
-import {useState, useEffect} from "react"
-import {useAPI} from "@/api/API"
-import {Button} from "@/components/ui/button"
-import {Input} from "@/components/ui/input"
-import {Label} from "@/components/ui/label"
-import {CheckCircle, XCircle, AlertCircle} from "lucide-react"
 // import CameraCapture from "@/components/ui/cameraCapture" // TODO: enable later
+
+import {useAPI} from "@/api/API.ts";
+import * as React from "react";
+import {useEffect, useState} from "react";
+import {Label} from "@/components/ui/label.tsx";
+import {Input} from "@/components/ui/input.tsx";
+import {AlertCircle, CheckCircle, XCircle} from "lucide-react";
+import {Button} from "@/components/ui/button.tsx";
 
 export default function PitScoutingLayout() {
     const {getTeamBasicInfo, submitPitData} = useAPI()
@@ -112,7 +113,7 @@ export default function PitScoutingLayout() {
                                     <span className="text-sm text-muted-foreground">Fetching...</span>
                                 )}
                                 {!loading && notFound && (
-                                    <span className="text-sm text-destructive">Team not found</span>
+                                    <span className="text-sm text-destructive">Team not found.</span>
                                 )}
                                 {!loading && teamInfo && (
                                     <>
@@ -124,7 +125,7 @@ export default function PitScoutingLayout() {
                                         </div>
                                         {teamInfo.scouted && (
                                             <div className="text-xs text-orange-500 mt-1 flex items-center space-x-1">
-                                                <span>Team already scouted, re-scouting will override data</span>
+                                                <span>Team already scouted, re-scouting will override existing data.</span>
                                             </div>
                                         )}
                                     </>
@@ -135,13 +136,13 @@ export default function PitScoutingLayout() {
                         {/* --- Right side: status icon --- */}
                         <div className="flex items-center">
                             {!loading && teamInfo?.scouted && !notFound && (
-                                <AlertCircle className="w-6 h-6 text-orange-500" />
+                                <AlertCircle className="w-6 h-6 text-orange-500"/>
                             )}
                             {!loading && teamInfo && !notFound && !teamInfo.scouted && (
-                                <CheckCircle className="w-6 h-6 text-green-500" />
+                                <CheckCircle className="w-6 h-6 text-green-500"/>
                             )}
                             {!loading && notFound && (
-                                <XCircle className="w-6 h-6 text-red-500" />
+                                <XCircle className="w-6 h-6 text-red-500"/>
                             )}
                         </div>
                     </div>
@@ -203,7 +204,7 @@ export default function PitScoutingLayout() {
                     >
                         {submitted ? (
                             <>
-                                <CheckCircle className="w-7 h-7 text-green-500" />
+                                <CheckCircle className="w-7 h-7 text-green-500"/>
                                 <span>Submitted!</span>
                             </>
                         ) : !teamNumber ? (
@@ -213,7 +214,7 @@ export default function PitScoutingLayout() {
                         ) : submitting ? (
                             "Submitting..."
                         ) : notFound ? (
-                            "Team not found"
+                            "Team not found."
                         ) : (
                             "Submit Pit Data"
                         )}

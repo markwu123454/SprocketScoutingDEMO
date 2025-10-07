@@ -1,24 +1,33 @@
 <!doctype html>
 <html lang="en" class="bg-zinc-800">
-<head>
-    <meta charset="UTF-8"/>
-    <link rel="icon" type="image/svg+xml" href="/vite.svg"/>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <!-- Tab icons -->
+    <link rel="shortcut icon" href="/favicon.ico" />
+    <!-- Optional dark/light versions -->
+    <!--
+    <link rel="icon" href="/favicon-light.png" media="(prefers-color-scheme: light)">
+    <link rel="icon" href="/favicon-dark.png" media="(prefers-color-scheme: dark)">
+    -->
 
     <!-- PWA manifest -->
-    <link rel="manifest" href="/manifest.webmanifest"/>
-    <meta name="theme-color" content="#000000"/>
+    <link rel="manifest" href="/manifest.webmanifest" />
+    <meta name="theme-color" content="#000000" />
 
-    <!-- iOS support (optional but recommended) -->
-    <meta name="apple-mobile-web-app-capable" content="yes"/>
-    <meta name="apple-mobile-web-app-status-bar-style" content="black"/>
-    <!-- Skip the apple-touch-icon for now -->
+    <!-- iOS PWA support -->
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+    <!-- Add this when you have one -->
+    <!-- <link rel="apple-touch-icon" href="/pwa/icon-192x192.png" /> -->
 
-    <title>Vite + React + TS</title>
-</head>
-<body class="bg-zinc-900">
-<link rel="stylesheet" href="src/index.css" />
-<div id="root"></div>
-<script type="module" src="src/main.tsx"></script>
-</body>
+    <title>Sprocket Scouting</title>
+  </head>
+
+  <body class="bg-zinc-900">
+    <link rel="stylesheet" href="src/index.css" />
+    <div id="root"></div>
+    <script type="module" src="src/main.tsx"></script>
+  </body>
 </html>
