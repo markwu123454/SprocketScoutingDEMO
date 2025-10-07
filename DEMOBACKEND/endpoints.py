@@ -3,7 +3,6 @@ from datetime import datetime, timezone, timedelta
 from typing import Optional, Dict, Any
 from fastapi import Depends, HTTPException, Body, APIRouter, Request, Query
 from starlette.responses import HTMLResponse
-
 import db
 import enums
 
@@ -13,106 +12,102 @@ router = APIRouter()
 @router.get("/", response_class=HTMLResponse)
 def root():
     return """
-<!doctype html>
-<html>
-<head>
-  <meta charset="utf-8">
-  <title>API Status</title>
-  <style>
-    :root{
-      --bg1:#140a2a; --bg2:#1f0b46; --card:#2a124d; --ink:#ffffff;
-      --ok:#8b5cf6; /* vivid purple */
-    }
-    *{box-sizing:border-box}
-    html,body{height:100%}
-    body{
-      margin:0; color:var(--ink);
-      background: radial-gradient(
-                80% 110% at 10% 10%,
-                #4c2c7a,
-                var(--bg2)
-              ) fixed,
-              linear-gradient(135deg, var(--bg1), var(--bg2)) fixed;
-      display:flex; align-items:center; justify-content:center;
-      font:16px/1.5 system-ui,Segoe UI,Roboto,Helvetica,Arial;
-    }
-    .logo{
-      position:fixed; top:16px; left:16px; width:168px; height:168px;
-    }
-    .logo img{ position:absolute; inset:0; width:100%; height:100%; object-fit:contain; }
-    .ring{ animation: spin 14s linear infinite; transform-origin: 50% 50%; }
-    @keyframes spin{ from{transform:rotate(0)} to{transform:rotate(360deg)} }
-
-    .card{
-      background: rgba(255,255,255,0.06);
-      border: 1px solid rgba(139,92,246,0.35);
-      border-radius: 16px;
-      padding: 42px 64px;
-      text-align:center;
-      box-shadow: 0 12px 40px rgba(0,0,0,0.35), inset 0 0 60px rgba(139,92,246,0.08);
-      backdrop-filter: blur(10px);
-    }
-    h1{ margin:0 0 8px; font-size:28px; letter-spacing:.3px }
-    .status{
-      display:inline-block; font-weight:700; font-size:14px;
-      padding:8px 14px; border-radius:999px;
-      background: var(--ok); color:#0b0420;
-      box-shadow: 0 0 0 0 rgba(139,92,246,.6);
-      animation: pulse 2.2s ease-out infinite;
-    }
-    @keyframes pulse{
-      0%{ box-shadow:0 0 0 0 rgba(139,92,246,.55) }
-      70%{ box-shadow:0 0 0 14px rgba(139,92,246,0) }
-      100%{ box-shadow:0 0 0 0 rgba(139,92,246,0) }
-    }
-    .links{ margin-top:14px; opacity:.9 }
-    .links a{
-      color:#c4b5fd; text-decoration:none; margin:0 10px; font-size:14px
-    }
-    .links a:hover{ text-decoration:underline }
-  </style>
-</head>
-<body>
-  <div class="logo" aria-hidden="true">
-    <img class="ring" src="/static/sprocket_logo_ring.png" alt="">
-    <img class="gear" src="/static/sprocket_logo_gear.png" alt="">
-  </div>
-
-  <div class="card">
-    <h1>Scouting Server is Online</h1>
-    <div class="status">STATUS: OK</div>
-    <div class="links">
-      <a href="/docs">Swagger UI</a>
-      <a href="/redoc">ReDoc</a>
-      <a href="#" id="pingLink" onclick="sendPing(event)">Ping</a>
-    </div>
-    <script>
-async function sendPing(event) {
-    event.preventDefault();
-    const link = document.getElementById("pingLink");
-    link.textContent = "Pinging...";
-    const start = performance.now();
-
-    try {
-        const res = await fetch("/ping");
-        if (!res.ok) throw new Error("Ping failed");
-        await res.text(); // consume body
-
-        const ms = Math.round(performance.now() - start);
-        link.textContent = `Pong! (${ms}ms)`;
-    } catch (err) {
-        link.textContent = "Ping failed";
-    }
-}
-</script>
-  </div>
-</body>
-</html>
+        <!doctype html>
+        <html>
+        <head>
+            <meta charset="utf-8">
+            <title>API Status</title>
+            <style>
+                :root{
+                    --bg1:#140a2a; --bg2:#1f0b46; --card:#2a124d; --ink:#ffffff;
+                    --ok:#8b5cf6; /* vivid purple */
+                }
+                *{box-sizing:border-box}
+                html,body{height:100%}
+                body{
+                    margin:0; color:var(--ink);
+                    background: radial-gradient( 80% 110% at 10% 10%, #4c2c7a,var(--bg2) ) fixed,
+                        linear-gradient(135deg, var(--bg1), var(--bg2)) fixed;
+                    display:flex; align-items:center; justify-content:center;
+                    font:16px/1.5 system-ui,Segoe UI,Roboto,Helvetica,Arial;
+                }
+                .logo{
+                    position:fixed; top:16px; left:16px; width:168px; height:168px;
+                }
+                .logo img{ position:absolute; inset:0; width:100%; height:100%; object-fit:contain; }
+                .ring{ animation: spin 14s linear infinite; transform-origin: 50% 50%; }
+                @keyframes spin{ from{transform:rotate(0)} to{transform:rotate(360deg)} }
+            
+                .card{
+                    background: rgba(255,255,255,0.06);
+                    border: 1px solid rgba(139,92,246,0.35);
+                    border-radius: 16px;
+                    padding: 42px 64px;
+                    text-align:center;
+                    box-shadow: 0 12px 40px rgba(0,0,0,0.35), inset 0 0 60px rgba(139,92,246,0.08);
+                    backdrop-filter: blur(10px);
+                }
+                h1{ margin:0 0 8px; font-size:28px; letter-spacing:.3px }
+                .status{
+                    display:inline-block; font-weight:700; font-size:14px;
+                    padding:8px 14px; border-radius:999px;
+                    background: var(--ok); color:#0b0420;
+                    box-shadow: 0 0 0 0 rgba(139,92,246,.6);
+                    animation: pulse 2.2s ease-out infinite;
+                }
+                @keyframes pulse{
+                    0%{ box-shadow:0 0 0 0 rgba(139,92,246,.55) }
+                    70%{ box-shadow:0 0 0 14px rgba(139,92,246,0) }
+                    100%{ box-shadow:0 0 0 0 rgba(139,92,246,0) }
+                }
+                .links{ margin-top:14px; opacity:.9 }
+                .links a{ color:#c4b5fd; text-decoration:none; margin:0 10px; font-size:14px }
+                .links a:hover{ text-decoration:underline }
+            </style>
+        </head>
+        <body>
+            <div class="logo" aria-hidden="true">
+                <img class="ring" src="/static/sprocket_logo_ring.png" alt="">
+                <img class="gear" src="/static/sprocket_logo_gear.png" alt="">
+            </div>
+        
+            <div class="card">
+                <h1>Scouting Server is Online</h1>
+                <div class="status">STATUS: OK</div>
+                <div class="links">
+                    <a href="/docs">Swagger UI</a>
+                    <a href="/redoc">ReDoc</a>
+                    <a href="#" id="pingLink" onclick="sendPing(event)">Ping</a>
+                </div>
+                <script>
+        async function sendPing(event) {
+            event.preventDefault();
+            const link = document.getElementById("pingLink");
+            link.textContent = "Pinging...";
+            const start = performance.now();
+        
+            try {
+                const res = await fetch("/ping");
+                if (!res.ok) throw new Error("Ping failed");
+                await res.text(); // consume body
+        
+                const ms = Math.round(performance.now() - start);
+                link.textContent = `Pong! (${ms}ms)`;
+            } catch (err) {
+                link.textContent = "Ping failed";
+            }
+        }
+        </script>
+          </div>
+        </body>
+        </html>
     """
+
 
 @router.get("/ping")
 def ping():
     return {"ping": "pong"}
+
 
 @router.post("/auth/login")
 async def login(request: Request, body: enums.PasscodeBody):
@@ -148,41 +143,6 @@ async def login(request: Request, body: enums.PasscodeBody):
     }
 
 
-'''
-@router.post("/auth/login/guest")
-async def guest_login(request: Request, body: enums.PasscodeBody):
-    """
-    Guest login: limited permissions; passcode still verified in users table.
-    """
-    user = await db.get_user_by_passcode(body.passcode)
-    if not user:
-        raise HTTPException(status_code=401, detail="Invalid passcode")
-
-    session_id = str(uuid.uuid4())
-    expires_dt = datetime.now(timezone.utc) + request.app.state.config.get("SESSION_DURATION", timedelta(hours=2))
-
-    session_data = {
-        "name": user["name"],
-        "permissions": {
-            "dev": False,
-            "admin": False,
-            "match_scouting": False,
-            "pit_scouting": False,
-            "match_access": user["match_access"]
-        },
-        "expires": expires_dt.isoformat()
-    }
-
-    await db.add_session(session_id, session_data, expires_dt)
-
-    return {
-        "uuid": session_id,
-        "name": session_data["name"],
-        "expires": session_data["expires"],
-        "permissions": session_data["permissions"]
-    }
-'''
-
 @router.get("/auth/verify")
 async def verify(session: enums.SessionInfo = Depends(db.require_session())):
     """
@@ -198,77 +158,47 @@ async def verify(session: enums.SessionInfo = Depends(db.require_session())):
         },
     }
 
-'''
-@router.post("/admin/expire/{session_id}")
-async def expire_uuid(session_id: str, _: enums.SessionInfo = Depends(db.require_permission("admin"))):
-    """
-    Expires a single UUID session.
-    """
-    await db.delete_session(session_id)
-    return {"status": "expired"}
 
-
-@router.post("/admin/expire_all")
-async def expire_all(_: enums.SessionInfo = Depends(db.require_permission("admin"))):
+@router.get("/team/{team}")
+async def get_team_basic_info(team: int):
     """
-    Expires all UUID sessions.
+    Returns team number, nickname, rookie year, and whether the team
+    has already been pit-scouted for the current event.
     """
-    await db.delete_all_sessions()
-    return {"status": "all expired"}
+    info = await db.get_team_info(team)
+    if not info:
+        raise HTTPException(status_code=404, detail="Team not found")
 
+    # --- Check if team already scouted ---
+    pit_records = await db.get_pit_scouting(team=team)
+    scouted = len(pit_records) > 0
 
-@router.post("/admin/set_event")
-async def set_event(event: str, _: enums.SessionInfo = Depends(db.require_permission("admin"))):
-    """
-    Admin-only: Initializes the scouting database for a given event key.
-    Pulls data from TBA and creates empty records for each team in each match.
-    """
-    try:
-        matches = tba_fetcher.get_event_data(event)["matches"]
-    except Exception as e:
-        raise HTTPException(status_code=400, detail=f"Failed to fetch event data: {str(e)}")
+    return {
+        "number": int(team),
+        "nickname": info.get("nickname", f"Team {team}"),
+        "rookie_year": info.get("rookie_year", None),
+        "scouted": scouted
+    }
 
-    # Insert match data into the database using async calls
-    for match in matches:
-        match_key = match["key"].split("_")[-1]  # e.g., qm1
-        for alliance in enums.AllianceType:
-            for team_key in match["alliances"][alliance.value]["team_keys"]:
-                team_number = int(team_key[3:])
-                # Use db.py to insert match scouting data asynchronously
-                await db.add_match_scouting(
-                    match=match_key,
-                    m_type=enums.MatchType.QUALIFIER,  # Assuming match type is "qm" for simplicity
-                    team=team_number,
-                    alliance=alliance,  # Directly using the Enum value
-                    scouter=None,
-                    status=enums.StatusType.UNCLAIMED,
-                    data={}
-                )
-
-    return {"status": "event initialized", "matches": len(matches)}
-'''
 
 
 @router.patch("/scouting/{m_type}/{match}/{team}/claim")
 async def claim_team(
-    m_type: enums.MatchType,
-    match: int,
-    team: int,
-    scouter: str = Query(...),
-    _: enums.SessionInfo = Depends(db.require_permission("match_scouting")),
+        m_type: enums.MatchType,
+        match: int,
+        team: int,
+        scouter: str = Query(...),
+        _: enums.SessionInfo = Depends(db.require_permission("match_scouting")),
 ):
     """
     Claims a team for the given scouter.
     Automatically sets its state to PRE.
     Fails if already claimed by someone else.
     """
-    if not isinstance(m_type, enums.MatchType):
-        m_type = enums.MatchType(m_type)
 
     rows = await db.get_match_scouting(match=match, m_type=m_type, team=team)
     if not rows:
         raise HTTPException(status_code=404, detail="Entry not found")
-    entry = rows[0]
 
     # Race-safe: only claim if currently unclaimed
     updated = await db.update_match_scouting(
@@ -287,21 +217,18 @@ async def claim_team(
     return {"status": "claimed", "team": team, "scouter": scouter, "phase": "pre"}
 
 
-
 @router.patch("/scouting/{m_type}/{match}/{team}/unclaim")
 async def unclaim_team(
-    m_type: enums.MatchType,
-    match: int,
-    team: int,
-    scouter: str = Query(...),
-    _: enums.SessionInfo = Depends(db.require_permission("match_scouting")),
+        m_type: enums.MatchType,
+        match: int,
+        team: int,
+        scouter: str = Query(...),
+        _: enums.SessionInfo = Depends(db.require_permission("match_scouting")),
 ):
     """
     Unclaims a team if the requester currently owns it.
     Also resets its state to UNCLAIMED.
     """
-    if not isinstance(m_type, enums.MatchType):
-        m_type = enums.MatchType(m_type)
 
     rows = await db.get_match_scouting(match=match, m_type=m_type, team=team)
     if not rows:
@@ -317,7 +244,7 @@ async def unclaim_team(
         team=team,
         scouter=scouter,
         scouter_new="__NONE__",
-        status=enums.StatusType.UNCLAIMED,   # ← explicitly reset to unclaimed
+        status=enums.StatusType.UNCLAIMED,  # ← explicitly reset to unclaimed
         data=None,
     )
 
@@ -329,27 +256,18 @@ async def unclaim_team(
 
 @router.patch("/scouting/{m_type}/{match}/{team}/state")
 async def update_state(
-    m_type: enums.MatchType,
-    match: int,
-    team: int,
-    scouter: str = Query(...),
-    status: enums.StatusType = Query(...),
-    _: enums.SessionInfo = Depends(db.require_permission("match_scouting")),
+        m_type: enums.MatchType,
+        match: int,
+        team: int,
+        scouter: str = Query(...),
+        status: enums.StatusType = Query(...),
+        _: enums.SessionInfo = Depends(db.require_permission("match_scouting")),
 ):
     """
     Updates the phase/state (pre, auto, teleop, post, submitted).
     Only the current scouter can update their own team's phase.
     Allows UNCLAIMED → PRE for initialization.
     """
-    # --- Normalize enum ---
-    if not isinstance(m_type, enums.MatchType):
-        m_type = enums.MatchType(m_type)
-    if not isinstance(status, enums.StatusType):
-        try:
-            status = enums.StatusType(status)
-        except ValueError:
-            raise HTTPException(status_code=400, detail=f"Invalid status: {status}")
-
     # --- Fetch entry ---
     rows = await db.get_match_scouting(match=match, m_type=m_type, team=team)
     if not rows:
@@ -408,21 +326,15 @@ async def update_state(
     return {"status": "updated", "team": team, "phase": status}
 
 
-
-
 @router.patch("/scouting/{m_type}/{match}/{team}/{scouter}")
 async def update_match(
-    match: int,
-    team: int,
-    scouter: str,                  # desired scouter; use "__UNCLAIM__" to clear
-    m_type: enums.MatchType,
-    body: Dict[str, Any] = Body(...),
-    _: enums.SessionInfo = Depends(db.require_permission("match_scouting")),
+        match: int,
+        team: int,
+        scouter: str,  # desired scouter; use "__UNCLAIM__" to clear
+        m_type: enums.MatchType,
+        body: Dict[str, Any] = Body(...),
+        _: enums.SessionInfo = Depends(db.require_permission("match_scouting")),
 ):
-    # Normalize enum if it came in as str
-    if not isinstance(m_type, enums.MatchType):
-        m_type = enums.MatchType(m_type)
-
     # Fetch existing row (without scouter to find the current owner)
     rows = await db.get_match_scouting(match=match, m_type=m_type, team=team)
     if not rows:
@@ -440,8 +352,8 @@ async def update_match(
         status = enums.StatusType(body["status"])
 
     # Strip meta fields from the stored data; keep the rest as the scouting payload
-    META = {"match", "match_type", "team", "teamNumber", "scouter", "status"}
-    data = {k: v for k, v in body.items() if k not in META}
+    data = {k: v for k, v in body.items() if
+            k not in {"match", "match_type", "team", "teamNumber", "scouter", "status"}}
 
     # Single atomic update: merge data, update status, optionally reassign scouter
     await db.update_match_scouting(
@@ -449,8 +361,8 @@ async def update_match(
         m_type=m_type,
         team=team,
         scouter=current_scouter,
-        status=status,          # None ⇒ keep existing
-        data=data,              # merged into existing
+        status=status,  # None ⇒ keep existing
+        data=data,  # merged into existing
         scouter_new=desired_scouter,
     )
 
@@ -507,6 +419,7 @@ async def submit_data(
 
     return {"status": "submitted"}
 
+
 @router.get("/match/{m_type}/{match}/{alliance}")
 async def get_match_info(
         m_type: enums.MatchType,
@@ -527,8 +440,6 @@ async def get_match_info(
         team_numbers = [t for t in match_row["red"] if t is not None]
     elif alliance == enums.AllianceType.BLUE:
         team_numbers = [t for t in match_row["blue"] if t is not None]
-    else:
-        raise HTTPException(status_code=400, detail="Invalid alliance")
 
     # Ensure each team has a match_scouting entry
     for t in team_numbers:
@@ -557,13 +468,12 @@ async def get_match_info(
     }
 
 
-
 @router.get("/match/{m_type}/{match}/{alliance}/state")
 async def get_scouter_state(
-    m_type: enums.MatchType,
-    match: int,
-    alliance: enums.AllianceType,
-    _: enums.SessionInfo = Depends(db.require_permission("match_scouting")),
+        m_type: enums.MatchType,
+        match: int,
+        alliance: enums.AllianceType,
+        _: enums.SessionInfo = Depends(db.require_permission("match_scouting")),
 ):
     entries = await db.get_match_scouting(match=match, m_type=m_type)
     relevant = [e for e in entries if e["alliance"] == alliance.value]
@@ -576,7 +486,193 @@ async def get_scouter_state(
     }
 
 
+@router.get("/pit/teams")
+async def list_pit_teams(
+    _: enums.SessionInfo = Depends(db.require_permission("pit_scouting")),
+):
+    """
+    Lists all teams with pit scouting data for the current event.
+    """
+    rows = await db.get_pit_scouting()  # uses metadata.current_event internally
+    return {"teams": [
+        {
+            "team": r["team"],
+            "scouter": r.get("scouter"),
+            "status": r.get("status"),
+            "last_modified": r.get("last_modified")
+        }
+        for r in rows
+    ]}
+
+
+@router.get("/pit/{team}")
+async def get_pit_team(
+    team: int,
+    _: enums.SessionInfo = Depends(db.require_permission("pit_scouting")),
+):
+    """
+    Fetches a single team's pit scouting data.
+    """
+    rows = await db.get_pit_scouting(team=team)
+    if not rows:
+        raise HTTPException(status_code=404, detail="No pit scouting entry found")
+    entry = rows[0]
+    return {
+        "team": entry["team"],
+        "scouter": entry["scouter"],
+        "status": entry["status"],
+        "data": entry["data"],
+        "last_modified": entry["last_modified"],
+    }
+
+
+@router.post("/pit/{team}")
+async def update_pit_team(
+    team: int,
+    body: Dict[str, Any] = Body(...),
+    _: enums.SessionInfo = Depends(db.require_permission("pit_scouting")),
+):
+    """
+    Creates or updates pit scouting data for a team.
+    """
+    existing = await db.get_pit_scouting(team=team)
+    scouter = body.get("scouter")
+    status = enums.StatusType(body.get("status", enums.StatusType.PRE.value))
+
+    if not existing:
+        # insert new row
+        await db.add_pit_scouting(
+            team=team,
+            scouter=scouter,
+            status=status,
+            data=body.get("data", {}),
+        )
+        return {"status": "created", "team": team}
+
+    # merge/update existing
+    await db.update_pit_scouting(
+        team=team,
+        scouter=scouter,
+        status=status,
+        data=body.get("data", {}),
+    )
+    return {"status": "updated", "team": team}
+
+
+@router.post("/pit/{team}/submit")
+async def submit_pit_data(
+    team: int,
+    full_data: Dict[str, Any] = Body(...),
+    _: enums.SessionInfo = Depends(db.require_permission("pit_scouting")),
+):
+    """
+    Finalizes pit scouting data for a team and marks it as SUBMITTED.
+    """
+    rows = await db.get_pit_scouting(team=team)
+    if not rows:
+        # create entry if missing
+        await db.add_pit_scouting(
+            team=team,
+            scouter=full_data.get("scouter"),
+            status=enums.StatusType.POST,
+            data={}
+        )
+
+    await db.update_pit_scouting(
+        team=team,
+        scouter=full_data.get("scouter"),
+        status=enums.StatusType.SUBMITTED,
+        data=full_data.get("data", full_data),
+    )
+
+    return {"status": "submitted", "team": team}
+
+
 '''
+@router.post("/auth/login/guest")
+async def guest_login(request: Request, body: enums.PasscodeBody):
+    """
+    Guest login: limited permissions; passcode still verified in users table.
+    """
+    user = await db.get_user_by_passcode(body.passcode)
+    if not user:
+        raise HTTPException(status_code=401, detail="Invalid passcode")
+
+    session_id = str(uuid.uuid4())
+    expires_dt = datetime.now(timezone.utc) + request.app.state.config.get("SESSION_DURATION", timedelta(hours=2))
+
+    session_data = {
+        "name": user["name"],
+        "permissions": {
+            "dev": False,
+            "admin": False,
+            "match_scouting": False,
+            "pit_scouting": False,
+            "match_access": user["match_access"]
+        },
+        "expires": expires_dt.isoformat()
+    }
+
+    await db.add_session(session_id, session_data, expires_dt)
+
+    return {
+        "uuid": session_id,
+        "name": session_data["name"],
+        "expires": session_data["expires"],
+        "permissions": session_data["permissions"]
+    }
+    
+    
+@router.post("/admin/expire/{session_id}")
+async def expire_uuid(session_id: str, _: enums.SessionInfo = Depends(db.require_permission("admin"))):
+    """
+    Expires a single UUID session.
+    """
+    await db.delete_session(session_id)
+    return {"status": "expired"}
+
+
+@router.post("/admin/expire_all")
+async def expire_all(_: enums.SessionInfo = Depends(db.require_permission("admin"))):
+    """
+    Expires all UUID sessions.
+    """
+    await db.delete_all_sessions()
+    return {"status": "all expired"}
+
+
+@router.post("/admin/set_event")
+async def set_event(event: str, _: enums.SessionInfo = Depends(db.require_permission("admin"))):
+    """
+    Admin-only: Initializes the scouting database for a given event key.
+    Pulls data from TBA and creates empty records for each team in each match.
+    """
+    try:
+        matches = tba_fetcher.get_event_data(event)["matches"]
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=f"Failed to fetch event data: {str(e)}")
+
+    # Insert match data into the database using async calls
+    for match in matches:
+        match_key = match["key"].split("_")[-1]  # e.g., qm1
+        for alliance in enums.AllianceType:
+            for team_key in match["alliances"][alliance.value]["team_keys"]:
+                team_number = int(team_key[3:])
+                # Use db.py to insert match scouting data asynchronously
+                await db.add_match_scouting(
+                    match=match_key,
+                    m_type=enums.MatchType.QUALIFIER,  # Assuming match type is "qm" for simplicity
+                    team=team_number,
+                    alliance=alliance,  # Directly using the Enum value
+                    scouter=None,
+                    status=enums.StatusType.UNCLAIMED,
+                    data={}
+                )
+
+    return {"status": "event initialized", "matches": len(matches)}
+
+
+
 @router.get("/data/processed")
 async def get_data_processed(_: enums.SessionInfo = Depends(db.require_permission("admin"))):
     rows = await db.get_processed_data()

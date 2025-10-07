@@ -143,6 +143,47 @@ export function useAPI() {
         }
     }
 
+    // --- Endpoint: GET /team/{team} ---
+    const getTeamBasicInfo = async (
+        team: number | string
+    ): Promise<{
+        number: number
+        nickname: string
+        rookie_year: number | null
+        scouted: boolean
+    } | null> =>
+    {
+        try {
+            const res = await fetch(`${BASE_URL}/team/${team}`, {
+                headers: getAuthHeaders(),
+            });
+
+            if (!res.ok) {
+                console.warn(`getTeamBasicInfo failed: ${res.status} ${res.statusText}`);
+                return null;
+            }
+
+            const json = await res.json();
+
+            // --- Strict shape validation ---
+            if (
+                typeof json.number !== "number" ||
+                typeof json.nickname !== "string" ||
+                !("rookie_year" in json) ||
+                typeof json.scouted !== "boolean"
+            ) {
+                console.error("getTeamBasicInfo: malformed response", json);
+                return null;
+            }
+
+            return json;
+        } catch (err) {
+            console.error("getTeamBasicInfo failed:", err);
+            return null;
+        }
+    };
+
+
     // --- Endpoint: POST /scouting/{m_type}/{match}/{team}/submit ---
     const submitData = async (
         match: number,
@@ -340,7 +381,133 @@ export function useAPI() {
         }
     };
 
+    // --- Endpoint: GET /pit/teams ---
+    const getPitTeams = async (): Promise<
+        { team: number | string; scouter: string | null; status: string; last_modified: number }[]
+    > => {
+        try {
+            const res = await fetch(`${BASE_URL}/pit/teams`, {
+                headers: getAuthHeaders(),
+            });
+
+            if (!res.ok) {
+                console.warn(`getPitTeams failed: ${res.statusText}`);
+                return [];
+            }
+
+            const json = await res.json();
+            if (!Array.isArray(json.teams)) {
+                console.error("getPitTeams: malformed response", json);
+                return [];
+            }
+
+            return json.teams;
+        } catch (err) {
+            console.error("getPitTeams failed:", err);
+            return [];
+        }
+    };
+
+    // --- Endpoint: GET /pit/{team} ---
+    const getPitData = async (
+        team: number | string
+    ): Promise<{
+        team: number | string;
+        scouter: string | null;
+        status: string;
+        data: Record<string, any>;
+        last_modified: number;
+    } | null> => {
+        try {
+            const res = await fetch(`${BASE_URL}/pit/${team}`, {
+                headers: getAuthHeaders(),
+            });
+
+            if (!res.ok) {
+                console.warn(`getPitData failed: ${res.statusText}`);
+                return null;
+            }
+
+            return await res.json();
+        } catch (err) {
+            console.error("getPitData failed:", err);
+            return null;
+        }
+    };
+
+    // --- Endpoint: POST /pit/{team} ---
+    const updatePitData = async (
+        team: number | string,
+        scouter: string,
+        data: Record<string, any>,
+        status: "pre" | "submitted" | "unclaimed" | "in_progress" = "pre"
+    ): Promise<boolean> => {
+        try {
+            const body = {
+                scouter,
+                status,
+                data,
+            };
+
+            const res = await fetch(`${BASE_URL}/pit/${team}`, {
+                method: "POST",
+                headers: {
+                    ...getAuthHeaders(),
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(body),
+            });
+
+            if (!res.ok) {
+                console.warn(`updatePitData failed: ${res.status} ${res.statusText}`);
+                return false;
+            }
+
+            return true;
+        } catch (err) {
+            console.error("updatePitData failed:", err);
+            return false;
+        }
+    };
+
+    // --- Endpoint: POST /pit/{team}/submit ---
+    const submitPitData = async (
+        team: number | string,
+        scouter: string,
+        data: Record<string, any>
+    ): Promise<boolean> => {
+        try {
+            const body = {
+                scouter,
+                data,
+            };
+
+            const res = await fetch(`${BASE_URL}/pit/${team}/submit`, {
+                method: "POST",
+                headers: {
+                    ...getAuthHeaders(),
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(body),
+            });
+
+            if (!res.ok) {
+                console.warn(`submitPitData failed: ${res.status} ${res.statusText}`);
+                return false;
+            }
+
+            return true;
+        } catch (err) {
+            console.error("submitPitData failed:", err);
+            return false;
+        }
+    };
+
+
     return {
+        login,
+        verify,
+        ping,
         claimTeam,
         unclaimTeam,
         updateState,
@@ -348,9 +515,11 @@ export function useAPI() {
         getTeamList,
         getAllStatuses,
         getCachedName,
-        login,
-        verify,
-        ping,
         getScouterState,
+        getPitTeams,
+        getPitData,
+        updatePitData,
+        submitPitData,
+        getTeamBasicInfo,
     };
 }

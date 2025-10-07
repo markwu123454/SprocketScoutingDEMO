@@ -1,12 +1,11 @@
 import hashlib
-
 import asyncpg
 import json
 import time
 import logging
 from typing import Dict, Any, Optional, Callable, Annotated
 from fastapi import HTTPException, Header, Depends
-from datetime import datetime, timezone, timedelta
+from datetime import datetime, timezone
 import uuid
 from asyncpg import PostgresError
 from asyncpg.exceptions import UniqueViolationError
@@ -23,8 +22,6 @@ DB_DSN = os.getenv("DATABASE_URL")
 _pools: dict[str, asyncpg.Pool] = {}
 DB_NAME = "data"
 
-# Connection pools keyed by db name
-_pools: dict[str, asyncpg.Pool] = {}
 
 S_NONE = "__NONE__"  # sentinel stored when scouter is logically NULL
 
@@ -176,6 +173,44 @@ async def init_session_db():
         await release_db_connection(DB_NAME, conn)
 
 
+# =================== General Scouting ===================
+
+async def get_team_info(team_number: int) -> Optional[dict]:
+    """
+    Fetches a single team record from the `teams` table.
+
+    Args:
+        team_number: The team number (e.g., 254, 1678, etc.)
+
+    Returns:
+        dict with team information, or None if not found.
+    """
+    conn = await get_db_connection(DB_NAME)
+    try:
+        row = await conn.fetchrow("""
+            SELECT team_number, nickname, rookie_year, last_updated
+            FROM teams
+            WHERE team_number = $1
+            LIMIT 1
+        """, team_number)
+
+        if not row:
+            return None
+
+        return {
+            "team_number": row["team_number"],
+            "nickname": row["nickname"],
+            "rookie_year": row["rookie_year"],
+            "last_updated": row["last_updated"].isoformat() if row["last_updated"] else None,
+        }
+
+    except PostgresError as e:
+        logger.error("Failed to fetch team info: %s", e)
+        raise HTTPException(status_code=500, detail=f"Failed to fetch team info: {e}")
+    finally:
+        await release_db_connection(DB_NAME, conn)
+
+
 # =================== Match Scouting ===================
 
 async def get_match_info(
@@ -220,41 +255,6 @@ async def get_match_info(
     finally:
         await release_db_connection(DB_NAME, conn)
 
-
-async def get_team_info(team_number: int) -> Optional[dict]:
-    """
-    Fetches a single team record from the `teams` table.
-
-    Args:
-        team_number: The team number (e.g., 254, 1678, etc.)
-
-    Returns:
-        dict with team information, or None if not found.
-    """
-    conn = await get_db_connection(DB_NAME)
-    try:
-        row = await conn.fetchrow("""
-            SELECT team_number, nickname, rookie_year, last_updated
-            FROM teams
-            WHERE team_number = $1
-            LIMIT 1
-        """, team_number)
-
-        if not row:
-            return None
-
-        return {
-            "team_number": row["team_number"],
-            "nickname": row["nickname"],
-            "rookie_year": row["rookie_year"],
-            "last_updated": row["last_updated"].isoformat() if row["last_updated"] else None,
-        }
-
-    except PostgresError as e:
-        logger.error("Failed to fetch team info: %s", e)
-        raise HTTPException(status_code=500, detail=f"Failed to fetch team info: {e}")
-    finally:
-        await release_db_connection(DB_NAME, conn)
 
 async def add_match_scouting(
     match: int,
@@ -334,6 +334,7 @@ async def update_match_scouting(
     finally:
         await release_db_connection(DB_NAME, conn)
 
+
 async def get_match_scouting(
     match: Optional[int] = None,
     m_type: Optional[enums.MatchType] = None,
@@ -386,7 +387,6 @@ async def get_match_scouting(
         await release_db_connection(DB_NAME, conn)
 
 
-
 async def get_processed_data() -> Optional[str]:
     """Retrieve the processed data text blob (first row only)."""
     conn = await get_db_connection(DB_NAME)
@@ -396,6 +396,144 @@ async def get_processed_data() -> Optional[str]:
     except PostgresError as e:
         logger.error("Failed to fetch processed data: %s", e)
         raise HTTPException(status_code=500, detail=f"Failed to fetch processed data: {e}")
+    finally:
+        await release_db_connection(DB_NAME, conn)
+
+
+# =================== Pit Scouting ===================
+
+async def add_pit_scouting(
+    team: int | str,
+    scouter: str | None,
+    status: enums.StatusType,
+    data: Dict[str, Any],
+):
+    """Insert a new pit scouting entry using current_event from metadata."""
+    conn = await get_db_connection(DB_NAME)
+    try:
+        await conn.execute("""
+            INSERT INTO pit_scouting (
+                event_key, team, scouter, status, data, last_modified
+            )
+            VALUES (
+                (SELECT current_event FROM metadata LIMIT 1),
+                $1, $2, $3, $4, $5
+            )
+        """, str(team), _to_db_scouter(scouter), status.value, data, time.time_ns())
+    except UniqueViolationError:
+        raise HTTPException(status_code=409, detail="Pit scouting entry already exists")
+    except PostgresError as e:
+        logger.error("Failed to add pit scouting data: %s", e)
+        raise HTTPException(status_code=500, detail=f"Failed to add pit scouting data: {e}")
+    finally:
+        await release_db_connection(DB_NAME, conn)
+
+
+async def update_pit_scouting(
+    team: int | str,
+    scouter: Optional[str],
+    status: Optional[enums.StatusType] = None,
+    data: Optional[Dict[str, Any]] = None,
+    scouter_new: Optional[str] = None,
+):
+    """
+    Update an existing pit scouting entry.
+    Uses current_event from metadata.
+    Raises 404 if entry not found or 409 on conflicting reassignment.
+    """
+    conn = await get_db_connection(DB_NAME)
+    try:
+        async with conn.transaction():
+            row = await conn.fetchrow("""
+                SELECT data, status
+                FROM pit_scouting
+                WHERE event_key = (SELECT current_event FROM metadata LIMIT 1)
+                  AND team = $1 AND scouter = $2
+                FOR UPDATE
+            """, str(team), _to_db_scouter(scouter))
+            if not row:
+                raise HTTPException(status_code=404, detail="Pit scouting entry not found")
+
+            current_data: Dict[str, Any] = row["data"]
+            if data:
+                current_data |= data
+            new_status = status.value if status else row["status"]
+            new_scouter_db = _to_db_scouter(scouter_new) if scouter_new is not None else _to_db_scouter(scouter)
+
+            try:
+                await conn.execute("""
+                    UPDATE pit_scouting
+                    SET data=$1, status=$2, last_modified=$3, scouter=$4
+                    WHERE event_key = (SELECT current_event FROM metadata LIMIT 1)
+                      AND team = $5 AND scouter = $6
+                """, current_data, new_status, time.time_ns(), new_scouter_db,
+                     str(team), _to_db_scouter(scouter))
+            except UniqueViolationError:
+                raise HTTPException(status_code=409, detail="Target scouter row already exists")
+            return True
+    finally:
+        await release_db_connection(DB_NAME, conn)
+
+
+async def get_pit_scouting(
+    team: Optional[int | str] = None,
+    scouter: Optional[str] = "__NOTPASSED__",
+) -> list[Dict[str, Any]]:
+    """
+    Fetch pit scouting records scoped by current_event from metadata.
+    Any combination of parameters can be supplied.
+    """
+    conn = await get_db_connection(DB_NAME)
+    try:
+        query = """
+            SELECT *
+            FROM pit_scouting
+            WHERE event_key = (SELECT current_event FROM metadata LIMIT 1)
+        """
+        params: list[Any] = []
+        idx = 1
+
+        if team is not None:
+            query += f" AND team = ${idx}"; params.append(str(team)); idx += 1
+        if scouter != "__NOTPASSED__":
+            query += f" AND scouter = ${idx}"; params.append(_to_db_scouter(scouter if scouter != "" else None)); idx += 1
+
+        rows = await conn.fetch(query, *params)
+
+        return [
+            {
+                "event_key": r["event_key"],
+                "team": r["team"],
+                "scouter": _from_db_scouter(r["scouter"]),
+                "status": r["status"],
+                "data": r["data"],
+                "last_modified": r["last_modified"],
+            }
+            for r in rows
+        ]
+    except PostgresError as e:
+        logger.error("Failed to fetch pit scouting data: %s", e)
+        raise HTTPException(status_code=500, detail=f"Failed to fetch pit scouting data: {e}")
+    finally:
+        await release_db_connection(DB_NAME, conn)
+
+
+async def delete_pit_scouting(
+    team: int | str,
+    scouter: Optional[str]
+) -> bool:
+    """Delete a pit scouting record."""
+    conn = await get_db_connection(DB_NAME)
+    try:
+        result = await conn.execute("""
+            DELETE FROM pit_scouting
+            WHERE event_key = (SELECT current_event FROM metadata LIMIT 1)
+              AND team = $1 AND scouter = $2
+        """, str(team), _to_db_scouter(scouter))
+        return result == "DELETE 1"
+    except PostgresError as e:
+        logger.error("Failed to delete pit scouting data: %s", e)
+        raise HTTPException(status_code=500, detail=f"Failed to delete pit scouting data: {e}")
     finally:
         await release_db_connection(DB_NAME, conn)
 
