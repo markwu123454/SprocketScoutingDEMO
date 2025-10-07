@@ -1,6 +1,6 @@
 {
-  "name": "Your App",
-  "short_name": "App",
+  "name": "Sprocket Scouting",
+  "short_name": "Scouting",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#000000",
