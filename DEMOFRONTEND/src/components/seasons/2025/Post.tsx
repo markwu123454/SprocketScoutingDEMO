@@ -4,9 +4,9 @@ import RatingSlider from "@/components/ui/ratingSlider.tsx"
 import InfoToggle from "@/components/ui/infoToggle.tsx" // adjust path if needed
 
 export default function PostMatch({
-    data,
-    setData,
-}: {
+                                      data,
+                                      setData,
+                                  }: {
     data: MatchScoutingData
     setData: React.Dispatch<React.SetStateAction<MatchScoutingData>>
 }) {
@@ -63,6 +63,17 @@ export default function PostMatch({
         }))
     }
 
+    const toggleDeAlgae = () => {
+        setData(prev => ({
+            ...prev,
+            postmatch: {
+                ...prev.postmatch,
+                de_algae: !prev.postmatch.de_algae
+            }
+        }))
+    }
+
+
     return (
         <div className="p-4 w-full">
             <div className="text-xl font-semibold mb-4">Post-Match Screen</div>
@@ -91,7 +102,8 @@ export default function PostMatch({
                 rightLabel="Fast"
                 infoBox={
                     <div>
-                        <strong>How long did it take the robot to drive to the reef, align, and lift off from the ground</strong><br/><br/>
+                        <strong>How long did it take the robot to drive to the reef, align, and lift off from the
+                            ground</strong><br/><br/>
                         <strong>Fast:</strong> &lt;2 seconds.<br/>
                         <strong>Medium:</strong> ~15 seconds.<br/>
                         <strong>Slow:</strong> &gt;30 seconds.
@@ -99,32 +111,44 @@ export default function PostMatch({
                 }
             />
 
-            <div className="flex gap-2 mt-4">
+            <div className="grid grid-cols-2 gap-2 mt-4">
                 <button
                     onClick={togglePlayedRole("offense")}
-                    className={`flex items-center justify-center gap-1 px-2 py-1 rounded text-sm w-[33%] ${
+                    className={`flex items-center justify-center gap-1 px-2 py-1 rounded text-sm ${
                         data.postmatch.offense ? "bg-green-600" : "bg-red-600"
                     }`}
                 >
                     Played Offense: {data.postmatch.offense ? "Yes" : "No"}
                 </button>
+
                 <button
                     onClick={togglePlayedRole("defense")}
-                    className={`flex items-center justify-center gap-1 px-2 py-1 rounded text-sm w-[33%] ${
+                    className={`flex items-center justify-center gap-1 px-2 py-1 rounded text-sm ${
                         data.postmatch.defense ? "bg-green-600" : "bg-red-600"
                     }`}
                 >
                     Played Defense: {data.postmatch.defense ? "Yes" : "No"}
                 </button>
+
                 <button
                     onClick={toggleClimbSuccess}
-                    className={`flex items-center justify-center gap-1 px-2 py-1 rounded text-sm w-[33%] ${
+                    className={`flex items-center justify-center gap-1 px-2 py-1 rounded text-sm ${
                         data.postmatch.climbSuccess ? "bg-green-600" : "bg-red-600"
                     }`}
                 >
                     Climb Success: {data.postmatch.climbSuccess ? "Yes" : "No"}
                 </button>
+
+                <button
+                    onClick={toggleDeAlgae}
+                    className={`flex items-center justify-center gap-1 px-2 py-1 rounded text-sm ${
+                        data.postmatch.de_algae ? "bg-green-600" : "bg-red-600"
+                    }`}
+                >
+                    Algae Remove: {data.postmatch.de_algae ? "Yes" : "No"}
+                </button>
             </div>
+
 
             <div className="text-xl font-semibold mb-4 border-t border-zinc-500 mt-6 pt-2">
                 Faults & Failures

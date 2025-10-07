@@ -72,6 +72,32 @@ import pandas as pd
 import numpy as np
 
 
+def compute_feature_elos(team_match_records, per_match_data, per_team_data, feature_axes):
+    elos, binners = {}, {}
+
+    # Build binners + train Elo per axis
+    for axis, extractor in feature_axes.items():
+        binner = make_quantile_binner(team_match_records, extractor, tag_prefix=axis)
+        binners[axis] = binner
+        elos[axis] = train_feature_elo(build_elo_games(per_match_data, binner))
+
+    # Apply to each team
+    for team, tdata in per_team_data.items():
+        team_matches = [
+            per_match_data[typ][num][alli][team]
+            for typ, num in tdata["match"]
+            for alli in ["red", "blue"]
+            if team in per_match_data[typ][num].get(alli, {})
+        ]
+        tdata["elo_featured"] = {
+            axis: team_axis_score(team_matches, elos[axis], binners[axis])
+            for axis in feature_axes
+        }
+
+    return per_team_data
+
+
+
 def expected(r_a: float, r_b: float) -> float:
     """Compute the expected win probability of rating A vs B using Elo formula."""
     return 1 / (1 + 10 ** ((r_b - r_a) / 400))

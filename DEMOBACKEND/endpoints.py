@@ -515,17 +515,14 @@ async def get_match_info(
         _: enums.SessionInfo = Depends(db.require_permission("match_scouting"))
 ):
     """
-    Retrieves match info directly from the database (no TBA fetcher).
-    Reads team numbers from `matches` table and ensures scouting entries exist.
+    Retrieves match info directly from DB using metadata.current_event.
     """
-    event_key = "2025caoc"  # TODO: make configurable later
-
-    # Fetch match info from DB
-    match_row = await db.get_match_info(event_key, m_type.value, match)
+    # Fetch match info automatically scoped to current_event
+    match_row = await db.get_match_info(m_type.value, match)
     if not match_row:
         raise HTTPException(status_code=404, detail="Match not found in database")
 
-    # Extract alliance-specific teams
+    # Extract alliance teams
     if alliance == enums.AllianceType.RED:
         team_numbers = [t for t in match_row["red"] if t is not None]
     elif alliance == enums.AllianceType.BLUE:
@@ -533,7 +530,7 @@ async def get_match_info(
     else:
         raise HTTPException(status_code=400, detail="Invalid alliance")
 
-    # Ensure each team has a corresponding scouting entry
+    # Ensure each team has a match_scouting entry
     for t in team_numbers:
         existing = await db.get_match_scouting(match=match, m_type=m_type, team=str(t))
         if not existing:
@@ -547,18 +544,18 @@ async def get_match_info(
                 data={}
             )
 
-    # Return structured match info
     return {
         "teams": [
             {
                 "number": int(t),
-                "name": f"Team {t}",  # optionally use preloaded team_data if available
+                "name": f"Team {t}",
                 "scouter": (await db.get_match_scouting(match=match, m_type=m_type, team=t))[0].get("scouter"),
                 "nickname": (await db.get_team_info(t))["nickname"]
             }
             for t in team_numbers
         ]
     }
+
 
 
 @router.get("/match/{m_type}/{match}/{alliance}/state")

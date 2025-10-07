@@ -87,6 +87,7 @@ async def init_data_db():
     """
     Initialize tables in the 'data' database:
       - match_scouting
+      - pit_scouting
       - processed_data
       - users
     Creates indices if missing.
@@ -94,8 +95,10 @@ async def init_data_db():
     conn = await get_db_connection(DB_NAME)
     try:
         async with conn.transaction():
+            # --- match_scouting table ---
             await conn.execute("""
                 CREATE TABLE IF NOT EXISTS match_scouting (
+                    event_key TEXT NOT NULL,
                     match INTEGER NOT NULL,
                     match_type TEXT NOT NULL,
                     team TEXT NOT NULL,
@@ -112,7 +115,29 @@ async def init_data_db():
                 CREATE INDEX IF NOT EXISTS idx_ms_lookup
                 ON match_scouting (match, match_type, team, scouter)
             """)
+
+            # --- pit_scouting table ---
+            await conn.execute("""
+                CREATE TABLE IF NOT EXISTS pit_scouting (
+                    event_key TEXT NOT NULL,
+                    team TEXT NOT NULL,
+                    scouter TEXT,
+                    status TEXT NOT NULL,
+                    data JSONB NOT NULL,
+                    last_modified BIGINT NOT NULL,
+                    PRIMARY KEY (event_key, team, scouter)
+                )
+            """)
+            await conn.execute("CREATE INDEX IF NOT EXISTS idx_pit_scouting_team ON pit_scouting (team)")
+            await conn.execute("""
+                CREATE INDEX IF NOT EXISTS idx_pit_lookup
+                ON pit_scouting (event_key, team, scouter)
+            """)
+
+            # --- processed_data table ---
             await conn.execute("CREATE TABLE IF NOT EXISTS processed_data (data TEXT)")
+
+            # --- users table ---
             await conn.execute("""
                 CREATE TABLE IF NOT EXISTS users(
                     name TEXT PRIMARY KEY,
@@ -129,7 +154,6 @@ async def init_data_db():
         raise HTTPException(status_code=500, detail=f"Failed to initialize database: {e}")
     finally:
         await release_db_connection(DB_NAME, conn)
-
 
 
 async def init_session_db():
@@ -155,40 +179,30 @@ async def init_session_db():
 # =================== Match Scouting ===================
 
 async def get_match_info(
-    event_key: str,
     match_type: str,
     match_number: int,
     set_number: int = 1
 ) -> Optional[dict]:
     """
-    Fetches a single match record from the `matches` table.
-    Returns team numbers and times for the specified event + match.
-
-    Args:
-        event_key: Event key (e.g., "2025caoc")
-        match_type: Match type ("qm", "qf", "sf", "f", etc.)
-        match_number: Match number integer (e.g., 1, 2, ...)
-        set_number: Optional, defaults to 1 (used for elimination matches)
-
-    Returns:
-        dict with keys like "red1", "blue3", etc., or None if not found.
+    Fetches a single match record from the `matches` table,
+    automatically using the current event key from metadata.
+    Returns team numbers and times for the current event.
     """
     conn = await get_db_connection(DB_NAME)
     try:
         row = await conn.fetchrow("""
             SELECT *
             FROM matches
-            WHERE event_key = $1
-              AND match_type = $2
-              AND match_number = $3
-              AND set_number = $4
+            WHERE event_key = (SELECT current_event FROM metadata LIMIT 1)
+              AND match_type = $1
+              AND match_number = $2
+              AND set_number = $3
             LIMIT 1
-        """, event_key, match_type, match_number, set_number)
+        """, match_type, match_number, set_number)
 
         if not row:
             return None
 
-        # Convert record to dict, filtering None values for missing teams/times
         return {
             "event_key": row["event_key"],
             "match_type": row["match_type"],
@@ -205,6 +219,7 @@ async def get_match_info(
         raise HTTPException(status_code=500, detail=f"Failed to fetch match info: {e}")
     finally:
         await release_db_connection(DB_NAME, conn)
+
 
 async def get_team_info(team_number: int) -> Optional[dict]:
     """
@@ -248,16 +263,21 @@ async def add_match_scouting(
     alliance: enums.AllianceType,
     scouter: str | None,
     status: enums.StatusType,
-    data: Dict[str, Any]
+    data: Dict[str, Any],
 ):
-    """Insert a new match scouting entry. Raises 409 if the (match, team, scouter) combination already exists."""
+    """Insert a new match scouting entry using current_event from metadata."""
     conn = await get_db_connection(DB_NAME)
     try:
         await conn.execute("""
-            INSERT INTO match_scouting (match, match_type, team, alliance, scouter, status, data, last_modified)
-            VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
-        """, match, m_type.value, str(team), alliance.value, _to_db_scouter(scouter),
-             status.value, data, time.time_ns())
+            INSERT INTO match_scouting (
+                event_key, match, match_type, team, alliance, scouter, status, data, last_modified
+            )
+            VALUES (
+                (SELECT current_event FROM metadata LIMIT 1),
+                $1, $2, $3, $4, $5, $6, $7, $8
+            )
+        """, match, m_type.value, str(team), alliance.value,
+             _to_db_scouter(scouter), status.value, data, time.time_ns())
     except UniqueViolationError:
         raise HTTPException(status_code=409, detail="Match scouting entry already exists")
     except PostgresError as e:
@@ -274,11 +294,11 @@ async def update_match_scouting(
     scouter: Optional[str],
     status: Optional[enums.StatusType] = None,
     data: Optional[Dict[str, Any]] = None,
-    scouter_new: Optional[str] = None
+    scouter_new: Optional[str] = None,
 ):
     """
     Update an existing match scouting entry.
-    Can modify data, status, or scouter assignment.
+    Uses current_event from metadata.
     Raises 404 if entry not found or 409 on conflicting reassignment.
     """
     conn = await get_db_connection(DB_NAME)
@@ -287,7 +307,8 @@ async def update_match_scouting(
             row = await conn.fetchrow("""
                 SELECT data, status
                 FROM match_scouting
-                WHERE match=$1 AND match_type=$2 AND team=$3 AND scouter=$4
+                WHERE event_key = (SELECT current_event FROM metadata LIMIT 1)
+                  AND match = $1 AND match_type = $2 AND team = $3 AND scouter = $4
                 FOR UPDATE
             """, match, m_type.value, str(team), _to_db_scouter(scouter))
             if not row:
@@ -303,30 +324,33 @@ async def update_match_scouting(
                 await conn.execute("""
                     UPDATE match_scouting
                     SET data=$1, status=$2, last_modified=$3, scouter=$4
-                    WHERE match=$5 AND match_type=$6 AND team=$7 AND scouter=$8
+                    WHERE event_key = (SELECT current_event FROM metadata LIMIT 1)
+                      AND match = $5 AND match_type = $6 AND team = $7 AND scouter = $8
                 """, current_data, new_status, time.time_ns(), new_scouter_db,
-                                   match, m_type.value, str(team), _to_db_scouter(scouter))
+                     match, m_type.value, str(team), _to_db_scouter(scouter))
             except UniqueViolationError:
                 raise HTTPException(status_code=409, detail="Target scouter row already exists")
             return True
     finally:
         await release_db_connection(DB_NAME, conn)
 
-
 async def get_match_scouting(
     match: Optional[int] = None,
     m_type: Optional[enums.MatchType] = None,
     team: Optional[int | str] = None,
-    scouter: Optional[str] = "__NOTPASSED__"
+    scouter: Optional[str] = "__NOTPASSED__",
 ) -> list[Dict[str, Any]]:
     """
-    Fetch match scouting records with optional filters.
+    Fetch match scouting records scoped by current_event from metadata.
     Any combination of parameters can be supplied.
-    Returns a list of records as dictionaries.
     """
     conn = await get_db_connection(DB_NAME)
     try:
-        query = "SELECT * FROM match_scouting WHERE 1=1"
+        query = """
+            SELECT *
+            FROM match_scouting
+            WHERE event_key = (SELECT current_event FROM metadata LIMIT 1)
+        """
         params: list[Any] = []
         idx = 1
 
@@ -343,6 +367,7 @@ async def get_match_scouting(
 
         return [
             {
+                "event_key": r["event_key"],
                 "match": r["match"],
                 "match_type": r["match_type"],
                 "team": r["team"],
@@ -359,6 +384,7 @@ async def get_match_scouting(
         raise HTTPException(status_code=500, detail=f"Failed to fetch match scouting data: {e}")
     finally:
         await release_db_connection(DB_NAME, conn)
+
 
 
 async def get_processed_data() -> Optional[str]:

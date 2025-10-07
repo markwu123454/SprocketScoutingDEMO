@@ -108,21 +108,20 @@ export default function Pre({
     }, [manualEntry, manualTeam, setData])
 
     useEffect(() => {
-    if (!isOnline || !serverOnline) return
-    if (!match || !teamNumber) return
+        if (!isOnline || !serverOnline) return
+        if (!match || !teamNumber) return
 
-    void (async () => {
-        try {
-            await unclaimTeam(match, teamNumber, match_type, scouter)
-        } finally {
-            setData(d => ({
-                ...d,
-                teamNumber: null,
-            }))
-        }
-    })()
-}, [match, match_type, alliance])
-
+        void (async () => {
+            try {
+                await unclaimTeam(match, teamNumber, match_type, scouter)
+            } finally {
+                setData(d => ({
+                    ...d,
+                    teamNumber: null,
+                }))
+            }
+        })()
+    }, [match, match_type, alliance])
 
 
     // === Offline auto-activate manual entry ===
@@ -158,6 +157,33 @@ export default function Pre({
             setClaiming(false)
         }
     }
+
+    useEffect(() => {
+        const scouter = getScouterName()!
+
+        const handleUnload = async () => {
+            if (!isOnline || !serverOnline) return
+            if (!match || !teamNumber) return
+            try {
+                await unclaimTeam(match, teamNumber, match_type, scouter)
+            } catch {
+                // ignored
+            }
+        }
+
+        const visibilityHandler = () => {
+            if (document.visibilityState === 'hidden') void handleUnload()
+        }
+
+        window.addEventListener('beforeunload', handleUnload)
+        document.addEventListener('visibilitychange', visibilityHandler)
+
+        return () => {
+            window.removeEventListener('beforeunload', handleUnload)
+            document.removeEventListener('visibilitychange', visibilityHandler)
+        }
+    }, [isOnline, serverOnline, match, teamNumber, match_type])
+
 
     return (
         <div className="p-4 w-full h-full flex flex-col justify gap-2">

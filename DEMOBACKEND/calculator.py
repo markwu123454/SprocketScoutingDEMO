@@ -11,10 +11,14 @@ from pprint import pprint
 from typing import Literal, Callable, Union
 import pandas as pd
 from calculators.KMeans_Clustering import compute_ai_ratings
-from calculators.Bayesian_Elo_Calculator import make_quantile_binner, build_elo_games, train_feature_elo, \
-    team_axis_score
+from calculators.Bayesian_Elo_Calculator import compute_feature_elos
 from calculators.Random_Forest_Regressor import predict_all_playable_matches
 import warnings
+import asyncpg
+from fastapi import HTTPException
+import json
+
+DB_NAME = "data"
 
 # TODO: make file future proof, right now it assumes all matches are already played
 
@@ -24,32 +28,34 @@ MatchType = Literal["qm", "sf", "f"]
 StatusType = Literal["unclaimed", "pre", "auto", "teleop", "post", "submitted"]
 
 
-# --- Query Function ---
-# FIXME: chang this from sqlite to postgresql
-def get_match_scouting() -> list[dict]:
-    """gets data from database."""
-    conn = get_db_conn()
-    cursor = conn.cursor()
-    query = "SELECT * FROM match_scouting WHERE 1=1"
-    params = []
+async def get_match_scouting() -> list[dict]:
+    """
+    Fetch all match scouting records from PostgreSQL.
+    Returns a list of dicts identical in structure to the SQLite version.
+    """
+    from db import get_db_connection, release_db_connection  # adjust import path if needed
 
-    cursor.execute(query, params)
-    rows = cursor.fetchall()
-    conn.close()
+    conn = await get_db_connection(DB_NAME)
+    try:
+        rows = await conn.fetch("SELECT * FROM match_scouting WHERE 1=1")
 
-    return [
-        {
-            "match": r[0],
-            "match_type": r[1],
-            "team": r[2],
-            "alliance": r[3],
-            "scouter": r[4],
-            "status": r[5],
-            "data": json.loads(r[6]),
-            "last_modified": r[7]
-        }
-        for r in rows
-    ]
+        return [
+            {
+                "match": r["match"],
+                "match_type": r["match_type"],
+                "team": r["team"],
+                "alliance": r["alliance"],
+                "scouter": r["scouter"],
+                "status": r["status"],
+                "data": r["data"] if isinstance(r["data"], dict) else json.loads(r["data"]),
+                "last_modified": r["last_modified"],
+            }
+            for r in rows
+        ]
+    except asyncpg.PostgresError as e:
+        raise HTTPException(status_code=500, detail=f"Database error while fetching match_scouting: {e}")
+    finally:
+        await release_db_connection(DB_NAME, conn)
 
 
 async def write_processed_string(data: str):
@@ -363,41 +369,15 @@ def compute_all_stats(raw_data: list[dict]) -> dict:
     print("Finished basic elo calculations")
 
     # ======= Step 3: Calculate featured elo rating =======
-    coral_extractor = lambda d: d["score_actions"]["teleop"]["coral_cycle"]
-    auto_extractor = lambda d: d["score_actions"]["auto"]["coral_cycle"]
-    algae_extractor = lambda d: d["score_actions"]["teleop"]["algae_cycle"]
-    climb_extractor = lambda d: d["score_actions"]["climb"]
-    defense_extractor = lambda d: d.get("defense_effect", 0)
+    feature_axes = {
+        "auto": lambda d: d["score_actions"]["auto"]["coral_cycle"],
+        "teleop_coral": lambda d: d["score_actions"]["teleop"]["coral_cycle"],
+        "teleop_algae": lambda d: d["score_actions"]["teleop"]["algae_cycle"],
+        "climb": lambda d: d["score_actions"]["climb"],
+        "defense": lambda d: d.get("defense_effect", 0),
+    }
 
-    coral_binner = make_quantile_binner(team_match_records, coral_extractor, tag_prefix="coral")
-    auto_binner = make_quantile_binner(team_match_records, auto_extractor, tag_prefix="auto")
-    algae_binner = make_quantile_binner(team_match_records, algae_extractor, tag_prefix="algae")
-    climb_binner = make_quantile_binner(team_match_records, climb_extractor, tag_prefix="climb")
-    defense_binner = make_quantile_binner(team_match_records, defense_extractor,
-                                          tag_prefix="defense")
-
-    coral_elo = train_feature_elo(build_elo_games(per_match_data, coral_binner))
-    auto_elo = train_feature_elo(build_elo_games(per_match_data, auto_binner))
-    algae_elo = train_feature_elo(build_elo_games(per_match_data, algae_binner))
-    climb_elo = train_feature_elo(build_elo_games(per_match_data, climb_binner))
-    defense_elo = train_feature_elo(
-        build_elo_games(per_match_data, defense_binner))
-
-    for team in per_team_data:
-        team_matches = [
-            per_match_data[typ][num][alli][team]
-            for typ, num in per_team_data[team]["match"]
-            for alli in ["red", "blue"]
-            if team in per_match_data[typ][num].get(alli, {})
-        ]
-
-        per_team_data[team]["elo_featured"] = {
-            "auto": team_axis_score(team_matches, auto_elo, auto_binner),
-            "teleop_coral": team_axis_score(team_matches, coral_elo, coral_binner),
-            "teleop_algae": team_axis_score(team_matches, algae_elo, algae_binner),
-            "climb": team_axis_score(team_matches, climb_elo, climb_binner),
-            "defense": team_axis_score(team_matches, defense_elo, defense_binner),
-        }
+    per_team_data = compute_feature_elos(team_match_records, per_match_data, per_team_data, feature_axes)
 
     print("Finished feature based elo calculations")
 
