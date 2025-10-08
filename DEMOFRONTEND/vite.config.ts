@@ -12,8 +12,8 @@ export default defineConfig({
         VitePWA({
             registerType: "autoUpdate",
             includeAssets: [
-                'offline.html',
                 "favicon.ico",
+                "splash.html",
                 "manifest.webmanifest",
                 "static/sprocket_logo_ring.png",
                 "static/sprocket_logo_gear.png",
