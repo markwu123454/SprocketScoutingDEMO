@@ -81,7 +81,7 @@ export default function PitScoutingLayout() {
 
 
     return (
-        <div className="h-screen overflow-y-auto bg-background text-foreground p-4">
+        <div className="min-h-screen bg-background overflow-x-hidden w-full text-foreground p-4">
             <form onSubmit={handleSubmit} className="space-y-6 max-w-xl mx-auto">
                 {/* --- Team Input Section --- */}
                 <div>
