@@ -137,7 +137,7 @@ export function HomeLayout() {
             {/* --- Foreground (Login box) --- */}
             <div
                 className={`
-                relative z-10 w-full max-w-md mx-10 p-6 rounded-lg shadow-lg space-y-6 border transition-colors duration-500 backdrop-blur-sm
+                relative z-10 w-full max-w-md mx-4 p-6 rounded-lg shadow-lg space-y-6 border transition-colors duration-500 backdrop-blur-sm
                 ${theme === "dark" ? "bg-zinc-950/70 border-zinc-800 text-white" : ""}
                 ${theme === "light" ? "bg-white border-zinc-300 text-zinc-900" : ""}
                 ${theme === "2025" ? "bg-[#0b234f]/70 border-[#1b3d80] text-white" : ""}
