@@ -3,11 +3,13 @@ import * as React from "react";
 import {useEffect, useState} from "react";
 import {Label} from "@/components/ui/label.tsx";
 import {Input} from "@/components/ui/input.tsx";
-import {AlertCircle, CheckCircle, XCircle} from "lucide-react";
+import {AlertCircle, ArrowLeft, CheckCircle, XCircle} from "lucide-react";
 import {Button} from "@/components/ui/button.tsx";
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/components/ui/select.tsx";
+import {useNavigate} from "react-router-dom";
 
 export default function PitScoutingLayout() {
+    const navigate = useNavigate()
     const {getTeamBasicInfo, submitPitData} = useAPI()
 
     const [teamNumber, setTeamNumber] = useState("")
@@ -99,7 +101,22 @@ export default function PitScoutingLayout() {
             >
                 {/* --- Team Input Section --- */}
                 <div>
+                    <div className="flex items-center justify-between">
                     <Label htmlFor="teamNumber" className="text-lg font-semibold">Enter Team Number</Label>
+                    <button
+                            onClick={() => navigate("/")}
+                            className="
+                            transition
+                            theme-light:text-zinc-600 theme-light:hover:text-zinc-900
+                            theme-dark:text-zinc-400 theme-dark:hover:text-white
+                            theme-2025:text-zinc-300 theme-2025:hover:text-white
+                            theme-2026:text-[#5a4800] theme-2026:hover:text-[#2d2100]
+                        "
+                            title="Back to Home"
+                        >
+                            <ArrowLeft className="w-5 h-5"/>
+                        </button>
+                    </div>
                     <Input
                         id="teamNumber"
                         type="text"
