@@ -126,11 +126,13 @@ export function HomeLayout() {
             />
 
             {/* --- Logo --- */}
-            <img
-                src={theme === "2025" ? logo_animation_2025 : logo_animation_2026}
-                alt="logo animation"
-                className="absolute top-2 left-4 h-30 pointer-events-none z-10"
-            />
+            {(theme === "2025" || theme === "2026") && (
+                <img
+                    src={theme === "2025" ? logo_animation_2025 : logo_animation_2026}
+                    alt="logo animation"
+                    className="absolute top-2 left-4 h-20 pointer-events-none z-10"
+                />
+            )}
 
             {/* --- Foreground (Login box) --- */}
             <div

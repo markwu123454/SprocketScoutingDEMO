@@ -6,11 +6,9 @@ import {Input} from "@/components/ui/input.tsx";
 import {AlertCircle, CheckCircle, XCircle} from "lucide-react";
 import {Button} from "@/components/ui/button.tsx";
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/components/ui/select.tsx";
-import {useTheme} from "@/contexts/themeProvider.tsx";
 
 export default function PitScoutingLayout() {
     const {getTeamBasicInfo, submitPitData} = useAPI()
-    const {theme} = useTheme()
 
     const [teamNumber, setTeamNumber] = useState("")
     const [teamInfo, setTeamInfo] = useState<{
@@ -184,10 +182,6 @@ export default function PitScoutingLayout() {
                     {/* --- TODO: CameraCapture --- */}
                     {/* <CameraCapture title="Robot Photos" ... /> */}
 
-                    {/* --- Robot Info Section --- */}
-                    <div className="space-y-6">
-                        <Label className="text-lg font-semibold">Robot Info</Label>
-
                         {/* --- Dimensions & Weight --- */}
                         <div>
                             <Label>Width (inches)</Label>
@@ -323,11 +317,7 @@ export default function PitScoutingLayout() {
                                             type="checkbox"
                                             checked={Array.isArray(answers.levels) && answers.levels.includes(level)}
                                             onChange={(e) => handleMultiToggle("levels", level, e.target.checked)}
-                                            className="
-              h-4 w-4 accent-primary
-              theme-2025:accent-[#4d75d9]
-              theme-2026:accent-[#a28d46]
-            "
+                                            className="h-4 w-4 accent-primary theme-2025:accent-[#4d75d9] theme-2026:accent-[#a28d46]"
                                         />
                                         <span>{level}</span>
                                     </label>
@@ -403,11 +393,7 @@ export default function PitScoutingLayout() {
                                             type="checkbox"
                                             checked={Array.isArray(answers.programming) && answers.programming.includes(prog.key)}
                                             onChange={(e) => handleMultiToggle("programming", prog.key, e.target.checked)}
-                                            className="
-              h-4 w-4 accent-primary
-              theme-2025:accent-[#4d75d9]
-              theme-2026:accent-[#a28d46]
-            "
+                                            className="h-4 w-4 accent-primary theme-2025:accent-[#4d75d9] theme-2026:accent-[#a28d46]"
                                         />
                                         <span>{prog.label}</span>
                                     </label>
@@ -423,7 +409,6 @@ export default function PitScoutingLayout() {
                                 onChange={(e) => setAnswers({...answers, comments: e.target.value})}
                             />
                         </div>
-                    </div>
                 </div>
 
                 {/* --- Submit --- */}
