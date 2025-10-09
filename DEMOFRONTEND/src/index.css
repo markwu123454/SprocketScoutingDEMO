@@ -3,6 +3,12 @@
 @import "tw-animate-css";
 @plugin 'tailwind-scrollbar';
 
+@custom-variant theme-light (&:is(.theme-light *));
+@custom-variant theme-dark (&:is(.theme-dark *));
+@custom-variant theme-2025 (&:is(.theme-2025 *));
+@custom-variant theme-2026 (&:is(.theme-2026 *));
+
+/* TODO: delete later */
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {
@@ -148,7 +154,7 @@
 
 @keyframes rainbow-scroll {
   0% {
-    background-position-x: 0%;
+    background-position-x: 0;
   }
   100% {
     background-position-x: 100%;

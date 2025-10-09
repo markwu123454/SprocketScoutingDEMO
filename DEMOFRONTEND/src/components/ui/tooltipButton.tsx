@@ -2,17 +2,19 @@ import {useState, useRef, useLayoutEffect} from "react"
 import {HelpCircle} from "lucide-react"
 
 export default function TooltipButton({
-                                          label,
-                                          tooltip,
-                                          onClick,
-                                          disabled = false,
-                                          className = "",
-                                      }: {
+    label,
+    tooltip,
+    onClick,
+    disabled = false,
+    className,
+    overrideClass = false, // NEW: allow full override
+}: {
     label: string
     tooltip?: React.ReactNode
     onClick?: () => void
     disabled?: boolean
     className?: string
+    overrideClass?: boolean
 }) {
     const [showTooltip, setShowTooltip] = useState(false)
     const [pos, setPos] = useState({top: 0, left: 0})
@@ -49,12 +51,8 @@ export default function TooltipButton({
         if (!showTooltip) return
 
         const handleClose = () => {
-            // Delay to allow toggle button to run first
-            setTimeout(() => {
-                setShowTooltip(false)
-            }, 1)
+            setTimeout(() => setShowTooltip(false), 1)
         }
-
 
         recalc()
         window.addEventListener("resize", recalc)
@@ -68,6 +66,18 @@ export default function TooltipButton({
         }
     }, [showTooltip])
 
+    // --- Button base classes ---
+    const base =
+        "w-full flex items-center justify-between px-3 py-2 rounded transition text-sm"
+
+    const defaultEnabled = "bg-zinc-700 hover:bg-zinc-600 text-white"
+    const defaultDisabled = "bg-zinc-800 text-zinc-500 cursor-not-allowed"
+
+    const classes = overrideClass
+        ? `${base} ${className ?? ""}` // fully custom override
+        : `${base} ${
+              disabled ? defaultDisabled : defaultEnabled
+          } ${className ?? ""}` // normal additive
 
     return (
         <div ref={containerRef} className="relative w-full">
@@ -87,27 +97,18 @@ export default function TooltipButton({
                     type="button"
                     disabled={disabled}
                     onClick={onClick}
-                    className={`w-full flex items-center justify-between px-3 py-2 rounded transition text-sm ${
-                        disabled
-                            ? "bg-zinc-800 text-zinc-500 cursor-not-allowed"
-                            : "bg-zinc-700 hover:bg-zinc-600 text-white"
-                    } ${className}`}
+                    className={classes}
                 >
                     <span>{label}</span>
-
-                    {/* Placeholder to make space for right trigger */}
-                    {tooltip && !disabled && (
-                        <div className="w-6 h-6"/>
-                    )}
+                    {tooltip && !disabled && <div className="w-6 h-6" />}
                 </button>
 
-                {/* Enlarged hitbox on top-right corner */}
                 {tooltip && (
                     <div
                         onClick={() => setShowTooltip((v) => !v)}
                         className="absolute top-0 right-0 h-full w-10 flex items-center justify-center cursor-pointer group"
                     >
-                        <HelpCircle className="w-4 h-4 text-zinc-300 group-hover:text-white"/>
+                        <HelpCircle className="w-4 h-4 text-zinc-300 group-hover:text-white" />
                     </div>
                 )}
             </div>
