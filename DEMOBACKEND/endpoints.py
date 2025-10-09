@@ -159,6 +159,39 @@ async def verify(session: enums.SessionInfo = Depends(db.require_session())):
     }
 
 
+@router.get("/admin/matches/filter")
+async def admin_filter_matches(
+    scouters: Optional[list[str]] = Query(None, description="List of scouter names to include"),
+    statuses: Optional[list[enums.StatusType]] = Query(None, description="List of statuses to include"),
+    _: enums.SessionInfo = Depends(db.require_permission("admin")),
+):
+    """
+    Returns match entries (no data field) filtered by lists of scouters and/or statuses.
+    Requires admin permission.
+    """
+    rows = await db.get_match_scouting()  # reuse existing function
+
+    filtered = []
+    for r in rows:
+        if scouters and (r["scouter"] not in scouters):
+            continue
+        if statuses and (r["status"] not in [s.value if isinstance(s, enums.StatusType) else s for s in statuses]):
+            continue
+
+        filtered.append({
+            "match": r["match"],
+            "match_type": r["match_type"],
+            "team": r["team"],
+            "alliance": r["alliance"],
+            "scouter": r["scouter"],
+            "status": r["status"],
+            "last_modified": r["last_modified"],
+        })
+
+    return {"count": len(filtered), "matches": filtered}
+
+
+
 @router.get("/team/{team}")
 async def get_team_basic_info(team: int):
     """
@@ -307,10 +340,6 @@ async def update_state(
         # Validate both are valid phases
         if current_status not in allowed_order or status not in allowed_order:
             raise HTTPException(status_code=400, detail=f"Invalid phase transition: {current_status} → {status}")
-
-        # Enforce monotonic progression
-        if allowed_order.index(status) < allowed_order.index(current_status):
-            raise HTTPException(status_code=400, detail="Cannot regress to earlier phase")
 
     # --- Apply update ---
     await db.update_match_scouting(

@@ -143,6 +143,54 @@ export function useAPI() {
         }
     }
 
+    // --- Endpoint: GET /admin/matches/filter ---
+    const getFilteredMatches = async (
+        scouters?: string[],
+        statuses?: string[]
+    ): Promise<
+        {
+            match: number;
+            match_type: string;
+            team: string;
+            alliance: string;
+            scouter: string | null;
+            status: string;
+            last_modified: number;
+        }[]
+    > => {
+        try {
+            const params = new URLSearchParams();
+            if (scouters)
+                for (const s of scouters)
+                    params.append("scouters", s);
+            if (statuses)
+                for (const st of statuses)
+                    params.append("statuses", st);
+
+            const res = await fetch(
+                `${BASE_URL}/admin/matches/filter?${params.toString()}`,
+                {headers: getAuthHeaders()}
+            );
+
+            if (!res.ok) {
+                console.warn(`getFilteredMatches failed: ${res.status} ${res.statusText}`);
+                return [];
+            }
+
+            const json = await res.json();
+            if (!json || !Array.isArray(json.matches)) {
+                console.error("getFilteredMatches: malformed response", json);
+                return [];
+            }
+
+            return json.matches;
+        } catch (err) {
+            console.error("getFilteredMatches failed:", err);
+            return [];
+        }
+    };
+
+
     // --- Endpoint: GET /team/{team} ---
     const getTeamBasicInfo = async (
         team: number | string
@@ -151,8 +199,7 @@ export function useAPI() {
         nickname: string
         rookie_year: number | null
         scouted: boolean
-    } | null> =>
-    {
+    } | null> => {
         try {
             const res = await fetch(`${BASE_URL}/team/${team}`, {
                 headers: getAuthHeaders(),
@@ -521,5 +568,6 @@ export function useAPI() {
         updatePitData,
         submitPitData,
         getTeamBasicInfo,
+        getFilteredMatches,
     };
 }

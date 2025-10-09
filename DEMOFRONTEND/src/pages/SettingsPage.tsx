@@ -80,7 +80,7 @@ export default function SettingLayout() {
             {/* --- Foreground content --- */}
             <div
                 className={`
-                relative z-10 flex flex-col items-center justify-center w-full text-white
+                relative z-10 max-w-md mx-10 flex flex-col items-center justify-center w-full text-white
                 theme-dark:text-white theme-light:text-zinc-900
                 theme-2025:text-white theme-2026:text-[#3b2d00]
                 transition-colors duration-500
@@ -131,7 +131,7 @@ export default function SettingLayout() {
                                 theme-2026:text-[#3b2d00]
                             "
                             >
-                                Theme (Work in progress)
+                                Theme
                             </Label>
                             <Select
                                 value={theme}

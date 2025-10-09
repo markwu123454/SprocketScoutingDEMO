@@ -75,7 +75,7 @@ DEMOFRONTEND/
 │  ├─ pages/
 │  │  ├─ Home.tsx
 │  │  ├─ MatchScouting.tsx
-│  │  ├─ PitScouting.tsx
+│  │  ├─ PitScoutingPage.tsx
 │  │  ├─ MatchMonitor.tsx
 │  │  ├─ Data.tsx
 │  │  └─ Pre.tsx

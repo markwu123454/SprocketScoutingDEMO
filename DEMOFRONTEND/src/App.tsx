@@ -11,8 +11,8 @@ import AdminHomeLayout from "@/pages/AdminHome.tsx"
 import MatchDetailPage from "@/pages/DataMatch.tsx"
 import NotFoundPage from "@/pages/NotFoundPage.tsx"
 import {LargeDataWrapper} from "@/contexts/dataProvider.tsx"
-import PitScoutingLayout from "@/pages/PitScouting.tsx"
-import SettingLayout from "@/pages/settings.tsx"
+import PitScoutingLayout from "@/pages/PitScoutingPage.tsx"
+import SettingLayout from "@/pages/SettingsPage.tsx"
 
 export default function App() {
     return (
