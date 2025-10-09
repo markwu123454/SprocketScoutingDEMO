@@ -1,19 +1,18 @@
 import path from "path";
-import { VitePWA } from "vite-plugin-pwa";
-import tailwindcss from "@tailwindcss/vite";
-import react from "@vitejs/plugin-react";
 import { defineConfig } from "vite";
+import react from "@vitejs/plugin-react";
+import tailwindcss from "@tailwindcss/vite";
+import { VitePWA } from "vite-plugin-pwa";
 
 export default defineConfig({
   plugins: [
     react(),
     tailwindcss(),
+
     VitePWA({
       registerType: "autoUpdate",
 
-      includeAssets: [
-        "manifest.webmanifest",
-      ],
+      includeAssets: ["favicon.ico", "robots.txt", "apple-touch-icon.png"],
 
       manifest: {
         name: "Sprocket Scouting",
@@ -31,9 +30,10 @@ export default defineConfig({
       },
 
       workbox: {
-        navigateFallback: "/index.html", // ← critical fix
+        navigateFallback: "/index.html",
+        globDirectory: "dist", // ✅ explicitly define this
         globPatterns: ["**/*.{js,css,html,ico,png,svg,webmanifest}"],
-        globIgnores: ["**/teams/team_icons/**"],
+        globIgnores: ["**/teams/team_icons/**", "sw.js", "workbox-*.js"],
 
         runtimeCaching: [
           {
@@ -53,6 +53,9 @@ export default defineConfig({
 
         maximumFileSizeToCacheInBytes: 5 * 1024 * 1024,
       },
+
+      injectRegister: "auto", // ensures auto registration
+      devOptions: { enabled: true }, // enables PWA during dev (optional)
     }),
   ],
 
@@ -60,5 +63,12 @@ export default defineConfig({
     alias: { "@": path.resolve(__dirname, "./src") },
   },
 
-  server: { host: true },
+  build: {
+    outDir: "dist", // ✅ make sure this matches your globDirectory
+    emptyOutDir: true,
+  },
+
+  server: {
+    host: true,
+  },
 });
