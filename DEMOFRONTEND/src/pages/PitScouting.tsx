@@ -6,7 +6,7 @@ import {Input} from "@/components/ui/input.tsx";
 import {AlertCircle, CheckCircle, XCircle} from "lucide-react";
 import {Button} from "@/components/ui/button.tsx";
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/components/ui/select.tsx";
-import {useTheme} from "@/contexts/ThemeProvider"; // ⬅️ Make sure to import your theme hook
+import {useTheme} from "@/contexts/themeProvider.tsx";
 
 export default function PitScoutingLayout() {
     const {getTeamBasicInfo, submitPitData} = useAPI()
