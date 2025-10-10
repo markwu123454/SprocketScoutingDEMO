@@ -33,7 +33,11 @@ export function HomeLayout() {
     useEffect(() => {
         void (async () => {
             const t = await getSetting("theme")
-            if (t) setTheme(t)
+            if (t === "dark" || t === "light" || t === "2025" || t === "2026") {
+                setTheme(t)
+            } else {
+                setTheme("2025")
+            }
         })()
     }, [])
 
@@ -117,12 +121,12 @@ export function HomeLayout() {
 
             <div
                 className="
-      absolute inset-0 bg-top bg-cover transition-colors duration-500
-      theme-light:bg-zinc-100
-      theme-dark:bg-zinc-950
-      theme-2025:bg-[url('@/assets/backgrounds/2025_expanded.png')]
-      theme-2026:bg-[url('@/assets/backgrounds/2026_expanded.png')]
-    "
+                absolute inset-0 bg-top bg-cover transition-colors duration-500
+                theme-light:bg-zinc-100
+                theme-dark:bg-zinc-950
+                theme-2025:bg-[url('@/assets/backgrounds/2025_expanded.png')]
+                theme-2026:bg-[url('@/assets/backgrounds/2026_expanded.png')]
+                "
             />
 
             {/* --- Logo --- */}
@@ -225,21 +229,19 @@ export function HomeLayout() {
 
                 <div
                     className={`
-        space-y-2 pt-2 border-t transition-colors duration-500
-        ${theme === "dark" ? "border-zinc-800" : ""}
-        ${theme === "light" ? "border-zinc-300" : ""}
-        ${theme === "2025" ? "border-[#1b3d80]" : ""}
-        ${theme === "2026" ? "border-[#e6ddae]" : ""}
-    `}
+                    space-y-2 pt-2 border-t transition-colors duration-500
+                    ${theme === "dark" ? "border-zinc-800" : ""}
+                    ${theme === "light" ? "border-zinc-300" : ""}
+                    ${theme === "2025" ? "border-[#1b3d80]" : ""}
+                    ${theme === "2026" ? "border-[#e6ddae]" : ""}`}
                 >
                     <p
                         className={`
-            text-sm transition-colors duration-500
-            ${theme === "dark" ? "text-zinc-500" : ""}
-            ${theme === "light" ? "text-zinc-600" : ""}
-            ${theme === "2025" ? "text-zinc-300" : ""}
-            ${theme === "2026" ? "text-[#5a4800]" : ""}
-        `}
+                        text-sm transition-colors duration-500
+                        ${theme === "dark" ? "text-zinc-500" : ""}
+                        ${theme === "light" ? "text-zinc-600" : ""}
+                        ${theme === "2025" ? "text-zinc-300" : ""}
+                        ${theme === "2026" ? "text-[#5a4800]" : ""}`}
                     >
                         Available Options
                     </p>
@@ -255,11 +257,10 @@ export function HomeLayout() {
                                         onClick={() => handleNavigate(path)}
                                         disabled={false}
                                         className={`
-                            ${theme === "dark" ? "bg-zinc-700 hover:bg-zinc-600 text-white" : ""}
-                            ${theme === "light" ? "bg-zinc-100 hover:bg-zinc-200 text-zinc-900" : ""}
-                            ${theme === "2025" ? "bg-[#102b6a]/80 hover:bg-[#1d3d7d] text-white" : ""}
-                            ${theme === "2026" ? "bg-[#fff8e5] hover:bg-[#f7edcc] text-[#3b2d00]" : ""}
-                        `}
+                                        ${theme === "dark" ? "bg-zinc-700 hover:bg-zinc-600 text-white" : ""}
+                                        ${theme === "light" ? "bg-zinc-100 hover:bg-zinc-200 text-zinc-900" : ""}
+                                        ${theme === "2025" ? "bg-[#102b6a]/80 hover:bg-[#1d3d7d] text-white" : ""}
+                                        ${theme === "2026" ? "bg-[#fff8e5] hover:bg-[#f7edcc] text-[#3b2d00]" : ""}`}
                                         overrideClass
                                     />
                                 )
@@ -307,27 +308,19 @@ export function HomeLayout() {
                                     tooltip={tooltips[tooltipKey]}
                                     onClick={() => handleNavigate(path)}
                                     className={`
-                        ${theme === "dark"
-                                        ? enabled
+                                    ${theme === "dark" ? enabled
                                             ? "bg-zinc-700 hover:bg-zinc-600 text-white"
                                             : "bg-zinc-800 text-zinc-500 cursor-not-allowed"
-                                        : ""}
-                        ${theme === "light"
-                                        ? enabled
+                                        : ""} ${theme === "light" ? enabled
                                             ? "bg-zinc-100 hover:bg-zinc-200 text-zinc-900"
                                             : "bg-zinc-50 text-zinc-400 cursor-not-allowed"
-                                        : ""}
-                        ${theme === "2025"
-                                        ? enabled
+                                        : ""} ${theme === "2025" ? enabled
                                             ? "bg-[#102b6a]/80 hover:bg-[#1d3d7d] text-white"
                                             : "bg-[#0b234f]/70 text-zinc-400 cursor-not-allowed"
-                                        : ""}
-                        ${theme === "2026"
-                                        ? enabled
+                                        : ""} ${theme === "2026" ? enabled
                                             ? "bg-[#fff8e5] hover:bg-[#f7edcc] text-[#3b2d00]"
                                             : "bg-[#fef7dc]/80 text-[#a19258] cursor-not-allowed"
-                                        : ""}
-                    `}
+                                        : ""} `}
                                     overrideClass
                                 />
                             )
