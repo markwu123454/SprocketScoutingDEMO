@@ -98,7 +98,7 @@ def predict_all_playable_matches(
     raw_match_data: dict,
     team_features_fn: Callable[[int, str, int], list[float]],
     aspect_extractors: dict[str, Callable[[dict], float]],
-    match_type: str = "qm"
+        match_type: str = "qm"
 ) -> list[dict]:
     match_data = raw_match_data.get(match_type, {})
     match_entries = sorted(match_data.items(), key=lambda x: int(x[0]) if isinstance(x[0], str) else x[0])

@@ -4,10 +4,12 @@ import json
 import os
 import ssl
 import certifi
-from collections import defaultdict
 import pandas as pd
+import numpy as np
+from collections import defaultdict
 from calculators.Bayesian_Elo_Calculator import compute_feature_elos
 from calculators.KMeans_Clustering import compute_ai_ratings
+from calculators.Random_Forest_Regressor import predict_all_playable_matches
 import dotenv
 
 dotenv.load_dotenv()
@@ -338,6 +340,108 @@ async def step6_ai_ratings(per_match_data):
     return ai_result
 
 
+async def step7_random_forest(per_match_data):
+    """
+    Runs Random Forest regressors across ALL matches (qm, sf, f combined).
+    Treats them as one chronological sequence for learning consistency.
+    """
+
+    # --- 1. Merge all match types into one unified chronological set ---
+    unified_matches = {}
+    match_order = {"qm": 0, "sf": 1, "f": 2}
+
+    for mtype, matches in per_match_data.items():
+        for mnum, data in matches.items():
+            order_offset = match_order.get(mtype, 99) * 1000
+            unified_matches[order_offset + int(mnum)] = data
+
+    combined_data = {"qm": unified_matches}
+    total_matches = len(unified_matches)
+    print(f"Collected {total_matches} total matches (qm+sf+f unified).\n")
+
+    # --- 2. Define extractors and feature builders ---
+    aspect_extractors = {
+        "coral": lambda d: d["score_breakdown"]["teleop"].get("coral", 0),
+        "algae": lambda d: d["score_breakdown"]["teleop"].get("algae", 0),
+        "climb": lambda d: d["score_breakdown"].get("climb", 0),
+        "auto": lambda d: d["score_breakdown"]["auto"].get("total", 0),
+    }
+
+    def team_features_fn(team_id: str, match_type: str, match_num: int):
+        try:
+            alliance_data = combined_data["qm"][match_num]
+        except KeyError:
+            raise KeyError(f"Missing match {match_num}")
+
+        for alliance in ["red", "blue"]:
+            if team_id in alliance_data.get(alliance, {}):
+                team_data = alliance_data[alliance][team_id]
+                break
+        else:
+            raise KeyError(f"Team {team_id} not found in match {match_num}")
+
+        sa = team_data["score_actions"]
+        tsl = team_data.get("teleop_scoring_location", {})
+        auto, tele = sa.get("auto", {}), sa.get("teleop", {})
+
+        total_coral_cycles = auto.get("coral_cycle", 0) + tele.get("coral_cycle", 0)
+        total_algae_cycles = auto.get("algae_cycle", 0) + tele.get("algae_cycle", 0)
+        move_flag = auto.get("move", 0)
+
+        total_attempts = sum(
+            tsl.get(loc, {}).get("total_attempt", 0)
+            for loc in ["l1", "l2", "l3", "l4", "barge"]
+        )
+        avg_accuracy = (
+            np.mean([
+                tsl.get(loc, {}).get("accuracy", 0.0)
+                for loc in ["l1", "l2", "l3", "l4", "barge"]
+                if tsl.get(loc, {}).get("total_attempt", 0) > 0
+            ])
+            if total_attempts > 0 else 0.0
+        )
+
+        return [total_coral_cycles, total_algae_cycles, move_flag, total_attempts, avg_accuracy]
+
+    # --- 3. Run Random Forest training/prediction ---
+    print("Building match history and running Random Forest regressors...\n")
+
+    results = predict_all_playable_matches(
+        raw_match_data=combined_data,
+        team_features_fn=team_features_fn,
+        aspect_extractors=aspect_extractors,
+        match_type="qm"
+    )
+
+    # --- 4. Inject results and print progress ---
+    print("\nInjecting predictions into original match data...")
+    predicted_count = 0
+    for i, match in enumerate(results, start=1):
+        match_num = match["match_num"]
+        for alliance in ["red", "blue"]:
+            for team in match[alliance]:
+                if "predicted" in match and team in match["predicted"][alliance]:
+                    pred = match["predicted"][alliance][team]
+                    # inject into the original match
+                    for mtype, matches in per_match_data.items():
+                        if match_num in matches:
+                            matches[match_num][alliance][team]["ai_prediction"] = pred
+                            break
+        predicted_count += 1
+        print(f"  ✓ Cycle {i}/{len(results)} complete → match {match_num} predicted")
+
+    print("\n--- Random Forest Summary ---")
+    if not results:
+        print("No matches were eligible for Random Forest prediction (no training history).")
+    else:
+        skipped_matches = total_matches - predicted_count
+        print(f"Predicted {predicted_count} matches successfully.")
+        print(f"Skipped {skipped_matches} matches (due to insufficient prior data).")
+
+    print("Random Forest predictions complete.\n")
+    return per_match_data
+
+
 # ================== Main ==================
 async def main():
     conn = await get_connection()
@@ -362,8 +466,11 @@ async def main():
         print("STEP 5: Computing featured ELOs...\n")
         per_team_data, per_match_data = await step5_featured_elo(submitted_rows)
 
-        print("STEP 6: Computing AI ratings...\n")
+        print("STEP 6: Computing AI groupings...\n")
         await step6_ai_ratings(per_match_data)
+
+        print("STEP 7: Predicting match outcomes with Random Forest...\n")
+        await step7_random_forest(per_match_data)
 
     finally:
         await conn.close()
