@@ -84,7 +84,7 @@ export default function RatingSlider({
                 className="relative flex w-full touch-none select-none items-center"
                 min={0}
                 max={1}
-                step={0.001}
+                step={0.25}
                 value={[value]}
                 onValueChange={([val]) => onChange(val)}
             >

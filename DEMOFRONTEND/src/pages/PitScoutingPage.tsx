@@ -201,57 +201,6 @@ export default function PitScoutingLayout() {
 
                         {/* --- Dimensions & Weight --- */}
                         <div>
-                            <Label>Width (inches)</Label>
-                            <ThemedInput
-                                type="number"
-                                placeholder="e.g. 28"
-                                value={answers.width ?? ""}
-                                onChange={(e) => setAnswers({...answers, width: e.target.value})}
-                            />
-                        </div>
-
-                        <div>
-                            <Label>Length (inches)</Label>
-                            <ThemedInput
-                                type="number"
-                                placeholder="e.g. 33"
-                                value={answers.length ?? ""}
-                                onChange={(e) => setAnswers({...answers, length: e.target.value})}
-                            />
-                        </div>
-
-                        <div>
-                            <Label>Height (collapsed) (inches)</Label>
-                            <ThemedInput
-                                type="number"
-                                placeholder="e.g. 22"
-                                value={answers.heightCollapsed ?? ""}
-                                onChange={(e) => setAnswers({...answers, heightCollapsed: e.target.value})}
-                            />
-                        </div>
-
-                        <div>
-                            <Label>Height (extended) (inches)</Label>
-                            <ThemedInput
-                                type="number"
-                                placeholder="e.g. 46"
-                                value={answers.heightExtended ?? ""}
-                                onChange={(e) => setAnswers({...answers, heightExtended: e.target.value})}
-                            />
-                        </div>
-
-                        <div>
-                            <Label>Weight with bumpers and battery (pounds)</Label>
-                            <ThemedInput
-                                type="number"
-                                placeholder="e.g. 118"
-                                value={answers.weightFull ?? ""}
-                                onChange={(e) => setAnswers({...answers, weightFull: e.target.value})}
-                            />
-                        </div>
-
-                        {/* --- Drivetrain & Structure --- */}
-                        <div>
                             <Label>Drivebase Type</Label>
                             <ThemedInput
                                 placeholder="e.g. Swerve, Tank"

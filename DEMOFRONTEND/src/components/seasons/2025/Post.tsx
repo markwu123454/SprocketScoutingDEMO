@@ -81,14 +81,14 @@ export default function PostMatch({
                 value={data.postmatch.skill}
                 onChange={handleChange("skill")}
                 title="Driver skill"
-                leftLabel="Lacking"
-                rightLabel="Skilled"
+                leftLabel="1"
+                rightLabel="5"
                 infoBox={
                     <div>
                         <strong>Assess driver's control of robot, defense skill, and field awareness</strong><br/><br/>
-                        <strong>Lacking:</strong> Frequently trapped or interfered by other robots, struggles to
+                        <strong>1:</strong> Frequently trapped or interfered by other robots, struggles to
                         maintain control.<br/>
-                        <strong>Skilled:</strong> Maintains control under pressure, evades defense effectively, or
+                        <strong>5:</strong> Maintains control under pressure, evades defense effectively, or
                         successfully defends when needed.
                     </div>
                 }
@@ -98,15 +98,15 @@ export default function PostMatch({
                 value={data.postmatch.climbSpeed}
                 onChange={handleChange("climbSpeed")}
                 title="Climb speed"
-                leftLabel="Slow"
-                rightLabel="Fast"
+                leftLabel="1"
+                rightLabel="5"
                 infoBox={
                     <div>
                         <strong>How long did it take the robot to drive to the reef, align, and lift off from the
                             ground</strong><br/><br/>
-                        <strong>Fast:</strong> &lt;2 seconds.<br/>
-                        <strong>Medium:</strong> ~15 seconds.<br/>
-                        <strong>Slow:</strong> &gt;30 seconds.
+                        <strong>1:</strong> &lt;2 seconds.<br/>
+                        <strong>3:</strong> ~10 seconds.<br/>
+                        <strong>5:</strong> &gt;30 seconds.
                     </div>
                 }
             />

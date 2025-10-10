@@ -131,32 +131,35 @@ export default function TeleopPhase({data, setData}: {
                                     >
                                         {label}
                                     </text>
-                                    {(["l2", "l3", "l4"] as const).map((level) => {
-                                        const active = data.teleop.branchPlacement?.[label]?.[level];
-                                        const offset =
-                                            levelOffsets[label]?.[level] ?? {x: 0, y: 0};
-                                        const tx = centroid.x + offset.x;
-                                        const ty = centroid.y + offset.y;
+                                    {(["l2", "l3", "l4"] as const).map(level => {
+                                        const autoActive = data.auto.branchPlacement?.[label]?.[level];
+                                        const teleopActive = data.teleop.branchPlacement?.[label]?.[level];
+                                        const offset = levelOffsets[label]?.[level] ?? {x: 0, y: 0};
+
+                                        // Skip if neither was active in auto or teleop
+                                        if (!autoActive && !teleopActive) return null;
+
+                                        // teleop overrides auto visually
+                                        const fillClass = teleopActive
+                                            ? "fill-white"
+                                            : autoActive
+                                                ? "fill-zinc-400"
+                                                : "fill-transparent";
+
                                         return (
-                                            active && (
-                                                <text
-                                                    key={level}
-                                                    x={tx}
-                                                    y={ty}
-                                                    textAnchor="middle"
-                                                    dominantBaseline="middle"
-                                                    transform={
-                                                        flip
-                                                            ? `rotate(180 ${tx} ${ty})`
-                                                            : undefined
-                                                    }
-                                                    className="fill-white text-md pointer-events-none select-none"
-                                                >
-                                                    {level}
-                                                </text>
-                                            )
+                                            <text
+                                                key={level}
+                                                x={centroid.x + offset.x}
+                                                y={centroid.y + offset.y}
+                                                textAnchor="middle"
+                                                dominantBaseline="middle"
+                                                className={`pointer-events-none select-none ${fillClass}`}
+                                            >
+                                                {level}
+                                            </text>
                                         );
                                     })}
+
                                 </g>
                             );
                         })}

@@ -29,6 +29,7 @@ class StatusType(Enum):
     AUTO = "auto"
     TELEOP = "teleop"
     POST = "post"
+    OFFLINE = "offline"
     SUBMITTED = "submitted"
 
 
