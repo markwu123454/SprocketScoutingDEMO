@@ -1,9 +1,11 @@
 import {useState} from "react"
 import type {MatchScoutingData} from "@/types"
 import ScoreBox from "@/components/ui/scoreBox.tsx"
-import fieldImage from "@/assets/2025_Reef_Transparent_No-Tape_Blue.png"
+import blueFieldImage from "@/assets/2025_Reef_Transparent_No-Tape_Blue.png"
+import redFieldImage from "@/assets/2025_Reef_Transparent_No-Tape_Red.png"
 import * as React from "react";
 import regions from "@/assets/reef_button_regions.json"
+import {getSettingSync} from "@/db/settingsDb.ts";
 
 const coralLevels = ['l2', 'l3', 'l4'] as const
 
@@ -49,6 +51,15 @@ export default function TeleopPhase({data, setData}: {
         const imageWidth = 567;
         const imageHeight = 655;
 
+        const fieldImage =
+            data.alliance === "blue"
+                ? blueFieldImage
+                : data.alliance === "red"
+                    ? redFieldImage
+                    : null;
+
+        const flip = (getSettingSync("field_orientation", "0") === "180") !== (data.alliance === "red");
+
         const levelOffsets: Record<string, Record<"l2" | "l3" | "l4", { x: number; y: number }>> = {
             A: {l2: {x: -35, y: 30}, l3: {x: -35, y: 0}, l4: {x: -35, y: -30}},
             B: {l2: {x: -35, y: 30}, l3: {x: -35, y: 0}, l4: {x: -35, y: -30}},
@@ -62,91 +73,120 @@ export default function TeleopPhase({data, setData}: {
             J: {l2: {x: 50, y: -14}, l3: {x: 20, y: -32}, l4: {x: -10, y: -50}},
             K: {l2: {x: -50, y: -14}, l3: {x: -20, y: -32}, l4: {x: 10, y: -50}},
             L: {l2: {x: -50, y: -14}, l3: {x: -20, y: -32}, l4: {x: 10, y: -50}},
-        }
-
+        };
 
         function getCentroid(points: { x: number; y: number }[]) {
-            const n = points.length
+            const n = points.length;
             const {x, y} = points.reduce(
                 (acc, p) => ({x: acc.x + p.x, y: acc.y + p.y}),
                 {x: 0, y: 0}
-            )
-            return {x: x / n, y: y / n}
+            );
+            return {x: x / n, y: y / n};
         }
-
 
         return (
             <div className="relative w-full aspect-[567/655]">
-                <img
-                    src={fieldImage}
-                    alt="Field"
-                    className="w-full h-full object-contain pointer-events-none absolute"
-                />
                 <svg
                     viewBox={`0 0 ${imageWidth} ${imageHeight}`}
-                    className="absolute inset-0 w-full h-full text-md"
+                    className="absolute inset-0 w-full h-full"
                 >
-                    {regions.map(({label, points}) => {
-                        const centroid = getCentroid(points)
-                        return (
-                            <>
-                                <polygon
-                                    key={label}
-                                    points={points.map(p => `${p.x},${p.y}`).join(" ")}
-                                    onClick={() => setSelectedBranch(label)}
-                                    className={`cursor-pointer ${
-                                        selectedBranch === label ? "fill-white/30" : "fill-transparent"
-                                    } stroke-white stroke-[0.5]`}
-                                />
-                                <text
-                                    x={centroid.x}
-                                    y={centroid.y}
-                                    textAnchor="middle"
-                                    dominantBaseline="middle"
-                                    className="fill-white pointer-events-none select-none"
-                                >
-                                    {label}
-                                </text>
-                                {(["l2", "l3", "l4"] as const).map((level) => {
-                                    const autoActive = data.auto.branchPlacement?.[label]?.[level];
-                                    const teleopActive = data.teleop.branchPlacement?.[label]?.[level];
-                                    const offset = levelOffsets[label]?.[level] ?? {x: 0, y: 0};
-
-                                    if (!autoActive && !teleopActive) return null;
-
-                                    return (
-                                        <text
-                                            key={level}
-                                            x={centroid.x + offset.x}
-                                            y={centroid.y + offset.y}
-                                            textAnchor="middle"
-                                            dominantBaseline="middle"
-                                            className={`pointer-events-none select-none ${
-                                                teleopActive ? "fill-white" : "fill-zinc-400"
-                                            }`}
-                                        >
-                                            {level}
-                                        </text>
-                                    );
-                                })}
-
-
-                            </>
-                        )
-                    })}
-                    <circle
-                        cx={imageWidth / 2}
-                        cy={imageHeight / 2}
-                        r={100}
-                        onClick={() => {
-                            setSelectedBranch("missed")
-                            setMissedMode("inc")
+                    <g
+                        transform={
+                            flip
+                                ? `rotate(180 ${imageWidth / 2} ${imageHeight / 2})`
+                                : undefined
                         }
-                        }
-                        className={`cursor-pointer ${
-                            selectedBranch === "missed" ? "fill-white/30" : "fill-transparent"
-                        } stroke-white stroke-[0.5]`}
-                    />
+                    >
+                        <image
+                            href={fieldImage}
+                            width={imageWidth}
+                            height={imageHeight}
+                            className="pointer-events-none"
+                        />
+
+                        {regions.map(({label, points}) => {
+                            const centroid = getCentroid(points);
+                            return (
+                                <g key={label}>
+                                    <polygon
+                                        points={points.map(p => `${p.x},${p.y}`).join(" ")}
+                                        onClick={() => setSelectedBranch(label)}
+                                        className={`cursor-pointer ${
+                                            selectedBranch === label
+                                                ? "fill-white/30"
+                                                : "fill-transparent"
+                                        } stroke-white stroke-[0.5]`}
+                                    />
+                                    <text
+                                        x={centroid.x}
+                                        y={centroid.y}
+                                        textAnchor="middle"
+                                        dominantBaseline="middle"
+                                        transform={
+                                            flip
+                                                ? `rotate(180 ${centroid.x} ${centroid.y})`
+                                                : undefined
+                                        }
+                                        className="fill-white pointer-events-none select-none"
+                                    >
+                                        {label}
+                                    </text>
+                                    {(["l2", "l3", "l4"] as const).map((level) => {
+                                        const active = data.teleop.branchPlacement?.[label]?.[level];
+                                        const offset =
+                                            levelOffsets[label]?.[level] ?? {x: 0, y: 0};
+                                        const tx = centroid.x + offset.x;
+                                        const ty = centroid.y + offset.y;
+                                        return (
+                                            active && (
+                                                <text
+                                                    key={level}
+                                                    x={tx}
+                                                    y={ty}
+                                                    textAnchor="middle"
+                                                    dominantBaseline="middle"
+                                                    transform={
+                                                        flip
+                                                            ? `rotate(180 ${tx} ${ty})`
+                                                            : undefined
+                                                    }
+                                                    className="fill-white text-md pointer-events-none select-none"
+                                                >
+                                                    {level}
+                                                </text>
+                                            )
+                                        );
+                                    })}
+                                </g>
+                            );
+                        })}
+
+                        <circle
+                            cx={imageWidth / 2}
+                            cy={imageHeight / 2}
+                            r={100}
+                            onClick={() => {
+                                setSelectedBranch("missed");
+                                setMissedMode("inc");
+                            }}
+                            className={`cursor-pointer ${
+                                selectedBranch === "missed"
+                                    ? "fill-white/30"
+                                    : "fill-transparent"
+                            } stroke-white stroke-[0.5]`}
+                        />
+                    </g>
+
+                    <text
+                        x={flip ? imageWidth * 0.95 : imageWidth * 0.05}
+                        y={imageHeight * 0.05}
+                        textAnchor={flip ? "end" : "start"}
+                        dominantBaseline="middle"
+                        className="fill-white text-sm select-none pointer-events-none"
+                    >
+                        {flip ? "driver station →" : "← driver station"}
+                    </text>
+
                     <text
                         x={imageWidth / 2}
                         y={imageHeight / 2 * 0.9}
