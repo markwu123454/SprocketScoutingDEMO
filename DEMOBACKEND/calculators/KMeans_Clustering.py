@@ -56,6 +56,22 @@ def compute_ai_ratings(
     kmeans = KMeans(n_clusters=n_clusters, random_state=42)
     stats["cluster"] = kmeans.fit_predict(X_scaled)
 
+    # --- Ranked K-Means: rank teams within each cluster ---
+    centroids = kmeans.cluster_centers_
+    scores = []
+    for i, (team, row) in enumerate(stats.iterrows()):
+        c = int(row["cluster"])
+        w = abs(centroids[c]) / (abs(centroids[c]).sum() + 1e-9)  # avoid div by 0
+        s = float((X_scaled[i] * w).sum())
+        scores.append(s)
+
+    stats["intra_rank_score"] = scores
+    stats["cluster_rank"] = (
+        stats.groupby("cluster")["intra_rank_score"]
+        .rank(ascending=False, method="dense")
+        .astype(int)
+    )
+
     # 6. Format output
 
     # (a) Per-team detailed output

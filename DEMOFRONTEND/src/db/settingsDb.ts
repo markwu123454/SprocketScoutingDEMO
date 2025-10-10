@@ -25,13 +25,26 @@ class SettingsDB extends Dexie {
 
 export const settingsDB = new SettingsDB()
 
+// --- Default base settings ---
+const DEFAULT_SETTINGS: Settings = {
+    theme: "2025",
+}
+
 // 2. Get full settings object or specific key (proper overloads)
-export async function getSetting(): Promise<Settings | null>
-export async function getSetting<K extends keyof Settings>(key: K): Promise<Settings[K] | null>
+export async function getSetting(): Promise<Settings>
+export async function getSetting<K extends keyof Settings>(key: K): Promise<Settings[K]>
 export async function getSetting(key?: keyof Settings): Promise<any> {
     const entry = await settingsDB.settings.get(GLOBAL_KEY)
-    if (!entry) return null
-    return key ? entry.value[key] ?? null : entry.value
+    const current = entry?.value ?? {}
+
+    // Fill in defaults
+    const merged = { ...Object.fromEntries(Object.entries(current).map(([k, v]) => [k, v ?? 0])), ...DEFAULT_SETTINGS }
+
+    if (key) {
+        const val = merged[key]
+        return val !== undefined ? val : (key === "theme" ? "2025" : 0)
+    }
+    return merged
 }
 
 // 3. Set partial or full settings (atomic)
@@ -48,7 +61,6 @@ export async function setSetting(patch: Partial<Settings>) {
     })
 }
 
-
 // 4. Clear all settings
 export async function clearSettings() {
     await settingsDB.settings.clear()
@@ -60,14 +72,12 @@ export function getSettingSync<K extends keyof Settings>(
     fallback?: Settings[K]
 ): Settings[K] {
     try {
-        // Try from localStorage first (instant)
         const cached = localStorage.getItem(`setting_${key}`)
         if (cached !== null) return cached as Settings[K]
-
-        // Dexie is async by design; don't block on it.
-        // So this only works if you previously cached it via setSetting below.
-        return fallback ?? null as Settings[K]
+        if (key === "theme") return "2025" as Settings[K]
+        return (fallback ?? 0) as Settings[K]
     } catch {
-        return fallback ?? null as Settings[K]
+        if (key === "theme") return "2025" as Settings[K]
+        return (fallback ?? 0) as Settings[K]
     }
 }
