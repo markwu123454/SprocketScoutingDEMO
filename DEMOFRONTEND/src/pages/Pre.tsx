@@ -1,7 +1,7 @@
 import type {MatchScoutingData, TeamInfo} from "@/types"
 import * as React from "react"
 import {useEffect, useRef, useState} from "react"
-import {getScouterName, useAPI} from "@/api/API.ts"
+import {getScouterName, useAPI} from "@/hooks/useAPI.ts"
 import {useClientEnvironment} from "@/hooks/useClientEnvironment.ts";
 
 export default function Pre({

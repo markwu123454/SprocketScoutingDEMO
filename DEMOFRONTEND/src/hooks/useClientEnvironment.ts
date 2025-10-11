@@ -1,5 +1,5 @@
 import {useEffect, useState} from "react"
-import {useAPI} from "../api/API.ts"
+import {useAPI} from "./useAPI.ts"
 
 export interface ClientEnvironment {
     isPWA: boolean

@@ -4,7 +4,7 @@ import {useNavigate} from "react-router-dom"
 
 import type {MatchScoutingData, Phase, ScoutingStatus} from '@/types'
 
-import {useAPI, getScouterName} from '@/api/API.ts'
+import {useAPI, getScouterName} from '@/hooks/useAPI.ts'
 import {useClientEnvironment} from "@/hooks/useClientEnvironment.ts"
 import {saveScoutingData, deleteScoutingData, db, type ScoutingDataWithKey, updateScoutingStatus} from "@/db/db.ts"
 
@@ -162,7 +162,11 @@ export function MatchScoutingLayout() {
 
                     // Reset after local save
                     setSubmitStatus("idle")
-                    setScoutingData({...defaultScoutingData, scouter: scouterName})
+                    setScoutingData(JSON.parse(JSON.stringify({
+                        ...defaultScoutingData,
+                        scouter: scouterName
+                    })))
+
                     setPhaseIndex(0)
                 }, 1000)
             } else {
@@ -178,7 +182,11 @@ export function MatchScoutingLayout() {
                 setSubmitStatus("success")
                 setTimeout(() => {
                     setSubmitStatus("idle")
-                    setScoutingData({...defaultScoutingData, scouter: scouterName})
+                    setScoutingData(JSON.parse(JSON.stringify({
+                        ...defaultScoutingData,
+                        scouter: scouterName
+                    })))
+
                     setPhaseIndex(0)
                 }, 1000)
             }
@@ -191,7 +199,11 @@ export function MatchScoutingLayout() {
                 const allowed = result.success && result.permissions?.match_scouting
                 if (!allowed) return
                 setSubmitStatus("idle")
-                setScoutingData({...defaultScoutingData, scouter: scouterName})
+                setScoutingData(JSON.parse(JSON.stringify({
+                    ...defaultScoutingData,
+                    scouter: scouterName
+                })))
+
                 setPhaseIndex(0)
             }, 1000)
         }

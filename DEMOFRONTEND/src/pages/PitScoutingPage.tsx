@@ -1,4 +1,4 @@
-import {useAPI} from "@/api/API.ts";
+import {useAPI} from "@/hooks/useAPI.ts";
 import * as React from "react";
 import {useEffect, useState} from "react";
 import {Label} from "@/components/ui/label.tsx";

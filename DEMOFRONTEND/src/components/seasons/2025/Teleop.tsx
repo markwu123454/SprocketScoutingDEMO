@@ -136,10 +136,8 @@ export default function TeleopPhase({data, setData}: {
                                         const teleopActive = data.teleop.branchPlacement?.[label]?.[level];
                                         const offset = levelOffsets[label]?.[level] ?? {x: 0, y: 0};
 
-                                        // Skip if neither was active in auto or teleop
                                         if (!autoActive && !teleopActive) return null;
 
-                                        // teleop overrides auto visually
                                         const fillClass = teleopActive
                                             ? "fill-white"
                                             : autoActive
@@ -147,16 +145,20 @@ export default function TeleopPhase({data, setData}: {
                                                 : "fill-transparent";
 
                                         return (
-                                            <text
+                                            <g
                                                 key={level}
-                                                x={centroid.x + offset.x}
-                                                y={centroid.y + offset.y}
-                                                textAnchor="middle"
-                                                dominantBaseline="middle"
-                                                className={`pointer-events-none select-none ${fillClass}`}
+                                                transform={flip ? `rotate(180 ${centroid.x + offset.x} ${centroid.y + offset.y})` : undefined}
                                             >
-                                                {level}
-                                            </text>
+                                                <text
+                                                    x={centroid.x + offset.x}
+                                                    y={centroid.y + offset.y}
+                                                    textAnchor="middle"
+                                                    dominantBaseline="middle"
+                                                    className={`pointer-events-none select-none ${fillClass}`}
+                                                >
+                                                    {level}
+                                                </text>
+                                            </g>
                                         );
                                     })}
 

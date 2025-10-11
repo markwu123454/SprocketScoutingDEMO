@@ -46,6 +46,7 @@ export type MatchScoutingData = {
     postmatch: {
         de_algae: boolean
         skill: number
+        defenseSkill: number
         climbSpeed: number
         climbSuccess: boolean
         offense: boolean
@@ -114,6 +115,7 @@ export const defaultScoutingData: Omit<MatchScoutingData, 'scouter'> = {
     postmatch: {
         de_algae: false,
         skill: 0,
+        defenseSkill: 0,
         climbSpeed: 0,
         climbSuccess: false,
         offense: false,

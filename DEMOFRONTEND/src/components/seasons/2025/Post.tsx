@@ -149,6 +149,21 @@ export default function PostMatch({
                 </button>
             </div>
 
+            {data.postmatch.defense ?
+                <RatingSlider
+                value={data.postmatch.defenseSkill}
+                onChange={handleChange("defenseSkill")}
+                title="Defense Skill"
+                leftLabel="1"
+                rightLabel="5"
+                infoBox={
+                    <div>
+                        <strong>How well their defense skills are</strong><br/><br/>
+                        <strong>1:</strong> Ineffective defense skills.<br/>
+                        <strong>5:</strong> Effective defense skills.<br/>
+                    </div>
+                }
+            /> : <></>}
 
             <div className="text-xl font-semibold mb-4 border-t border-zinc-500 mt-6 pt-2">
                 Faults & Failures

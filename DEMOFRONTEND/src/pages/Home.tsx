@@ -1,6 +1,6 @@
 import {useEffect, useRef, useState} from "react"
 import {useNavigate} from "react-router-dom"
-import {useAPI} from "@/api/API.ts"
+import {useAPI} from "@/hooks/useAPI.ts"
 import {Eye, EyeOff} from "lucide-react"
 import TooltipButton from "@/components/ui/tooltipButton"
 import {useClientEnvironment} from "@/hooks/useClientEnvironment.ts"

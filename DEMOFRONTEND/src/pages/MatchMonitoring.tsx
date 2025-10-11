@@ -1,5 +1,5 @@
 import {useEffect, useState} from "react"
-import {useAPI} from "@/api/API"
+import {useAPI} from "@/hooks/useAPI.ts"
 import {Loader2} from "lucide-react"
 import {getSettingSync, type Settings} from "@/db/settingsDb"
 

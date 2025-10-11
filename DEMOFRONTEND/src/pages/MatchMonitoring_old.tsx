@@ -1,5 +1,5 @@
 import {useEffect, useState} from 'react'
-import {getAuthHeaders, useAPI} from '@/api/API.ts'
+import {getAuthHeaders, useAPI} from '@/hooks/useAPI.ts'
 import {Badge} from '@/components/ui/badge'
 import type {TeamInfo, UIInfo, MatchScoutingData, MatchType} from '@/types'
 import field_overlay from '@/assets/2025_FMS_In-Match.png'
