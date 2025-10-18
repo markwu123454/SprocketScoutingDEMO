@@ -60,29 +60,21 @@ export type MatchScoutingData = {
     }
 }
 
-export const defaultScoutingData: Omit<MatchScoutingData, 'scouter'> = {
+export const createDefaultScoutingData = (): Omit<MatchScoutingData, "scouter"> => ({
     match: null,
     match_type: null,
     alliance: null,
     teamNumber: null,
     auto: {
         branchPlacement: Object.fromEntries(
-            (["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L"] as const).map((id) => [
-                id, {l2: false, l3: false, l4: false},
-            ])) as Record<"A" | "B" | "C" | "D" | "E" | "F" | "G" | "H" | "I" | "J" | "K" | "L", {
-            l2: boolean;
-            l3: boolean;
-            l4: boolean
-        }>,
-        algaePlacement: {
-            AB: true,
-            CD: true,
-            EF: true,
-            GH: true,
-            IJ: true,
-            KL: true
-        },
-        missed: {l1: 0, l2: 0, l3: 0, l4: 0},
+            (["A","B","C","D","E","F","G","H","I","J","K","L"] as const)
+            .map(id => [id, { l2: false, l3: false, l4: false }])
+        ) as Record<
+            "A"|"B"|"C"|"D"|"E"|"F"|"G"|"H"|"I"|"J"|"K"|"L",
+            { l2: boolean; l3: boolean; l4: boolean }
+        >,
+        algaePlacement: { AB: true, CD: true, EF: true, GH: true, IJ: true, KL: true },
+        missed: { l1: 0, l2: 0, l3: 0, l4: 0 },
         l1: 0,
         processor: 0,
         barge: 0,
@@ -91,22 +83,14 @@ export const defaultScoutingData: Omit<MatchScoutingData, 'scouter'> = {
     },
     teleop: {
         branchPlacement: Object.fromEntries(
-            (["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L"] as const).map((id) => [
-                id, {l2: false, l3: false, l4: false},
-            ])) as Record<"A" | "B" | "C" | "D" | "E" | "F" | "G" | "H" | "I" | "J" | "K" | "L", {
-            l2: boolean;
-            l3: boolean;
-            l4: boolean
-        }>,
-        algaePlacement: {
-            AB: true,
-            CD: true,
-            EF: true,
-            GH: true,
-            IJ: true,
-            KL: true
-        },
-        missed: {l1: 0, l2: 0, l3: 0, l4: 0},
+            (["A","B","C","D","E","F","G","H","I","J","K","L"] as const)
+            .map(id => [id, { l2: false, l3: false, l4: false }])
+        ) as Record<
+            "A"|"B"|"C"|"D"|"E"|"F"|"G"|"H"|"I"|"J"|"K"|"L",
+            { l2: boolean; l3: boolean; l4: boolean }
+        >,
+        algaePlacement: { AB: true, CD: true, EF: true, GH: true, IJ: true, KL: true },
+        missed: { l1: 0, l2: 0, l3: 0, l4: 0 },
         l1: 0,
         processor: 0,
         barge: 0,
@@ -120,14 +104,11 @@ export const defaultScoutingData: Omit<MatchScoutingData, 'scouter'> = {
         climbSuccess: false,
         offense: false,
         defense: false,
-        faults: {
-            system: false,
-            idle: false,
-            other: false,
-        },
-        notes: '',
+        faults: { system: false, idle: false, other: false },
+        notes: "",
     },
-}
+})
+
 
 export type PitScoutingData = {
     team: number;

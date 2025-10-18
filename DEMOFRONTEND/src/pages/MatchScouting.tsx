@@ -17,7 +17,7 @@ import Pre from "@/pages/Pre.tsx"
 import AutoPhase from "@/components/seasons/2025/Auto.tsx"
 import TeleopPhase from "@/components/seasons/2025/Teleop.tsx"
 import PostMatch from "@/components/seasons/2025/Post.tsx"
-import {defaultScoutingData} from "@/components/seasons/2025/yearConfig.ts"
+import {createDefaultScoutingData} from "@/components/seasons/2025/yearConfig.ts"
 
 const PHASE_ORDER: Phase[] = ['pre', 'auto', 'teleop', 'post']
 
@@ -32,7 +32,7 @@ export function MatchScoutingLayout() {
     // 2. State
     const [phaseIndex, setPhaseIndex] = useState(0)
     const [scoutingData, setScoutingData] = useState<MatchScoutingData>({
-        ...defaultScoutingData,
+        ...createDefaultScoutingData(),
         scouter: scouterName,
     })
     const [submitStatus, setSubmitStatus] = useState<'idle' | 'loading' | 'success' | 'local' | 'error' | 'warning'>('idle')
@@ -60,7 +60,7 @@ export function MatchScoutingLayout() {
                 setResumeList(activeEntries);
                 setShowResumeDialog(true);
             } else {
-                setScoutingData({...defaultScoutingData, scouter: scouterName})
+                setScoutingData({...createDefaultScoutingData(), scouter: scouterName})
                 setPhaseIndex(0)
             }
         })()
@@ -70,9 +70,9 @@ export function MatchScoutingLayout() {
         if (phase === "pre") return;
 
         // Determine if user entered anything different from default
-        const isDataChanged = Object.keys(defaultScoutingData).some(key => {
+        const isDataChanged = Object.keys(createDefaultScoutingData()).some(key => {
             const value = (scoutingData as any)[key];
-            const defaultValue = (defaultScoutingData as any)[key];
+            const defaultValue = (createDefaultScoutingData() as any)[key];
             return JSON.stringify(value) !== JSON.stringify(defaultValue);
         });
 
@@ -132,6 +132,10 @@ export function MatchScoutingLayout() {
         };
     }, [location.pathname]);
 
+    useEffect(() => {
+        console.log("scoutingData updated:", scoutingData)
+    }, [scoutingData])
+
     // 5. Event handlers
     const handleSubmit = async () => {
         if (baseDisabled) return
@@ -163,7 +167,7 @@ export function MatchScoutingLayout() {
                     // Reset after local save
                     setSubmitStatus("idle")
                     setScoutingData(JSON.parse(JSON.stringify({
-                        ...defaultScoutingData,
+                        ...createDefaultScoutingData(),
                         scouter: scouterName
                     })))
 
@@ -183,7 +187,7 @@ export function MatchScoutingLayout() {
                 setTimeout(() => {
                     setSubmitStatus("idle")
                     setScoutingData(JSON.parse(JSON.stringify({
-                        ...defaultScoutingData,
+                        ...createDefaultScoutingData(),
                         scouter: scouterName
                     })))
 
@@ -200,7 +204,7 @@ export function MatchScoutingLayout() {
                 if (!allowed) return
                 setSubmitStatus("idle")
                 setScoutingData(JSON.parse(JSON.stringify({
-                    ...defaultScoutingData,
+                    ...createDefaultScoutingData(),
                     scouter: scouterName
                 })))
 
@@ -290,7 +294,7 @@ export function MatchScoutingLayout() {
                             variant="secondary"
                             onClick={() => {
                                 setShowResumeDialog(false);
-                                setScoutingData({...defaultScoutingData, scouter: scouterName});
+                                setScoutingData({...createDefaultScoutingData(), scouter: scouterName});
                                 setPhaseIndex(0);
                             }}
                         >

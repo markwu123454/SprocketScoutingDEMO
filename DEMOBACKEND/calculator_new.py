@@ -10,11 +10,8 @@ from collections import defaultdict
 from calculators.Bayesian_Elo_Calculator import compute_feature_elos
 from calculators.KMeans_Clustering import compute_ai_ratings
 from calculators.Random_Forest_Regressor import predict_all_playable_matches
-import dotenv
 
-dotenv.load_dotenv()
-
-DB_DSN = os.getenv("DATABASE_URL")
+DB_DSN = "postgresql://neondb_owner:npg_zABmb94iDJdn@ep-jolly-darkness-af8t104l-pooler.c-2.us-west-2.aws.neon.tech/neondb?sslmode=require&channel_binding=require"
 
 # ================== Setup ==================
 async def get_connection():
@@ -52,6 +49,7 @@ def summarize_submitted(rows):
         print(f"   Red:  {', '.join(red) if red else '—'}")
         print(f"   Blue: {', '.join(blue) if blue else '—'}\n")
     return grouped
+
 
 
 # ================== Step 2: Fetch scheduled matches ==================
@@ -418,15 +416,25 @@ async def step7_random_forest(per_match_data):
     predicted_count = 0
     for i, match in enumerate(results, start=1):
         match_num = match["match_num"]
+        predicted = match.get("predicted", {})
         for alliance in ["red", "blue"]:
-            for team in match[alliance]:
-                if "predicted" in match and team in match["predicted"][alliance]:
-                    pred = match["predicted"][alliance][team]
-                    # inject into the original match
-                    for mtype, matches in per_match_data.items():
-                        if match_num in matches:
-                            matches[match_num][alliance][team]["ai_prediction"] = pred
-                            break
+            for team, pred in predicted.get(alliance, {}).items():
+                injected = False
+                # inject into existing match if it exists
+                for mtype, matches in per_match_data.items():
+                    if match_num in matches:
+                        matches[match_num][alliance][team]["ai_prediction"] = pred
+                        injected = True
+                        break
+                # create a new future match entry if it doesn't exist yet
+                if not injected:
+                    per_match_data["qm"][match_num] = per_match_data["qm"].get(match_num, {"red": {}, "blue": {}})
+                    per_match_data["qm"][match_num][alliance][team] = {
+                        "score_breakdown": {},
+                        "ai_prediction": pred,
+                    }
+        print(f"  ✓ Cycle {i}/{len(results)} complete → match {match_num} predicted")
+
         predicted_count += 1
         print(f"  ✓ Cycle {i}/{len(results)} complete → match {match_num} predicted")
 
@@ -442,8 +450,235 @@ async def step7_random_forest(per_match_data):
     return per_match_data
 
 
+# ================== Step 8: Scoring Habits ==================
+def step8_habits(submitted_rows):
+    """
+    Derive habits from all matches using auto+teleop branchPlacement.
+    - position_preference: most commonly used reef nodes (A–L)
+    - accuracy_by_level: share of total placements at each level (L2–L4)
+    """
+
+    habits = {}
+
+    for r in submitted_rows:
+        team = str(r["team"])
+        data = r["data"]
+        auto_branches = data.get("auto", {}).get("branchPlacement", {})
+        tele_branches = data.get("teleop", {}).get("branchPlacement", {})
+
+        # Merge both phases
+        all_branches = {**auto_branches, **tele_branches}
+        if not all_branches:
+            continue
+
+        team_habit = habits.setdefault(team, {
+            "position_counts": defaultdict(int),
+            "level_counts": defaultdict(int)
+        })
+
+        for pos_id, levels in all_branches.items():
+            if not isinstance(levels, dict):
+                continue
+            for lvl, filled in levels.items():
+                if filled:
+                    team_habit["position_counts"][pos_id] += 1
+                    team_habit["level_counts"][lvl] += 1
+
+    result = {}
+    for team, stats in habits.items():
+        ranked_positions = sorted(
+            stats["position_counts"].items(), key=lambda x: x[1], reverse=True
+        )
+        total_levels = sum(stats["level_counts"].values()) or 1
+        level_ratios = {
+            lvl: round(cnt / total_levels, 3)
+            for lvl, cnt in stats["level_counts"].items()
+        }
+        result[team] = {
+            "position_preference": ranked_positions,
+            "accuracy_by_level": level_ratios  # actually level usage ratio
+        }
+
+    # Display concise summary
+    print("=== Step 8: Scoring Habits Summary (branch-based) ===\n")
+    for team, res in list(result.items())[:15]:
+        top_positions = ", ".join(f"{p}({c})" for p, c in res["position_preference"][:3])
+        print(f"Team {team}:  top positions → {top_positions}")
+        print(f"             level usage → {res['accuracy_by_level']}\n")
+
+    return result
+
+
+
+
+# ================== Step 9: Collect and Search Results ==================
+def build_search_index(per_match_data, per_team_data, ai_result, habits):
+    """Build searchable summaries combining heuristic, ELO, AI, RF, and Habits data."""
+    index = {"teams": {}, "matches": {}}
+
+    # --- Team summary ---
+    for team, tdata in per_team_data.items():
+        entry = {
+            "elo": tdata.get("elo_featured", {}),
+            "matches": [f"{mtype} {mnum}" for mtype, mnum in tdata.get("match", [])],
+            "ai_cluster": None,
+            "ai_features": {},
+            "habits": habits.get(team, None),   # <-- NEW
+        }
+
+        # --- allow integer keys in ai_result ---
+        team_key = team if team in ai_result.get("team_stats", {}) else int(team) if team.isdigit() and int(team) in ai_result.get("team_stats", {}) else None
+        if team_key is not None:
+            entry["ai_cluster"] = ai_result["team_stats"][team_key].get("cluster")
+            entry["ai_features"] = ai_result["team_stats"][team_key]
+
+        index["teams"][team] = entry
+
+    # --- Match summary ---
+    for mtype, matches in per_match_data.items():
+        for mnum, mdata in matches.items():
+            match_key = f"{mtype} {mnum}"
+            entry = {"red": {}, "blue": {}}
+            for color in ["red", "blue"]:
+                for team, tdata in mdata.get(color, {}).items():
+                    heur = tdata.get("score_breakdown", {})
+                    ai_pred = tdata.get("ai_prediction", {})
+                    entry[color][team] = {
+                        "heuristic": heur,
+                        "ai_prediction": ai_pred,
+                        "total_predicted": ai_pred.get("predicted_total")
+                        if isinstance(ai_pred, dict)
+                        else ai_pred,
+                    }
+            index["matches"][match_key] = entry
+
+    return index
+
+
+def search(index):
+    """Deep-dump search: per-aspect heuristic, actual, and AI comparison."""
+    print("\n================= SEARCH MODE =================")
+    print("Type a team number (e.g. 4201) or match key (e.g. qm 12). Type 'exit' to quit.\n")
+
+    def flatten_heuristics(heur):
+        """Flatten nested heuristic dicts into aspect:value pairs."""
+        flat = {}
+        for phase, vals in heur.items():
+            if isinstance(vals, dict):
+                for k, v in vals.items():
+                    if k != "total":
+                        flat[f"{phase}_{k}"] = v
+        return flat
+
+    def flatten_ai(ai):
+        """Flatten AI prediction dicts similarly."""
+        if not isinstance(ai, dict):
+            return {}
+        return {k: v for k, v in ai.items() if isinstance(v, (int, float))}
+
+    # ========== TEAM SEARCH ==========
+    while True:
+        q = input("Search> ").strip().lower()
+        if q in {"exit", "quit"}:
+            break
+
+        if q in index["teams"]:
+            team = q
+            info = index["teams"][team]
+            print(f"\n================= TEAM {team} =================")
+            print(f"Matches: {', '.join(info['matches']) or '—'}")
+
+            # --- ELO ---
+            print("\n--- FEATURED ELO ---")
+            if info.get("elo"):
+                for k, v in info["elo"].items():
+                    print(f"  {k:15s}: {round(v, 3)}")
+            else:
+                print("  (none)")
+
+            # --- AI Cluster ---
+            print("\n--- AI CLUSTER ---")
+            if info["ai_cluster"] is not None:
+                print(f"  Cluster: {info['ai_cluster']}")
+            else:
+                print("  (no AI data)")
+
+            # --- HABITS ---
+            print("\n--- HABITS ---")
+            hab = info.get("habits")
+            if hab:
+                top_positions = hab["position_preference"][:5]
+                print("  Top positions by attempts:")
+                for pos, count in top_positions:
+                    print(f"    {pos:>3s}: {count}")
+                print("\n  Accuracy by level:")
+                for lvl, acc in hab["accuracy_by_level"].items():
+                    print(f"    {lvl.upper()}: {acc if acc is not None else '—'}")
+            else:
+                print("  (no habit data)")
+
+            # --- MATCH-BY-MATCH ASPECT DUMP ---
+            print("\n--- PER-MATCH ASPECT SUMMARY ---")
+            for match_key in info["matches"]:
+                if match_key not in index["matches"]:
+                    continue
+                match_info = index["matches"][match_key]
+                color = "red" if team in match_info["red"] else "blue" if team in match_info["blue"] else None
+                if not color:
+                    continue
+                team_data = match_info[color][team]
+                heur = flatten_heuristics(team_data.get("heuristic", {}))
+                ai = flatten_ai(team_data.get("ai_prediction", {}))
+                actual = flatten_heuristics(team_data.get("heuristic", {}))  # placeholder if you later add real actuals
+
+                all_keys = sorted(set(heur) | set(actual) | set(ai))
+                print(f"\n[{match_key.upper()}] ({color.upper()} alliance)")
+                for k in all_keys:
+                    hv = heur.get(k, 0)
+                    av = actual.get(k, 0)
+                    iv = ai.get(k, 0)
+                    print(f"  {k:20s}  heuristic={hv:<5}  actual={av:<5}  ai_pred={iv:<5}")
+
+                    # Show predicted total score summary
+                    if "predicted_total" in ai:
+                        print(f"    → Predicted total score: {round(ai['predicted_total'], 2)}")
+
+            print("\n=====================================================\n")
+
+
+
+        # ========== MATCH SEARCH ==========
+        elif q in index["matches"]:
+            m = q
+            info = index["matches"][m]
+            print(f"\n================= MATCH {m.upper()} =================")
+            for color in ["red", "blue"]:
+                print(f"\n{color.upper()} alliance:")
+                for team, s in info[color].items():
+                    heur = flatten_heuristics(s.get("heuristic", {}))
+                    ai = flatten_ai(s.get("ai_prediction", {}))
+                    actual = flatten_heuristics(s.get("heuristic", {}))  # replace if real scores available
+
+                    all_keys = sorted(set(heur) | set(actual) | set(ai))
+                    print(f"\nTeam {team}:")
+                    for k in all_keys:
+                        hv = heur.get(k, 0)
+                        av = actual.get(k, 0)
+                        iv = ai.get(k, 0)
+                        print(f"  {k:20s}  heuristic={hv:<5}  actual={av:<5}  ai_pred={iv:<5}")
+                print()
+            print("=====================================================\n")
+
+        else:
+            print("Not found.\n")
+
+
+
+
 # ================== Main ==================
 async def main():
+    # TODO: change data type to be not per season but per season and be grouped by game features(heat map, placing matrix, etc)
+    # TODO: integrate qualitative data with algorithms
     conn = await get_connection()
     try:
         print("STEP 1: Fetching submitted match scouting data...\n")
@@ -456,21 +691,39 @@ async def main():
 
         print("STEP 3: Checking for unscouted matches...\n")
         find_unscouted(all_matches, submitted_summary)
+        # TODO: add toggle for cleaning strictness
 
         print("STEP 4: Heuristic scoring predictions...\n")
         await step4_predict_scores(submitted_rows)
 
+        print("STEP 8: Analyzing team habits (branch placement)...\n")
+        habits = step8_habits(submitted_rows)
+        # TODO: which cage they climbed at, where ground pickup(heatmap), where coral ground intake
+
         print("STEP 4.5: Filtering incomplete matches...\n")
         submitted_rows = filter_incomplete_matches(submitted_rows)
+        # TODO: make visual report on what is filtered out in messed up date
 
         print("STEP 5: Computing featured ELOs...\n")
         per_team_data, per_match_data = await step5_featured_elo(submitted_rows)
+        # TODO: calculate with different sets of feature combinations and uses
+        # TODO: add qualitative features in elo
 
         print("STEP 6: Computing AI groupings...\n")
-        await step6_ai_ratings(per_match_data)
+        ai_result = await step6_ai_ratings(per_match_data)
+        # TODO: use variace/stdev to see how good the clustering is
+        # TODO: pass variance on performance as a param
 
         print("STEP 7: Predicting match outcomes with Random Forest...\n")
-        await step7_random_forest(per_match_data)
+        per_match_data = await step7_random_forest(per_match_data)
+        # TODO: predict alliance selection and produce picklist
+
+
+
+        print("STEP 9: Building searchable index...\n")
+        index = build_search_index(per_match_data, per_team_data, ai_result, habits)
+        search(index)
+
 
     finally:
         await conn.close()

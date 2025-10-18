@@ -8,6 +8,8 @@ import {Button} from "@/components/ui/button.tsx";
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/components/ui/select.tsx";
 import {useNavigate} from "react-router-dom";
 
+// TODO: add questions for human factor(openness, approachability, etc)
+
 export default function PitScoutingLayout() {
     const navigate = useNavigate()
     const {getTeamBasicInfo, submitPitData} = useAPI()
